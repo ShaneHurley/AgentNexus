@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "change_units",
+    "file_allowlist",
+    "rollback",
+    "unresolved_questions",
+    "verification_commands"
+  ],
+  "properties": {
+    "change_units": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "file", "operation", "summary", "verification"],
+        "properties": {
+          "id": { "type": "string" },
+          "file": { "type": "string" },
+          "operation": { "type": "string", "enum": ["create", "modify", "delete"] },
+          "summary": { "type": "string" },
+          "region": { "type": "string" },
+          "find": { "type": "string" },
+          "replace": { "type": "string" },
+          "content": { "type": "string" },
+          "verification": { "type": "string" },
+          "depends_on": { "type": "array", "items": { "type": "string" } }
+        },
+        "additionalProperties": false
+      }
+    },
+    "file_allowlist": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "verification_commands": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "rollback": {
+      "type": "string"
+    },
+    "unresolved_questions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "skills": { "type": "array", "items": { "type": "string" } },
+    "estimated_tokens": { "type": "integer" }
+  },
+  "additionalProperties": false
+}

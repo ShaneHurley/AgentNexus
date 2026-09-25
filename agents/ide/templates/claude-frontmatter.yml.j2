@@ -1,0 +1,7 @@
+# Claude Code projection extras
+# Variables: name, description, allowedTools, disallowedTools
+
+name: "{{ name }}"
+description: "{{ description }}"
+allowedTools: {{ allowed_tools | default([]) }}
+disallowedTools: {{ disallowed_tools | default(['Write', 'Edit', 'MultiEdit', 'NotebookEdit']) }}

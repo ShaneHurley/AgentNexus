@@ -1,0 +1,217 @@
+{
+  "package": "browser-agent-pack",
+  "version": "3.0.0-federated",
+  "families": [
+    "plans-and-places",
+    "kitchen-cooking",
+    "learning-coach",
+    "writing-studio",
+    "research-desk",
+    "code-crafter",
+    "code-reviewer",
+    "document-reviewer",
+    "mission-control",
+    "thinking-lab"
+  ],
+  "agent_count": 21,
+  "default_paste": [
+    "AGENT_MESSAGE.md",
+    "TASK_PACKET",
+    "evidence"
+  ],
+  "agents": [
+    {
+      "family": "code-crafter",
+      "variant": null,
+      "display_name": "Code Crafter",
+      "path": "code-crafter",
+      "carousel": true,
+      "ide_counterpart": "/daily-coder + ide-bridge",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "code-crafter",
+      "variant": "bridge-handoff",
+      "display_name": "Code Crafter \u2014 Bridge Handoff",
+      "path": "code-crafter/variants/bridge-handoff",
+      "carousel": false,
+      "ide_counterpart": "/daily-coder + ide-bridge",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "code-crafter",
+      "variant": "debug-root-cause",
+      "display_name": "Code Crafter \u2014 Debug Root Cause",
+      "path": "code-crafter/variants/debug-root-cause",
+      "carousel": false,
+      "ide_counterpart": "/daily-coder + ide-bridge",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "code-crafter",
+      "variant": "patch-draft",
+      "display_name": "Code Crafter \u2014 Patch Draft",
+      "path": "code-crafter/variants/patch-draft",
+      "carousel": false,
+      "ide_counterpart": "/daily-coder + ide-bridge",
+      "deprecated_aliases": [
+        "daily-coder",
+        "browser_idea:daily-coder"
+      ]
+    },
+    {
+      "family": "code-crafter",
+      "variant": "rollback-plan",
+      "display_name": "Code Crafter \u2014 Rollback Plan",
+      "path": "code-crafter/variants/rollback-plan",
+      "carousel": false,
+      "ide_counterpart": "/daily-coder + ide-bridge",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "code-crafter",
+      "variant": "self-review-only",
+      "display_name": "Code Crafter \u2014 Self Review Only",
+      "path": "code-crafter/variants/self-review-only",
+      "carousel": false,
+      "ide_counterpart": "/daily-coder + ide-bridge",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "code-crafter",
+      "variant": "test-checklist",
+      "display_name": "Code Crafter \u2014 Test Checklist",
+      "path": "code-crafter/variants/test-checklist",
+      "carousel": false,
+      "ide_counterpart": "/daily-coder + ide-bridge",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "code-reviewer",
+      "variant": null,
+      "display_name": "Code Reviewer",
+      "path": "code-reviewer",
+      "carousel": true,
+      "ide_counterpart": "/code-reviewer",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "code-reviewer",
+      "variant": "diff-adversarial",
+      "display_name": "Code Reviewer \u2014 Diff Adversarial",
+      "path": "code-reviewer/variants/diff-adversarial",
+      "carousel": false,
+      "ide_counterpart": "/code-reviewer",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "code-reviewer",
+      "variant": "pr-checklist",
+      "display_name": "Code Reviewer \u2014 Pr Checklist",
+      "path": "code-reviewer/variants/pr-checklist",
+      "carousel": false,
+      "ide_counterpart": "/code-reviewer",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "code-reviewer",
+      "variant": "regression-hunt",
+      "display_name": "Code Reviewer \u2014 Regression Hunt",
+      "path": "code-reviewer/variants/regression-hunt",
+      "carousel": false,
+      "ide_counterpart": "/code-reviewer",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "code-reviewer",
+      "variant": "security-focus",
+      "display_name": "Code Reviewer \u2014 Security Focus",
+      "path": "code-reviewer/variants/security-focus",
+      "carousel": false,
+      "ide_counterpart": "/code-reviewer",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "code-reviewer",
+      "variant": "test-gap",
+      "display_name": "Code Reviewer \u2014 Test Gap",
+      "path": "code-reviewer/variants/test-gap",
+      "carousel": false,
+      "ide_counterpart": "/code-reviewer",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "document-reviewer",
+      "variant": null,
+      "display_name": "Document Reviewer",
+      "path": "document-reviewer",
+      "carousel": true,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "document-reviewer",
+      "variant": "academic-integrity",
+      "display_name": "Document Reviewer \u2014 Academic Integrity",
+      "path": "document-reviewer/variants/academic-integrity",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "document-reviewer",
+      "variant": "audience-clarity",
+      "display_name": "Document Reviewer \u2014 Audience Clarity",
+      "path": "document-reviewer/variants/audience-clarity",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "document-reviewer",
+      "variant": "claims-evidence",
+      "display_name": "Document Reviewer \u2014 Claims Evidence",
+      "path": "document-reviewer/variants/claims-evidence",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "document-reviewer",
+      "variant": "docx-adversarial",
+      "display_name": "Document Reviewer \u2014 Docx Adversarial",
+      "path": "document-reviewer/variants/docx-adversarial",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "document-reviewer",
+      "variant": "pdf-adversarial",
+      "display_name": "Document Reviewer \u2014 Pdf Adversarial",
+      "path": "document-reviewer/variants/pdf-adversarial",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "document-reviewer",
+      "variant": "policy-compliance",
+      "display_name": "Document Reviewer \u2014 Policy Compliance",
+      "path": "document-reviewer/variants/policy-compliance",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "document-reviewer",
+      "variant": "spec-completeness",
+      "display_name": "Document Reviewer \u2014 Spec Completeness",
+      "path": "document-reviewer/variants/spec-completeness",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    }
+  ],
+  "manifest_index": "shared/browser/MANIFEST.index.json"
+}

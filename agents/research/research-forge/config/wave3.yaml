@@ -1,0 +1,20 @@
+# Wave 3 scrutiny defaults (mock-by-default)
+cost_estimate_usd: 0.35
+
+skeptic:
+  max_rounds: 3
+
+followup:
+  max_rounds: 1
+  high_stakes_second_round_budget_usd: 0.5
+
+auditor:
+  sample_rate: 0.25
+
+calibration:
+  severity_thresholds:
+    critical_min_score: 0.85
+    major_min_score: 0.65
+
+scrutiny_suite:
+  task_id: w3-exit-001

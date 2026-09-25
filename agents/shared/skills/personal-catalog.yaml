@@ -1,0 +1,88 @@
+version: "0.1.0"
+resident_max: 8
+skills:
+  - id: study-hints
+    path: personal/study-hints/SKILL.md
+    resident: true
+    triggers:
+      - study
+      - quiz
+      - flashcard
+      - homework hint
+      - explain concept
+    anti_triggers:
+      - write my exam answers
+      - cheat
+    permissions: [read]
+    side_effects: none
+    status: active
+  - id: professor-email
+    path: personal/professor-email/SKILL.md
+    resident: true
+    triggers:
+      - email professor
+      - email TA
+      - office hours email
+    anti_triggers:
+      - send email without review
+    permissions: [read]
+    side_effects: draft_only
+    calls: [writing-improver]
+    status: active
+  - id: writing-improver
+    path: shared/writing-improver/SKILL.md
+    resident: true
+    shared: true
+    triggers:
+      - rewrite
+      - proofread
+      - tone
+      - improve writing
+      - documentation polish
+    anti_triggers:
+      - invent documentation without sources
+    permissions: [read]
+    side_effects: draft_only
+    status: active
+  - id: career-tools
+    path: personal/career-tools/SKILL.md
+    resident: true
+    modes: [accomplishment, resume-tailor, opportunity-review, interview-prep]
+    triggers:
+      - accomplishment
+      - resume
+      - interview prep
+      - job opportunity
+    anti_triggers:
+      - invent metrics
+      - leak confidential
+    permissions: [read, personal_store_confirm]
+    side_effects: store_with_confirm
+    status: active
+  - id: lab-preflight
+    path: personal/lab-preflight/SKILL.md
+    resident: false
+    phase: 2
+    triggers:
+      - lab prep
+      - preflight
+      - lab checklist
+    anti_triggers:
+      - invent pinouts
+    permissions: [read]
+    side_effects: none
+    status: experimental
+  - id: deadline-triage
+    path: personal/deadline-triage/SKILL.md
+    resident: false
+    phase: 2
+    triggers:
+      - deadline triage
+      - what is due
+      - prioritize deadlines
+    anti_triggers:
+      - replace my calendar
+      - schedule my life
+    permissions: [read]
+    side_effects: none
+    status: experimental

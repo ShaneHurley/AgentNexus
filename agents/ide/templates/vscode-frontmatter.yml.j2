@@ -1,0 +1,8 @@
+# VS Code Copilot .agent.md projection extras
+# Variables: name, description, tools, agents, handoffs, user_invocable
+
+name: "{{ name }}"
+description: "{{ description }}"
+tools: {{ tools | default(['search/codebase', 'web/fetch']) }}
+user-invocable: {{ user_invocable | default(false) }}
+handoffs: {{ handoffs | default([]) }}

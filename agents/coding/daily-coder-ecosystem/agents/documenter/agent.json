@@ -1,0 +1,15 @@
+{
+  "id": "documenter",
+  "model_tier": "lowest",
+  "job": "Document only reviewed, observed changes.",
+  "tools": [
+    "filesystem.read",
+    "filesystem.write",
+    "patch.apply",
+    "repository.diff"
+  ],
+  "output_schema": "documentation",
+  "max_output_tokens": 1600,
+  "max_retries": 1,
+  "write_scope": "documenter"
+}

@@ -1,0 +1,17 @@
+{
+  "id": "code_reviewer",
+  "model_tier": "high",
+  "job": "Review the actual diff adversarially before author commentary.",
+  "tools": [
+    "filesystem.read",
+    "filesystem.search",
+    "repository.diff",
+    "repository.status",
+    "github.repo.metadata",
+    "github.pull.list"
+  ],
+  "output_schema": "review",
+  "max_output_tokens": 3500,
+  "max_retries": 1,
+  "write_scope": "none"
+}

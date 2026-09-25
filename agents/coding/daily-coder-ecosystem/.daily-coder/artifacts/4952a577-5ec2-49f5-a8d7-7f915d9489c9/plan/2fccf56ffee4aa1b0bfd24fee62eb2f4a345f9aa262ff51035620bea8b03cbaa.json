@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "run_id": "4952a577-5ec2-49f5-a8d7-7f915d9489c9",
+  "kind": "plan",
+  "producer_role": "planner",
+  "created_at": 1790100706.6148052,
+  "payload": {
+    "change_units": [],
+    "file_allowlist": [],
+    "verification_commands": [],
+    "rollback": "No changes to roll back.",
+    "unresolved_questions": []
+  }
+}

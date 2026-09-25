@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "run_id": "995d17be-4951-4ac7-974d-9c27a82aef11",
+  "kind": "test_execute",
+  "producer_role": "test_executor",
+  "created_at": 1790102857.8947458,
+  "payload": {
+    "verdict": "pass",
+    "commands": [],
+    "evidence": [
+      "Mock orchestration contract only"
+    ],
+    "limitations": [
+      "No repository tests executed"
+    ]
+  }
+}

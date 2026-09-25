@@ -1,0 +1,798 @@
+{
+  "schema_version": "research-draft/1.0",
+  "status": "PARTIAL",
+  "topic": "NOW verification, easy NEXT implementation, and roadmap issue additions (ai_agents monorepo)",
+  "decision": "Verify shipped NOW items with a code-and-doc audit matrix (not pytest-only): treat REC-02, REC-04, and REC-06 as PARTIAL until checklist GitHub table alignment, docker sandbox test, and dashboard RF resume tests exist. Close doc false negatives (RF CLI resume) before expanding scope. Implement NEXT easy wins in order: Agents GUI trio (CSS whitespace reset on .agent-card, status-line separation, in-card local-hint) as the difficulty exemplar (~30 min–half day); then LIVE_PROVIDERS drift guard (CI equality or import); REC-DASH-TOKEN-ENV (env/file over argv for Daily Coder serve); optional root CI ruff/mypy mirroring research-forge package CI. Add new roadmap IDs for resume gate parity, resume test, doc truth, token env wiring, button wrap, and security checklist L47.",
+  "audience": "Monorepo maintainers and research orchestration parent (Recommendation Scorer next)",
+  "scope": {
+    "workspace": "C:\\Users\\WZ69B7\\Downloads\\ai_agents",
+    "packages": ["research-forge", "agent-dashboard", "daily-coder-ecosystem", "docs"],
+    "research_questions": ["RQ1 NOW verification", "RQ2 RF resume truth vs docs", "RQ3 Agents GUI legibility", "RQ4 LIVE_PROVIDERS drift", "RQ5 token delivery", "RQ6 CI ruff/mypy parity", "RQ7 live/resume gate asymmetry"],
+    "out_of_scope": ["Recommendation scoring", "Live RF search at scale", "Spawning subagents", "Runtime pytest re-execution on integrator host"]
+  },
+  "freshness_boundary": "Repository tree and lane reports accessed 2026-09-22; no fresh pytest run on integrator host this session.",
+  "corpus_counts": {
+    "processed_sources": 18,
+    "unique_lineages": 8,
+    "unprocessed_items": 3,
+    "lanes_complete": 6,
+    "lanes_partial": 1
+  },
+  "sources": [
+    {
+      "id": "SRC-LANE-INTERNAL",
+      "lineage_id": "LIN-INTERNAL",
+      "title": "Internal lane summary (COMPLETE)",
+      "url": null,
+      "author_or_publisher": "Deep research internal lane",
+      "date_or_version": "2026-09-22",
+      "source_class": "INTERNAL_AUDIT",
+      "access_class": "INTERNAL",
+      "output_handling": "CITE_ONLY"
+    },
+    {
+      "id": "SRC-LANE-OFFICIAL",
+      "lineage_id": "LIN-OFFICIAL",
+      "title": "Official lane summary (COMPLETE)",
+      "url": null,
+      "author_or_publisher": "Deep research official lane",
+      "date_or_version": "2026-09-22",
+      "source_class": "OFFICIAL_GUIDANCE",
+      "access_class": "PUBLIC",
+      "output_handling": "CITE_ONLY",
+      "limitations": ["Lane cites 12-factor, CWE-214, CircleCI, OWASP, WCAG, Ruff, mypy/GHA without per-URL fetch in integrator pass"]
+    },
+    {
+      "id": "SRC-LANE-ACADEMIC",
+      "lineage_id": "LIN-ACADEMIC",
+      "title": "Academic lane summary (PARTIAL)",
+      "url": null,
+      "author_or_publisher": "Deep research academic lane",
+      "date_or_version": "2026-09-22",
+      "source_class": "ACADEMIC",
+      "access_class": "PUBLIC",
+      "output_handling": "CITE_ONLY",
+      "limitations": ["Cockburn 2002 legible elision — weak RQ3 support only"]
+    },
+    {
+      "id": "SRC-LANE-PRACTITIONER",
+      "lineage_id": "LIN-PRACTITIONER",
+      "title": "Practitioner lane summary (COMPLETE)",
+      "url": null,
+      "author_or_publisher": "Deep research practitioner lane",
+      "date_or_version": "2026-09-22",
+      "source_class": "PRACTITIONER",
+      "access_class": "PUBLIC",
+      "output_handling": "CITE_ONLY"
+    },
+    {
+      "id": "SRC-LANE-FAILURE",
+      "lineage_id": "LIN-FAILURE",
+      "title": "Failure / unfavorable lane summary (COMPLETE)",
+      "url": null,
+      "author_or_publisher": "Deep research failure lane",
+      "date_or_version": "2026-09-22",
+      "source_class": "ADVERSARIAL_REVIEW",
+      "access_class": "INTERNAL",
+      "output_handling": "CITE_ONLY"
+    },
+    {
+      "id": "SRC-LANE-ALTERNATIVES",
+      "lineage_id": "LIN-ALTERNATIVES",
+      "title": "Alternatives lane summary (COMPLETE)",
+      "url": null,
+      "author_or_publisher": "Deep research alternatives lane",
+      "date_or_version": "2026-09-22",
+      "source_class": "DESIGN_ALTERNATIVES",
+      "access_class": "INTERNAL",
+      "output_handling": "CITE_ONLY"
+    },
+    {
+      "id": "SRC-LANE-TARGETED-GAP",
+      "lineage_id": "LIN-TARGETED-GAP",
+      "title": "Targeted gap lane summary (COMPLETE)",
+      "url": null,
+      "author_or_publisher": "Deep research targeted gap lane",
+      "date_or_version": "2026-09-22",
+      "source_class": "INTERNAL_AUDIT",
+      "access_class": "INTERNAL",
+      "output_handling": "CITE_ONLY"
+    },
+    {
+      "id": "SRC-REPO-RF-CLI",
+      "lineage_id": "LIN-REPO-SNAPSHOT",
+      "title": "research-forge cli.py resume/status",
+      "url": "file://research-forge/src/research_forge/cli.py",
+      "author_or_publisher": "ai_agents monorepo",
+      "date_or_version": "2026-09-22 snapshot",
+      "source_class": "PRIMARY_CODE",
+      "access_class": "INTERNAL",
+      "output_handling": "QUOTE"
+    },
+    {
+      "id": "SRC-REPO-DASH-ADAPTERS",
+      "lineage_id": "LIN-REPO-SNAPSHOT",
+      "title": "agent-dashboard adapters (research_forge, daily_coder)",
+      "url": "file://agent-dashboard/agent_dashboard/adapters/",
+      "author_or_publisher": "ai_agents monorepo",
+      "date_or_version": "2026-09-22 snapshot",
+      "source_class": "PRIMARY_CODE",
+      "access_class": "INTERNAL",
+      "output_handling": "QUOTE"
+    },
+    {
+      "id": "SRC-REPO-DASH-UI",
+      "lineage_id": "LIN-REPO-SNAPSHOT",
+      "title": "agent-dashboard web styles.css, agents.js",
+      "url": "file://agent-dashboard/agent_dashboard/web/",
+      "author_or_publisher": "ai_agents monorepo",
+      "date_or_version": "2026-09-22 snapshot",
+      "source_class": "PRIMARY_CODE",
+      "access_class": "INTERNAL",
+      "output_handling": "QUOTE"
+    },
+    {
+      "id": "SRC-REPO-DC-REGISTRY",
+      "lineage_id": "LIN-REPO-SNAPSHOT",
+      "title": "daily_coder.providers.registry LIVE_PROVIDERS",
+      "url": "file://daily-coder-ecosystem/daily_coder/providers/registry.py",
+      "author_or_publisher": "ai_agents monorepo",
+      "date_or_version": "2026-09-22 snapshot",
+      "source_class": "PRIMARY_CODE",
+      "access_class": "INTERNAL",
+      "output_handling": "QUOTE"
+    },
+    {
+      "id": "SRC-REPO-CI",
+      "lineage_id": "LIN-REPO-SNAPSHOT",
+      "title": "GitHub Actions CI workflows (root vs research-forge)",
+      "url": "file://.github/workflows/ci.yml",
+      "author_or_publisher": "ai_agents monorepo",
+      "date_or_version": "2026-09-22 snapshot",
+      "source_class": "PRIMARY_CODE",
+      "access_class": "INTERNAL",
+      "output_handling": "QUOTE"
+    },
+    {
+      "id": "SRC-REPO-DOCS-ROADMAP",
+      "lineage_id": "LIN-REPO-SNAPSHOT",
+      "title": "docs/build-roadmap.md NOW/NEXT tables",
+      "url": "file://docs/build-roadmap.md",
+      "author_or_publisher": "ai_agents monorepo",
+      "date_or_version": "2026-09-22 snapshot",
+      "source_class": "INTERNAL_DOC",
+      "access_class": "INTERNAL",
+      "output_handling": "QUOTE"
+    },
+    {
+      "id": "SRC-REPO-SEC-CHK",
+      "lineage_id": "LIN-REPO-SNAPSHOT",
+      "title": "research-forge security-review-checklist.md",
+      "url": "file://research-forge/docs/security-review-checklist.md",
+      "author_or_publisher": "ai_agents monorepo",
+      "date_or_version": "2026-09-22 snapshot",
+      "source_class": "INTERNAL_DOC",
+      "access_class": "INTERNAL",
+      "output_handling": "QUOTE"
+    },
+    {
+      "id": "SRC-REPO-ENV-EX",
+      "lineage_id": "LIN-REPO-SNAPSHOT",
+      "title": "Root .env.example",
+      "url": "file://.env.example",
+      "author_or_publisher": "ai_agents monorepo",
+      "date_or_version": "2026-09-22 snapshot",
+      "source_class": "INTERNAL_DOC",
+      "access_class": "INTERNAL",
+      "output_handling": "QUOTE"
+    },
+    {
+      "id": "SRC-REPO-RF-TESTS",
+      "lineage_id": "LIN-REPO-SNAPSHOT",
+      "title": "research-forge tests/test_cli.py resume coverage",
+      "url": "file://research-forge/tests/test_cli.py",
+      "author_or_publisher": "ai_agents monorepo",
+      "date_or_version": "2026-09-22 snapshot",
+      "source_class": "PRIMARY_CODE",
+      "access_class": "INTERNAL",
+      "output_handling": "QUOTE"
+    },
+    {
+      "id": "SRC-REPO-DASH-TESTS",
+      "lineage_id": "LIN-REPO-SNAPSHOT",
+      "title": "agent-dashboard tests (smoke; no resume test)",
+      "url": "file://agent-dashboard/tests/test_smoke.py",
+      "author_or_publisher": "ai_agents monorepo",
+      "date_or_version": "2026-09-22 snapshot",
+      "source_class": "PRIMARY_CODE",
+      "access_class": "INTERNAL",
+      "output_handling": "QUOTE"
+    },
+    {
+      "id": "SRC-REPO-ARCH-DOCS",
+      "lineage_id": "LIN-REPO-SNAPSHOT",
+      "title": "docs/architecture-overview.md, research-forge-deep-dive.md stale resume claims",
+      "url": "file://docs/",
+      "author_or_publisher": "ai_agents monorepo",
+      "date_or_version": "2026-09-22 snapshot",
+      "source_class": "INTERNAL_DOC",
+      "access_class": "INTERNAL",
+      "output_handling": "CITE_ONLY"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "EV-CLI-RESUME-IMPL",
+      "source_id": "SRC-REPO-RF-CLI",
+      "lineage_id": "LIN-REPO-SNAPSHOT",
+      "locator": "cli.py resume command ~L121-174",
+      "observation": "CLI `resume` loads persisted state, applies `validate_decisions_for_gate` when `use_live`, invokes `Wave1Orchestrator.resume`, persists on success.",
+      "limitations": ["Integrator did not execute CLI on host"]
+    },
+    {
+      "id": "EV-CLI-TESTS-RESUME",
+      "source_id": "SRC-REPO-RF-TESTS",
+      "lineage_id": "LIN-REPO-SNAPSHOT",
+      "locator": "test_persist_and_cli_resume_status, test_resume_missing_run_not_found",
+      "observation": "Package tests cover happy-path CLI resume and missing-run exit 2; cache lists test_resume_not_implemented_json but not present in current test_cli.py body read.",
+      "limitations": ["pytest not re-run 2026-09-22 on integrator host"]
+    },
+    {
+      "id": "EV-DOC-STALE-RESUME",
+      "source_id": "SRC-REPO-ARCH-DOCS",
+      "lineage_id": "LIN-REPO-SNAPSHOT",
+      "locator": "docs/build-roadmap.md L188; architecture-overview.md L169; research-forge-deep-dive.md L312",
+      "observation": "Portfolio docs still state CLI resume NOT_IMPLEMENTED while cli.py implements resume.",
+      "limitations": []
+    },
+    {
+      "id": "EV-DASH-RF-SOFT-RESUME",
+      "source_id": "SRC-REPO-DASH-ADAPTERS",
+      "lineage_id": "LIN-REPO-SNAPSHOT",
+      "locator": "research_forge.py resume ~L207-253",
+      "observation": "On FileNotFoundError for state, adapter returns accepted=True with hint and inbox note; does not surface hard failure. Orchestrator path skips CLI `validate_decisions_for_gate`.",
+      "limitations": []
+    },
+    {
+      "id": "EV-DASH-DC-ARGV-TOKEN",
+      "source_id": "SRC-REPO-DASH-ADAPTERS",
+      "lineage_id": "LIN-REPO-SNAPSHOT",
+      "locator": "daily_coder.py _serve_command ~L279-290; start_backend ~L188-193",
+      "observation": "Managed Daily Coder serve passes `--token` on argv; comment notes intentional avoidance of env leak to child.",
+      "limitations": []
+    },
+    {
+      "id": "EV-ENV-DASH-TOKEN-UNWIRED",
+      "source_id": "SRC-REPO-ENV-EX",
+      "lineage_id": "LIN-REPO-SNAPSHOT",
+      "locator": ".env.example L17",
+      "observation": "AGENT_DASHBOARD_TOKEN documented in .env.example; server.py loads token from CLI/config path, not this env var in integrator read.",
+      "limitations": ["Did not exhaust all env load paths"]
+    },
+    {
+      "id": "EV-LIVE-PROVIDERS-DUP",
+      "source_id": "SRC-REPO-DC-REGISTRY",
+      "lineage_id": "LIN-REPO-SNAPSHOT",
+      "locator": "registry.py LIVE_PROVIDERS; daily_coder.py L18-21 frozenset",
+      "observation": "Two definitions list same seven live provider names; dashboard copy carries sync comment.",
+      "limitations": ["Sets not programmatically diffed at runtime"]
+    },
+    {
+      "id": "EV-GUI-NOWRAP-SIDEBAR",
+      "source_id": "SRC-REPO-DASH-UI",
+      "lineage_id": "LIN-REPO-SNAPSHOT",
+      "locator": "styles.css L44 grid 280px; L190 button white-space nowrap; agents.js L32-35 card markup",
+      "observation": "Global button nowrap applies to .agent-card buttons; narrow sidebar; description and status share card with status-line concatenating message after em dash.",
+      "limitations": ["No browser screenshot in integrator pass"]
+    },
+    {
+      "id": "EV-GUI-HINT-ORPHAN",
+      "source_id": "SRC-REPO-DASH-UI",
+      "lineage_id": "LIN-REPO-SNAPSHOT",
+      "locator": "agents.js L41",
+      "observation": "Research Forge shows `no server needed` span in agent-actions row outside the card button.",
+      "limitations": []
+    },
+    {
+      "id": "EV-CI-ROOT-NO-RUFF",
+      "source_id": "SRC-REPO-CI",
+      "lineage_id": "LIN-REPO-SNAPSHOT",
+      "locator": ".github/workflows/ci.yml vs research-forge/.github/workflows/ci.yml",
+      "observation": "Root CI runs pytest/unittest only; research-forge package workflow runs ruff, mypy, pytest.",
+      "limitations": []
+    },
+    {
+      "id": "EV-SEC-CHK-L47-OPEN",
+      "source_id": "SRC-REPO-SEC-CHK",
+      "lineage_id": "LIN-REPO-SNAPSHOT",
+      "locator": "security-review-checklist.md L47",
+      "observation": "Unchecked item: live resume requires same live-mode decision gate as run --live.",
+      "limitations": []
+    },
+    {
+      "id": "EV-NO-DOCKER-TEST",
+      "source_id": "SRC-REPO-RF-TESTS",
+      "lineage_id": "LIN-REPO-SNAPSHOT",
+      "locator": "research-forge/tests grep RF_EXPERIMENT_SANDBOX",
+      "observation": "No test reference to RF_EXPERIMENT_SANDBOX/docker in tests tree per integrator search.",
+      "limitations": []
+    },
+    {
+      "id": "EV-NO-DASH-RESUME-TEST",
+      "source_id": "SRC-REPO-DASH-TESTS",
+      "lineage_id": "LIN-REPO-SNAPSHOT",
+      "locator": "agent-dashboard/tests/test_smoke.py",
+      "observation": "Smoke tests cover RF start/thread/doctor paths; no adapter.resume integration test found.",
+      "limitations": []
+    },
+    {
+      "id": "EV-LANE-GUI-EFFORT",
+      "source_id": "SRC-LANE-PRACTITIONER",
+      "lineage_id": "LIN-PRACTITIONER",
+      "locator": "Practitioner lane summary",
+      "observation": "Practitioner estimates GUI whitespace reset first; ~30 min to half day for sidebar legibility fixes.",
+      "limitations": ["Heuristic not measured in repo"]
+    },
+    {
+      "id": "EV-LANE-TOKEN-POLICY",
+      "source_id": "SRC-LANE-OFFICIAL",
+      "lineage_id": "LIN-OFFICIAL",
+      "locator": "Official lane summary",
+      "observation": "Official lane: prefer env/file over argv (12-factor, CWE-214); OWASP favors file/manager over env in hardened deploys.",
+      "limitations": ["Integrator did not re-fetch primary standards text"]
+    },
+    {
+      "id": "EV-LANE-WCAG-TRUNC",
+      "source_id": "SRC-LANE-OFFICIAL",
+      "lineage_id": "LIN-OFFICIAL",
+      "locator": "Official lane summary",
+      "observation": "WCAG-oriented guidance: truncation acceptable only if full text recoverable; title alone insufficient.",
+      "limitations": []
+    },
+    {
+      "id": "EV-LANE-DOC-FN-SEV",
+      "source_id": "SRC-LANE-FAILURE",
+      "lineage_id": "LIN-FAILURE",
+      "locator": "Failure lane summary",
+      "observation": "Failure lane rates doc false negatives high severity; soft-accept dashboard resume without state; argv token risk; live gate asymmetry.",
+      "limitations": []
+    },
+    {
+      "id": "EV-LANE-ADAPTER-SKIP-PREFLIGHT",
+      "source_id": "SRC-LANE-TARGETED-GAP",
+      "lineage_id": "LIN-TARGETED-GAP",
+      "locator": "Targeted gap lane summary",
+      "observation": "Daily Coder adapter reported to skip CLI preflight gate; orchestrator still gates live via validate_live_contract.",
+      "limitations": ["Preflight skip not re-traced line-by-line in integrator pass"]
+    },
+    {
+      "id": "EV-LANE-COCKBURN-RQ3",
+      "source_id": "SRC-LANE-ACADEMIC",
+      "lineage_id": "LIN-ACADEMIC",
+      "locator": "Academic lane summary",
+      "observation": "Cockburn 2002 legible elision inadvisable — weak support for wrap/disclosure over mashed truncated text (RQ3 only).",
+      "limitations": ["Partial lane; not primary for security/CI claims"]
+    },
+    {
+      "id": "EV-LANE-REGISTRY-CI",
+      "source_id": "SRC-LANE-PRACTITIONER",
+      "lineage_id": "LIN-PRACTITIONER",
+      "locator": "Practitioner lane summary",
+      "observation": "Registry drift mitigation options: CI equality test, API introspection, or import from registry module.",
+      "limitations": []
+    },
+    {
+      "id": "EV-LANE-RUFF-MYPY",
+      "source_id": "SRC-LANE-OFFICIAL",
+      "lineage_id": "LIN-OFFICIAL",
+      "locator": "Official lane summary",
+      "observation": "Ruff/mypy official posture: required exit in quality job; optional via GHA continue-on-error pattern.",
+      "limitations": []
+    },
+    {
+      "id": "EV-ROADMAP-NOW-PARTIAL",
+      "source_id": "SRC-LANE-INTERNAL",
+      "lineage_id": "LIN-INTERNAL",
+      "locator": "Internal lane NOW partials",
+      "observation": "Internal lane marks REC-02 partial (checklist GitHub table drift), REC-06 partial (no dashboard resume test), REC-04 partial (no docker sandbox test).",
+      "limitations": []
+    }
+  ],
+  "claims": [
+    {
+      "id": "CL-001",
+      "text": "[Observation] RF CLI `resume` and `status` are implemented in code with persistence and live gate on CLI path when `--live` or meta.live.",
+      "classification": "CONFIRMED",
+      "kind": "observation",
+      "supporting_evidence_ids": ["EV-CLI-RESUME-IMPL", "EV-CLI-TESTS-RESUME"],
+      "contradicting_evidence_ids": []
+    },
+    {
+      "id": "CL-002",
+      "text": "[Observation] Portfolio docs (build-roadmap Future table, architecture-overview, deep-dive) still claim CLI resume NOT_IMPLEMENTED.",
+      "classification": "CONFIRMED",
+      "kind": "observation",
+      "supporting_evidence_ids": ["EV-DOC-STALE-RESUME"],
+      "contradicting_evidence_ids": []
+    },
+    {
+      "id": "CL-003",
+      "text": "[Inference] Doc false negatives on resume mislead operators and violate build-roadmap 'code wins' policy until REC-DOCS-RF-RESUME-TRUTH (or equivalent) lands.",
+      "classification": "CORROBORATED",
+      "kind": "inference",
+      "supporting_evidence_ids": ["EV-DOC-STALE-RESUME", "EV-LANE-DOC-FN-SEV", "EV-ROADMAP-NOW-PARTIAL"],
+      "contradicting_evidence_ids": []
+    },
+    {
+      "id": "CL-004",
+      "text": "[Observation] Dashboard RF adapter resume soft-accepts missing persisted state (accepted=True + hint) and does not call CLI live decision gate.",
+      "classification": "CONFIRMED",
+      "kind": "observation",
+      "supporting_evidence_ids": ["EV-DASH-RF-SOFT-RESUME"],
+      "contradicting_evidence_ids": []
+    },
+    {
+      "id": "CL-005",
+      "text": "[Inference] Live/resume policy parity gap remains open per security checklist L47 and adapter vs CLI asymmetry.",
+      "classification": "CORROBORATED",
+      "kind": "inference",
+      "supporting_evidence_ids": ["EV-SEC-CHK-L47-OPEN", "EV-DASH-RF-SOFT-RESUME", "EV-CLI-RESUME-IMPL", "EV-LANE-DOC-FN-SEV"],
+      "contradicting_evidence_ids": []
+    },
+    {
+      "id": "CL-006",
+      "text": "[Observation] Agents sidebar legibility issue plausibly driven by global `button { white-space: nowrap }` on `.agent-card` within 280px column plus inline status concatenation.",
+      "classification": "CORROBORATED",
+      "kind": "observation",
+      "supporting_evidence_ids": ["EV-GUI-NOWRAP-SIDEBAR", "EV-LANE-GUI-EFFORT"],
+      "contradicting_evidence_ids": []
+    },
+    {
+      "id": "CL-007",
+      "text": "[Inference] First GUI fix should reset whitespace/wrap on agent cards before wider layout options (Alternatives A–E); aligns with practitioner effort band and low server-side risk.",
+      "classification": "SUPPORTED",
+      "kind": "inference",
+      "supporting_evidence_ids": ["EV-GUI-NOWRAP-SIDEBAR", "EV-LANE-GUI-EFFORT"],
+      "contradicting_evidence_ids": []
+    },
+    {
+      "id": "CL-008",
+      "text": "[Observation] LIVE_PROVIDERS is duplicated between daily_coder registry and dashboard adapter with manual sync comment; sets currently match by name.",
+      "classification": "CONFIRMED",
+      "kind": "observation",
+      "supporting_evidence_ids": ["EV-LIVE-PROVIDERS-DUP"],
+      "contradicting_evidence_ids": []
+    },
+    {
+      "id": "CL-009",
+      "text": "[Inference] Drift risk is latent until registry changes without dashboard update; CI equality or import is preferred cheap guard.",
+      "classification": "SUPPORTED",
+      "kind": "inference",
+      "supporting_evidence_ids": ["EV-LIVE-PROVIDERS-DUP", "EV-LANE-REGISTRY-CI"],
+      "contradicting_evidence_ids": []
+    },
+    {
+      "id": "CL-010",
+      "text": "[Observation] Daily Coder managed serve passes API token via argv; AGENT_DASHBOARD_TOKEN in root .env.example is not wired to dashboard serve entry in integrator read.",
+      "classification": "CONFIRMED",
+      "kind": "observation",
+      "supporting_evidence_ids": ["EV-DASH-DC-ARGV-TOKEN", "EV-ENV-DASH-TOKEN-UNWIRED"],
+      "contradicting_evidence_ids": []
+    },
+    {
+      "id": "CL-011",
+      "text": "[Inference] Token delivery should move toward env/file for Daily Coder serve while weighing OWASP file/manager preference vs 12-factor env for local dev.",
+      "classification": "SUPPORTED",
+      "kind": "inference",
+      "supporting_evidence_ids": ["EV-LANE-TOKEN-POLICY", "EV-DASH-DC-ARGV-TOKEN"],
+      "contradicting_evidence_ids": ["EV-LANE-TOKEN-POLICY"]
+    },
+    {
+      "id": "CL-012",
+      "text": "[Observation] Root monorepo CI does not run ruff/mypy; research-forge package CI does.",
+      "classification": "CONFIRMED",
+      "kind": "observation",
+      "supporting_evidence_ids": ["EV-CI-ROOT-NO-RUFF"],
+      "contradicting_evidence_ids": []
+    },
+    {
+      "id": "CL-013",
+      "text": "[Inference] Optional root job mirroring RF quality steps is low-cost NEXT; strict vs continue-on-error is policy choice per official lane.",
+      "classification": "SUPPORTED",
+      "kind": "inference",
+      "supporting_evidence_ids": ["EV-CI-ROOT-NO-RUFF", "EV-LANE-RUFF-MYPY"],
+      "contradicting_evidence_ids": []
+    },
+    {
+      "id": "CL-014",
+      "text": "[Observation] REC-04 docker sandbox and REC-06 dashboard resume lack automated tests in integrator search; REC-02 checklist has open GitHub-related rows vs shipped GH features.",
+      "classification": "CORROBORATED",
+      "kind": "observation",
+      "supporting_evidence_ids": ["EV-NO-DOCKER-TEST", "EV-NO-DASH-RESUME-TEST", "EV-ROADMAP-NOW-PARTIAL", "EV-SEC-CHK-L47-OPEN"],
+      "contradicting_evidence_ids": []
+    },
+    {
+      "id": "CL-015",
+      "text": "[Inference] NOW band items REC-02, REC-04, REC-06 should be verified PARTIAL in roadmap truth table until tests/checklist alignment complete.",
+      "classification": "SUPPORTED",
+      "kind": "inference",
+      "supporting_evidence_ids": ["EV-ROADMAP-NOW-PARTIAL", "EV-NO-DOCKER-TEST", "EV-NO-DASH-RESUME-TEST"],
+      "contradicting_evidence_ids": []
+    },
+    {
+      "id": "CL-016",
+      "text": "[Inference] WCAG-aligned UI should provide full text via wrap, title+aria, or disclosure—not title-only ellipsis for description/status.",
+      "classification": "SUPPORTED",
+      "kind": "inference",
+      "supporting_evidence_ids": ["EV-LANE-WCAG-TRUNC", "EV-GUI-NOWRAP-SIDEBAR"],
+      "contradicting_evidence_ids": []
+    },
+    {
+      "id": "CL-017",
+      "text": "[Inference] Cockburn legible-elision literature weakly supports disclosure/wrap for RQ3 only; N/A to token/CI/resume gates.",
+      "classification": "SUPPORTED",
+      "kind": "inference",
+      "supporting_evidence_ids": ["EV-LANE-COCKBURN-RQ3"],
+      "contradicting_evidence_ids": []
+    },
+    {
+      "id": "CL-018",
+      "text": "[Observation] Daily Coder live path uses dashboard UI confirm; adapter does not invoke same CLI preflight as daily-coder CLI for all gates (targeted gap lane).",
+      "classification": "CORROBORATED",
+      "kind": "observation",
+      "supporting_evidence_ids": ["EV-LANE-ADAPTER-SKIP-PREFLIGHT"],
+      "contradicting_evidence_ids": []
+    }
+  ],
+  "facts": [
+    {
+      "id": "FA-001",
+      "text": "cli.py defines `resume` command loading run state and calling Wave1Orchestrator.resume.",
+      "classification": "CONFIRMED",
+      "evidence_ids": ["EV-CLI-RESUME-IMPL"],
+      "limitations": []
+    },
+    {
+      "id": "FA-002",
+      "text": "build-roadmap.md Future table line ~188 states CLI resume NOT_IMPLEMENTED.",
+      "classification": "CONFIRMED",
+      "evidence_ids": ["EV-DOC-STALE-RESUME"],
+      "limitations": []
+    },
+    {
+      "id": "FA-003",
+      "text": "styles.css sets grid-template-columns 280px 1fr and button { white-space: nowrap }.",
+      "classification": "CONFIRMED",
+      "evidence_ids": ["EV-GUI-NOWRAP-SIDEBAR"],
+      "limitations": []
+    },
+    {
+      "id": "FA-004",
+      "text": "daily_coder.py LIVE_PROVIDERS frozenset matches registry.py set members at snapshot.",
+      "classification": "CONFIRMED",
+      "evidence_ids": ["EV-LIVE-PROVIDERS-DUP"],
+      "limitations": ["Manual compare only"]
+    },
+    {
+      "id": "FA-005",
+      "text": "Root .github/workflows/ci.yml has no ruff/mypy steps.",
+      "classification": "CONFIRMED",
+      "evidence_ids": ["EV-CI-ROOT-NO-RUFF"],
+      "limitations": []
+    },
+    {
+      "id": "FA-006",
+      "text": "security-review-checklist.md item at L47 (live resume gate) is unchecked.",
+      "classification": "CONFIRMED",
+      "evidence_ids": ["EV-SEC-CHK-L47-OPEN"],
+      "limitations": []
+    }
+  ],
+  "contradictions": [
+    {
+      "id": "CTR-001",
+      "claim_ids": ["CL-001", "CL-002"],
+      "evidence_ids": ["EV-CLI-RESUME-IMPL", "EV-DOC-STALE-RESUME"],
+      "unresolved_reason": "Code and docs disagree on resume shipping status; docs stale — not a code defect but unresolved until doc edit."
+    },
+    {
+      "id": "CTR-002",
+      "claim_ids": ["CL-011"],
+      "evidence_ids": ["EV-LANE-TOKEN-POLICY"],
+      "unresolved_reason": "Official lane reports tension: 12-factor/CWE-214 favor env over argv; OWASP hardened deploy favors file/secret manager over env. Policy choice required for REC-DASH-TOKEN-ENV."
+    },
+    {
+      "id": "CTR-003",
+      "claim_ids": ["CL-005", "CL-018"],
+      "evidence_ids": ["EV-LANE-ADAPTER-SKIP-PREFLIGHT", "EV-SEC-CHK-L47-OPEN"],
+      "unresolved_reason": "Multiple live-gate surfaces (CLI validate_decisions, orchestrator validate_live_contract, dashboard UI confirm, DC adapter) — full equivalence matrix not traced in integrator pass."
+    }
+  ],
+  "examples": [
+    {
+      "id": "EX-GUI-A-E",
+      "domain": "Agents sidebar layout",
+      "source_lane": "ALTERNATIVES",
+      "note": "Options A–E documented in alternatives lane (wrap reset, widen sidebar, card block layout, tooltip disclosure, separate status row). Breakpoint: mobile vs desktop grid."
+    },
+    {
+      "id": "EX-REG-A-E",
+      "domain": "LIVE_PROVIDERS drift",
+      "source_lane": "ALTERNATIVES",
+      "note": "Registry options A–E include CI set equality, import re-export, codegen, introspection API, manual comment only."
+    },
+    {
+      "id": "EX-TOKEN-A-F",
+      "domain": "Token delivery",
+      "source_lane": "ALTERNATIVES",
+      "note": "Token options A–F span argv (current), env var to serve, temp file, stdin, secret manager, hybrid dashboard memory-only."
+    },
+    {
+      "id": "EX-CI-A-F",
+      "domain": "Monorepo CI quality",
+      "source_lane": "ALTERNATIVES",
+      "note": "CI options A–F include duplicate RF job at root, callable workflow, path-filter optional job, continue-on-error lint, pre-commit only, status quo."
+    },
+    {
+      "id": "EX-GUI-TRIO-EXEMPLAR",
+      "domain": "Easy NEXT difficulty exemplar",
+      "mapping": ["REC-DASH-AGENTS-OVERFLOW", "REC-DASH-AGENTS-STATUS-LAYOUT", "REC-DASH-AGENTS-LOCAL-HINT"],
+      "note": "Single CSS/JS pass: .agent-card { white-space: normal }, split status from description, move no-server hint into card footer."
+    }
+  ],
+  "gaps": [
+    {
+      "id": "GAP-PYTEST-HOST",
+      "description": "pytest/unittest not re-executed on integrator host 2026-09-22; test pass claims rely on source read and lane INTERNAL.",
+      "severity": "medium"
+    },
+    {
+      "id": "GAP-DC-PREFLIGHT-TRACE",
+      "description": "Full Daily Coder CLI preflight vs dashboard start_backend gate mapping not line-traced.",
+      "severity": "medium"
+    },
+    {
+      "id": "GAP-REC02-TABLE",
+      "description": "Exact GitHub checklist table rows out of sync with shipped REC-GH-* not enumerated cell-by-cell.",
+      "severity": "low"
+    },
+    {
+      "id": "GAP-ACADEMIC",
+      "description": "Academic lane PARTIAL; no additional HCI literature beyond Cockburn 2002 for RQ3.",
+      "severity": "low"
+    }
+  ],
+  "recommendation_candidates": [
+    {
+      "id": "REC-DASH-AGENTS-GUI-TRIO",
+      "proposal": "Ship Agents GUI trio as one PR: override nowrap on .agent-card, separate status from description (avoid em-dash mash), relocate Research Forge no-server hint inside card/actions. Verify in 280px sidebar with long description strings.",
+      "maps_existing": ["REC-DASH-AGENTS-OVERFLOW", "REC-DASH-AGENTS-STATUS-LAYOUT", "REC-DASH-AGENTS-LOCAL-HINT"],
+      "evidence_ids": ["EV-GUI-NOWRAP-SIDEBAR", "EV-GUI-HINT-ORPHAN", "EV-LANE-GUI-EFFORT", "EV-LANE-WCAG-TRUNC"],
+      "fact_ids": ["FA-003"],
+      "verify_now": "Manual browser check + optional visual regression; no server change required."
+    },
+    {
+      "id": "REC-DASH-LIVE-REGISTRY",
+      "proposal": "Eliminate LIVE_PROVIDERS duplication: import from daily_coder.providers.registry in adapter or add CI test asserting set equality.",
+      "evidence_ids": ["EV-LIVE-PROVIDERS-DUP", "EV-LANE-REGISTRY-CI"],
+      "fact_ids": ["FA-004"]
+    },
+    {
+      "id": "REC-DASH-TOKEN-ENV",
+      "proposal": "Pass Daily Coder serve token via env var or short-lived file instead of argv; document threat model (CWE-214 process listing). Keep dashboard auth token memory-only.",
+      "evidence_ids": ["EV-DASH-DC-ARGV-TOKEN", "EV-LANE-TOKEN-POLICY"],
+      "fact_ids": ["FA-005"],
+      "policy_note": "Resolve CTR-002: dev env vs hardened deploy."
+    },
+    {
+      "id": "REC-CI-RUFF-MYPY",
+      "proposal": "Add optional root CI job running research-forge ruff/mypy (fail or continue-on-error per team policy).",
+      "evidence_ids": ["EV-CI-ROOT-NO-RUFF", "EV-LANE-RUFF-MYPY"],
+      "fact_ids": ["FA-005"]
+    },
+    {
+      "id": "REC-DOCS-RF-RESUME-TRUTH",
+      "proposal": "Update build-roadmap Future table, architecture-overview, deep-dive, README truth table to reflect shipped CLI resume/status; remove NOT_IMPLEMENTED stubs.",
+      "evidence_ids": ["EV-DOC-STALE-RESUME", "EV-LANE-DOC-FN-SEV"],
+      "fact_ids": ["FA-001", "FA-002"]
+    },
+    {
+      "id": "REC-DASH-RF-RESUME-GATE",
+      "proposal": "Align dashboard RF resume with CLI live decision gate when meta.live or live run; fail closed like cli.py POLICY_DENIED.",
+      "evidence_ids": ["EV-DASH-RF-SOFT-RESUME", "EV-SEC-CHK-L47-OPEN", "EV-CLI-RESUME-IMPL"],
+      "fact_ids": ["FA-006"]
+    },
+    {
+      "id": "REC-DASH-RF-RESUME-TEST",
+      "proposal": "Add agent-dashboard test: resume with persisted state succeeds; missing state returns non-soft failure or explicit 4xx per product choice.",
+      "evidence_ids": ["EV-NO-DASH-RESUME-TEST", "EV-DASH-RF-SOFT-RESUME"],
+      "fact_ids": ["FA-001"]
+    },
+    {
+      "id": "REC-DASH-TOKEN-ENV-WIRE",
+      "proposal": "Wire AGENT_DASHBOARD_TOKEN from environment when auth_required, matching .env.example comment.",
+      "evidence_ids": ["EV-ENV-DASH-TOKEN-UNWIRED"],
+      "fact_ids": []
+    },
+    {
+      "id": "REC-DASH-UI-BUTTON-WRAP",
+      "proposal": "Scoped CSS: `.agent-card { white-space: normal; }` or `.agent-list button.agent-card` reset instead of global button nowrap inheritance.",
+      "evidence_ids": ["EV-GUI-NOWRAP-SIDEBAR"],
+      "fact_ids": ["FA-003"],
+      "note": "Subset of GUI trio; smallest single-line exemplar."
+    },
+    {
+      "id": "REC-SEC-CHK-L47-CLOSE",
+      "proposal": "Implement live resume gate parity, then check security-review-checklist.md L47 and cross-link REC-DASH-RF-RESUME-GATE.",
+      "evidence_ids": ["EV-SEC-CHK-L47-OPEN", "EV-CLI-RESUME-IMPL"],
+      "fact_ids": ["FA-006"]
+    },
+    {
+      "id": "REC-04-VERIFY-DOCKER-TEST",
+      "proposal": "Add skipped-by-default or CI-conditional test for RF_EXPERIMENT_SANDBOX=docker to close REC-04 NOW partial.",
+      "evidence_ids": ["EV-NO-DOCKER-TEST", "EV-ROADMAP-NOW-PARTIAL"],
+      "fact_ids": []
+    },
+    {
+      "id": "REC-02-CHK-GH-SYNC",
+      "proposal": "Reconcile security-review-checklist GitHub table with shipped clone/read tools; mark rows accurately.",
+      "evidence_ids": ["EV-ROADMAP-NOW-PARTIAL"],
+      "fact_ids": []
+    }
+  ],
+  "limitations": [
+    "Integrator status PARTIAL: no pytest re-run on host 2026-09-22.",
+    "Academic lane PARTIAL — RQ3 only weak external support.",
+    "Official standards cited via lane summary without primary document re-fetch.",
+    "No browser visual verification of GUI clipping.",
+    "Recommendation candidates intentionally unscored — awaiting Recommendation Scorer.",
+    "Did not invoke subagents; merge-only pass."
+  ],
+  "unprocessed_items": [
+    {
+      "id": "UNP-PYTEST-ALL",
+      "reason": "Host pytest for research-forge, agent-dashboard, daily-coder not executed in integrator session",
+      "owner_lane": "INTERNAL"
+    },
+    {
+      "id": "UNP-ALTERNATIVES-FULL",
+      "reason": "Alternatives A–F matrices referenced by lane but full breakpoint tables not copied into draft",
+      "owner_lane": "ALTERNATIVES"
+    },
+    {
+      "id": "UNP-ACADEMIC-DEEP",
+      "reason": "Academic lane marked PARTIAL beyond Cockburn 2002",
+      "owner_lane": "ACADEMIC"
+    }
+  ],
+  "now_verification_matrix": {
+    "access_date": "2026-09-22",
+    "method": "Source read + lane INTERNAL; pytest not re-run",
+    "items": [
+      {"roadmap_id": "REC-01a/b", "verify": "cli.py resume/status + test_cli.py present", "result": "CONFIRMED in source", "pytest": "NOT_RERUN"},
+      {"roadmap_id": "REC-08", "verify": "test_cli resume/status cases", "result": "CONFIRMED in source", "pytest": "NOT_RERUN"},
+      {"roadmap_id": "REC-06", "verify": "research_forge adapter resume + dashboard test", "result": "PARTIAL — adapter yes, test no", "pytest": "NOT_RERUN"},
+      {"roadmap_id": "REC-04", "verify": "RF_EXPERIMENT_SANDBOX docker test", "result": "PARTIAL — env documented, test absent", "pytest": "NOT_RERUN"},
+      {"roadmap_id": "REC-02", "verify": "security checklist vs GH shipped", "result": "PARTIAL — table drift per INTERNAL", "pytest": "N/A"},
+      {"roadmap_id": "REC-05", "verify": "root ci.yml three packages", "result": "CONFIRMED in source", "pytest": "NOT_RERUN"}
+    ]
+  },
+  "roadmap_additions_suggested": [
+    "REC-DASH-RF-RESUME-GATE",
+    "REC-DASH-RF-RESUME-TEST",
+    "REC-DOCS-RF-RESUME-TRUTH",
+    "REC-DASH-TOKEN-ENV-WIRE",
+    "REC-DASH-UI-BUTTON-WRAP",
+    "REC-SEC-CHK-L47-CLOSE"
+  ],
+  "easy_next_order": [
+    "REC-DASH-UI-BUTTON-WRAP / REC-DASH-AGENTS-GUI-TRIO (exemplar)",
+    "REC-DOCS-RF-RESUME-TRUTH",
+    "REC-DASH-LIVE-REGISTRY",
+    "REC-DASH-TOKEN-ENV",
+    "REC-CI-RUFF-MYPY",
+    "REC-DASH-RF-RESUME-GATE",
+    "REC-DASH-RF-RESUME-TEST",
+    "REC-SEC-CHK-L47-CLOSE"
+  ]
+}

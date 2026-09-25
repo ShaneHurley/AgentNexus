@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "accomplishment",
+  "type": "object",
+  "required": [
+    "id",
+    "context",
+    "action",
+    "result_status",
+    "confidentiality"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^ACC-"
+    },
+    "context": {
+      "type": "string"
+    },
+    "action": {
+      "type": "string"
+    },
+    "result": {
+      "type": "string"
+    },
+    "technologies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "competencies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "result_status": {
+      "enum": [
+        "VERIFIED",
+        "USER_CONFIRMED",
+        "UNKNOWN"
+      ]
+    },
+    "confidentiality": {
+      "enum": [
+        "public",
+        "private",
+        "employer_confidential"
+      ]
+    },
+    "resume_safe_summary": {
+      "type": "string"
+    },
+    "interview_story_outline": {
+      "type": "string"
+    }
+  }
+}

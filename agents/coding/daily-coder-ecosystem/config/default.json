@@ -1,0 +1,76 @@
+{
+  "runtime_dir": ".daily-coder",
+  "provider": "mock",
+  "max_parallel_agents": 4,
+  "max_tool_turns": 6,
+  "role_tool_turns": {
+    "researcher": 4,
+    "master": 2,
+    "test_designer": 2,
+    "planner": 3,
+    "plan_reviewer": 2,
+    "implementer": 6,
+    "test_author": 4,
+    "test_executor": 2,
+    "code_reviewer": 2,
+    "documenter": 2,
+    "alignment_checker": 1,
+    "failure_diagnostician": 2,
+    "frontier_advisor": 1,
+    "skill_curator": 2
+  },
+  "drift_watchdog": {
+    "reanchor_after_s": 600,
+    "max_identical_tool_calls": 2
+  },
+  "decomposition": {
+    "profiles": ["L", "XL"],
+    "max_change_units_per_chunk": 2,
+    "max_chunks": 6
+  },
+  "boundary_alignment": {
+    "S": [],
+    "S_TRIVIAL": [],
+    "M": ["PLAN"],
+    "L": ["PLAN", "IMPLEMENT"],
+    "XL": ["RESEARCH", "PLAN", "IMPLEMENT"]
+  },
+  "detach_tests_over_s": 120,
+  "job_timeout_s": 21600,
+  "default_skills": [],
+  "require_live_flag": true,
+  "limits": {
+    "max_tokens_per_day": 500000,
+    "max_spend_usd": 5.0
+  },
+  "human_approval": {
+    "plan_before_writes": true,
+    "skill_promotion": true,
+    "external_writes": true,
+    "high_risk_changes": true
+  },
+  "acceptance": {
+    "require_clean_scope": true,
+    "require_test_evidence_for_nontrivial": true,
+    "require_alignment_pass": true,
+    "max_repair_cycles": 2
+  },
+  "evolution": {
+    "enabled": true,
+    "curate_every_verified_runs": 5,
+    "human_promotion_required": true
+  },
+  "server": {
+    "host": "127.0.0.1",
+    "port": 8765,
+    "auth_required": true,
+    "allowed_repo_roots": [".", "../../.."]
+  },
+  "providers": {
+    "openai": { "base_url": "https://api.openai.com/v1", "default_model": "gpt-4o-mini", "tier_models": {"lowest":"gpt-4o-mini","mid":"gpt-4o-mini","high":"gpt-4o","frontier":"gpt-4o"} },
+    "anthropic": { "base_url": "https://api.anthropic.com/v1", "default_model": "claude-sonnet-4-5", "tier_models": {"lowest":"claude-haiku-4-5","mid":"claude-haiku-4-5","high":"claude-sonnet-4-5","frontier":"claude-opus-4-5"} },
+    "gemini": { "base_url": "https://generativelanguage.googleapis.com/v1beta", "default_model": "gemini-2.5-flash", "tier_models": {"lowest":"gemini-2.5-flash","mid":"gemini-2.5-flash","high":"gemini-2.5-pro","frontier":"gemini-2.5-pro"} },
+    "openrouter": { "base_url": "https://openrouter.ai/api/v1", "default_model": "openai/gpt-4o-mini", "tier_models": {"lowest":"openai/gpt-4o-mini","mid":"anthropic/claude-haiku-4.5","high":"anthropic/claude-sonnet-4.5","frontier":"anthropic/claude-opus-4.5"} },
+    "local": { "base_url": "http://127.0.0.1:11434/v1", "default_model": "qwen2.5-coder", "tier_models": {"lowest":"qwen2.5-coder","mid":"qwen2.5-coder","high":"qwen2.5-coder","frontier":"qwen2.5-coder"} }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "id": "skill_curator",
+  "model_tier": "mid",
+  "job": "Propose traceable skill changes; never self-promote them.",
+  "tools": [
+    "filesystem.read",
+    "filesystem.search",
+    "repository.history"
+  ],
+  "output_schema": "skill_candidate",
+  "max_output_tokens": 2600,
+  "max_retries": 1,
+  "write_scope": "none"
+}

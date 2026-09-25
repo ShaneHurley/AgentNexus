@@ -1,0 +1,355 @@
+{
+  "protocol_version": "1.0.0",
+  "tasks": [
+    {
+      "task_id": "BL-001",
+      "category": "factual",
+      "request": {
+        "topic": "Wave1 baseline task 1 (factual)",
+        "objective": "Evaluate factual question 1",
+        "intended_decision_or_use": "internal planning",
+        "required_output": "brief",
+        "desired_depth": "standard"
+      },
+      "checks": [
+        "produces_report"
+      ]
+    },
+    {
+      "task_id": "BL-002",
+      "category": "technical",
+      "request": {
+        "topic": "Wave1 baseline task 2 (technical)",
+        "objective": "Evaluate technical question 2",
+        "intended_decision_or_use": "internal planning",
+        "required_output": "brief",
+        "desired_depth": "standard"
+      },
+      "checks": [
+        "produces_report"
+      ]
+    },
+    {
+      "task_id": "BL-003",
+      "category": "decision",
+      "request": {
+        "topic": "Wave1 baseline task 3 (decision)",
+        "objective": "Evaluate decision question 3",
+        "intended_decision_or_use": "internal planning",
+        "required_output": "brief",
+        "desired_depth": "standard"
+      },
+      "checks": [
+        "produces_report"
+      ]
+    },
+    {
+      "task_id": "BL-004",
+      "category": "source_guided",
+      "request": {
+        "topic": "Wave1 baseline task 4 (source_guided)",
+        "objective": "Evaluate source_guided question 4",
+        "intended_decision_or_use": "internal planning",
+        "required_output": "brief",
+        "desired_depth": "standard"
+      },
+      "checks": [
+        "produces_report"
+      ]
+    },
+    {
+      "task_id": "BL-005",
+      "category": "ambiguous",
+      "request": {
+        "topic": "Wave1 baseline task 5 (ambiguous)",
+        "objective": "Evaluate ambiguous question 5",
+        "intended_decision_or_use": "internal planning",
+        "required_output": "brief",
+        "desired_depth": "standard"
+      },
+      "checks": [
+        "produces_report"
+      ]
+    },
+    {
+      "task_id": "BL-006",
+      "category": "contested",
+      "request": {
+        "topic": "Wave1 baseline task 6 (contested)",
+        "objective": "Evaluate contested question 6",
+        "intended_decision_or_use": "internal planning",
+        "required_output": "brief",
+        "desired_depth": "standard"
+      },
+      "checks": [
+        "produces_report"
+      ]
+    },
+    {
+      "task_id": "BL-007",
+      "category": "insufficient",
+      "request": {
+        "topic": "Wave1 baseline task 7 (insufficient)",
+        "objective": "Evaluate insufficient question 7",
+        "intended_decision_or_use": "internal planning",
+        "required_output": "brief",
+        "desired_depth": "standard"
+      },
+      "checks": [
+        "produces_report"
+      ]
+    },
+    {
+      "task_id": "BL-008",
+      "category": "factual",
+      "request": {
+        "topic": "Wave1 baseline task 8 (factual)",
+        "objective": "Evaluate factual question 8",
+        "intended_decision_or_use": "internal planning",
+        "required_output": "brief",
+        "desired_depth": "standard"
+      },
+      "checks": [
+        "produces_report"
+      ]
+    },
+    {
+      "task_id": "BL-009",
+      "category": "technical",
+      "request": {
+        "topic": "Wave1 baseline task 9 (technical)",
+        "objective": "Evaluate technical question 9",
+        "intended_decision_or_use": "internal planning",
+        "required_output": "brief",
+        "desired_depth": "standard"
+      },
+      "checks": [
+        "produces_report"
+      ]
+    },
+    {
+      "task_id": "BL-010",
+      "category": "decision",
+      "request": {
+        "topic": "Wave1 baseline task 10 (decision)",
+        "objective": "Evaluate decision question 10",
+        "intended_decision_or_use": "internal planning",
+        "required_output": "brief",
+        "desired_depth": "standard"
+      },
+      "checks": [
+        "produces_report"
+      ]
+    },
+    {
+      "task_id": "BL-011",
+      "category": "source_guided",
+      "request": {
+        "topic": "Wave1 baseline task 11 (source_guided)",
+        "objective": "Evaluate source_guided question 11",
+        "intended_decision_or_use": "internal planning",
+        "required_output": "brief",
+        "desired_depth": "standard"
+      },
+      "checks": [
+        "produces_report"
+      ]
+    },
+    {
+      "task_id": "BL-012",
+      "category": "ambiguous",
+      "request": {
+        "topic": "Wave1 baseline task 12 (ambiguous)",
+        "objective": "Evaluate ambiguous question 12",
+        "intended_decision_or_use": "internal planning",
+        "required_output": "brief",
+        "desired_depth": "standard"
+      },
+      "checks": [
+        "produces_report"
+      ]
+    },
+    {
+      "task_id": "BL-013",
+      "category": "contested",
+      "request": {
+        "topic": "Wave1 baseline task 13 (contested)",
+        "objective": "Evaluate contested question 13",
+        "intended_decision_or_use": "internal planning",
+        "required_output": "brief",
+        "desired_depth": "standard"
+      },
+      "checks": [
+        "produces_report"
+      ]
+    },
+    {
+      "task_id": "BL-014",
+      "category": "insufficient",
+      "request": {
+        "topic": "Wave1 baseline task 14 (insufficient)",
+        "objective": "Evaluate insufficient question 14",
+        "intended_decision_or_use": "internal planning",
+        "required_output": "brief",
+        "desired_depth": "standard"
+      },
+      "checks": [
+        "produces_report"
+      ]
+    },
+    {
+      "task_id": "BL-015",
+      "category": "factual",
+      "request": {
+        "topic": "Wave1 baseline task 15 (factual)",
+        "objective": "Evaluate factual question 15",
+        "intended_decision_or_use": "internal planning",
+        "required_output": "brief",
+        "desired_depth": "standard"
+      },
+      "checks": [
+        "produces_report"
+      ]
+    },
+    {
+      "task_id": "BL-016",
+      "category": "technical",
+      "request": {
+        "topic": "Wave1 baseline task 16 (technical)",
+        "objective": "Evaluate technical question 16",
+        "intended_decision_or_use": "internal planning",
+        "required_output": "brief",
+        "desired_depth": "standard"
+      },
+      "checks": [
+        "produces_report"
+      ]
+    },
+    {
+      "task_id": "BL-017",
+      "category": "decision",
+      "request": {
+        "topic": "Wave1 baseline task 17 (decision)",
+        "objective": "Evaluate decision question 17",
+        "intended_decision_or_use": "internal planning",
+        "required_output": "brief",
+        "desired_depth": "standard"
+      },
+      "checks": [
+        "produces_report"
+      ]
+    },
+    {
+      "task_id": "BL-018",
+      "category": "source_guided",
+      "request": {
+        "topic": "Wave1 baseline task 18 (source_guided)",
+        "objective": "Evaluate source_guided question 18",
+        "intended_decision_or_use": "internal planning",
+        "required_output": "brief",
+        "desired_depth": "standard"
+      },
+      "checks": [
+        "produces_report"
+      ]
+    },
+    {
+      "task_id": "BL-019",
+      "category": "ambiguous",
+      "request": {
+        "topic": "Wave1 baseline task 19 (ambiguous)",
+        "objective": "Evaluate ambiguous question 19",
+        "intended_decision_or_use": "internal planning",
+        "required_output": "brief",
+        "desired_depth": "standard"
+      },
+      "checks": [
+        "produces_report"
+      ]
+    },
+    {
+      "task_id": "BL-020",
+      "category": "contested",
+      "request": {
+        "topic": "Wave1 baseline task 20 (contested)",
+        "objective": "Evaluate contested question 20",
+        "intended_decision_or_use": "internal planning",
+        "required_output": "brief",
+        "desired_depth": "standard"
+      },
+      "checks": [
+        "produces_report"
+      ]
+    },
+    {
+      "task_id": "BL-021",
+      "category": "insufficient",
+      "request": {
+        "topic": "Wave1 baseline task 21 (insufficient)",
+        "objective": "Evaluate insufficient question 21",
+        "intended_decision_or_use": "internal planning",
+        "required_output": "brief",
+        "desired_depth": "standard"
+      },
+      "checks": [
+        "produces_report"
+      ]
+    },
+    {
+      "task_id": "BL-022",
+      "category": "factual",
+      "request": {
+        "topic": "Wave1 baseline task 22 (factual)",
+        "objective": "Evaluate factual question 22",
+        "intended_decision_or_use": "internal planning",
+        "required_output": "brief",
+        "desired_depth": "standard"
+      },
+      "checks": [
+        "produces_report"
+      ]
+    },
+    {
+      "task_id": "BL-023",
+      "category": "technical",
+      "request": {
+        "topic": "Wave1 baseline task 23 (technical)",
+        "objective": "Evaluate technical question 23",
+        "intended_decision_or_use": "internal planning",
+        "required_output": "brief",
+        "desired_depth": "standard"
+      },
+      "checks": [
+        "produces_report"
+      ]
+    },
+    {
+      "task_id": "BL-024",
+      "category": "decision",
+      "request": {
+        "topic": "Wave1 baseline task 24 (decision)",
+        "objective": "Evaluate decision question 24",
+        "intended_decision_or_use": "internal planning",
+        "required_output": "brief",
+        "desired_depth": "standard"
+      },
+      "checks": [
+        "produces_report"
+      ]
+    },
+    {
+      "task_id": "BL-025",
+      "category": "source_guided",
+      "request": {
+        "topic": "Wave1 baseline task 25 (source_guided)",
+        "objective": "Evaluate source_guided question 25",
+        "intended_decision_or_use": "internal planning",
+        "required_output": "brief",
+        "desired_depth": "standard"
+      },
+      "checks": [
+        "produces_report"
+      ]
+    }
+  ]
+}

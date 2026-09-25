@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "research_plan.schema.json",
+  "title": "research_plan",
+  "type": "object",
+  "required": [
+    "plan_id",
+    "charter_question_map",
+    "source_classes",
+    "inclusion_rules",
+    "exclusion_rules",
+    "recency",
+    "initial_queries",
+    "negative_evidence_lane"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "plan_id": { "type": "string" },
+    "charter_question_map": {
+      "type": "object",
+      "additionalProperties": { "type": "array", "items": { "type": "string" } }
+    },
+    "source_classes": { "type": "array", "items": { "type": "string" } },
+    "inclusion_rules": { "type": "array", "items": { "type": "string" } },
+    "exclusion_rules": { "type": "array", "items": { "type": "string" } },
+    "recency": { "type": "string" },
+    "initial_queries": { "type": "array", "items": { "type": "string" } },
+    "negative_evidence_lane": {
+      "type": "object",
+      "required": ["lane_id", "query_templates"],
+      "additionalProperties": false,
+      "properties": {
+        "lane_id": { "type": "string" },
+        "query_templates": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "budget_profile": { "type": "string", "enum": ["S", "M", "L", "XL"] },
+    "budget_profile_reason": { "type": "string" }
+  }
+}

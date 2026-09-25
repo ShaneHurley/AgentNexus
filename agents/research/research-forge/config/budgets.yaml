@@ -1,0 +1,49 @@
+profiles:
+  S:
+    label: Quick
+    discovery_lanes: [2, 3]
+    deep_read_targets: [5, 10]
+    model_calls: 15
+    token_ceiling: 35000
+    director_calls: 1
+    cost_usd: 5.0
+    time_minutes: 30
+    retry_limit: 2
+    reserve_audit_fraction: 0.10
+  M:
+    label: Standard
+    discovery_lanes: [4, 6]
+    deep_read_targets: [12, 25]
+    model_calls: 30
+    token_ceiling: 80000
+    director_calls: 1
+    cost_usd: 25.0
+    time_minutes: 120
+    retry_limit: 3
+    reserve_audit_fraction: 0.10
+  L:
+    label: Deep
+    discovery_lanes: [7, 10]
+    deep_read_targets: [25, 60]
+    model_calls: 60
+    token_ceiling: 170000
+    director_calls: 1
+    cost_usd: 75.0
+    time_minutes: 480
+    retry_limit: 4
+    reserve_audit_fraction: 0.10
+  XL:
+    label: Thesis
+    discovery_lanes: [10, 16]
+    deep_read_targets: [50, 120]
+    model_calls: 100
+    token_ceiling: 320000
+    director_calls: 2
+    cost_usd: 200.0
+    time_minutes: 1440
+    retry_limit: 5
+    reserve_audit_fraction: 0.10
+thresholds:
+  warn_fraction: 0.70
+  checkpoint_fraction: 0.80
+  hard_stop_fraction: 0.90

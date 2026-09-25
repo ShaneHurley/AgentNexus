@@ -1,0 +1,38 @@
+[
+  {
+    "event_id": "rt-001",
+    "request_features": {"lane_count": 5, "complexity": "high", "budget_profile": "M"},
+    "route": "fan_out",
+    "models": ["mock/mid"],
+    "tools": ["search", "reader"],
+    "budget_profile": "M",
+    "outcome_metrics": {"cost_usd": 3.5, "quality": 0.9},
+    "audit_ref": "ledger-001",
+    "expert_verdict": "good",
+    "outcome_verified": true
+  },
+  {
+    "event_id": "rt-002",
+    "request_features": {"lane_count": 1, "complexity": "low", "budget_profile": "S"},
+    "route": "single_agent",
+    "models": ["mock/low"],
+    "tools": ["search"],
+    "budget_profile": "S",
+    "outcome_metrics": {"cost_usd": 0.5, "quality": 0.85},
+    "audit_ref": "ledger-002",
+    "expert_verdict": "good",
+    "outcome_verified": true
+  },
+  {
+    "event_id": "rt-bad",
+    "request_features": {"lane_count": 2},
+    "route": "fan_out",
+    "models": [],
+    "tools": [],
+    "budget_profile": "",
+    "outcome_metrics": {},
+    "audit_ref": "",
+    "expert_verdict": "failed",
+    "outcome_verified": false
+  }
+]

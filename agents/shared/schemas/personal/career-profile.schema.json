@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "career_profile",
+  "type": "object",
+  "required": [
+    "version",
+    "identity"
+  ],
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "identity": {
+      "type": "object"
+    },
+    "skills": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "education": {
+      "type": "array"
+    },
+    "experience_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "public_summary": {
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+.venv/
+gui/.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+dist/
+build/
+.env
+*.token
+gui/config/agents.json
+!gui/config/agents.json.example
+gui/agent_dashboard_data/
+*.log
+*.jsonl
+.DS_Store

@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "description": "IDE pack soft least-privilege hooks. Not PolicyGateway — see docs/ide-agents/hooks-and-skills.md.",
+  "hooks": {
+    "subagentStart": [
+      {
+        "command": "python .cursor/hooks/enforce-agent-authority.py",
+        "failClosed": true
+      }
+    ],
+    "preToolUse": [
+      {
+        "command": "python .cursor/hooks/deny-mutating-for-readonly.py",
+        "failClosed": true
+      }
+    ],
+    "beforeShellExecution": [
+      {
+        "command": "python .cursor/hooks/deny-mutating-for-readonly.py",
+        "failClosed": true
+      }
+    ],
+    "beforeReadFile": [
+      {
+        "command": "python .cursor/hooks/path-jail-audit.py",
+        "failClosed": true
+      }
+    ],
+    "afterFileEdit": [
+      {
+        "command": "python .cursor/hooks/deny-unbridged-writes.py",
+        "failClosed": true
+      }
+    ],
+    "stop": [
+      {
+        "command": "python .cursor/hooks/session-audit.py",
+        "failClosed": false
+      }
+    ]
+  }
+}

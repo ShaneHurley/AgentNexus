@@ -1,0 +1,7 @@
+{
+  "tier": "lowest",
+  "model_ref": "tier:lowest",
+  "fallback_policy": "configured-tier-fallback",
+  "temperature": "provider_default",
+  "reasoning": "adaptive"
+}

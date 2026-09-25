@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "idea.schema.json",
+  "title": "candidate_idea",
+  "type": "object",
+  "required": [
+    "idea_id",
+    "title",
+    "lineage",
+    "root_cause_model",
+    "proposal",
+    "evidence_ids",
+    "assumptions",
+    "falsification_test",
+    "status",
+    "opportunity_type",
+    "baseline",
+    "lineage_hash"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "idea_id": { "type": "string", "pattern": "^IDEA-" },
+    "title": { "type": "string" },
+    "lineage": { "type": "array", "items": { "type": "string" } },
+    "root_cause_model": { "type": "string" },
+    "proposal": { "type": "string" },
+    "components": { "type": "array", "items": { "type": "string" } },
+    "evidence_ids": { "type": "array", "items": { "type": "string" } },
+    "assumptions": { "type": "array", "items": { "type": "string" } },
+    "incompatibilities": { "type": "array", "items": { "type": "string" } },
+    "expected_benefits": { "type": "array", "items": { "type": "string" } },
+    "failure_modes": { "type": "array", "items": { "type": "string" } },
+    "costs": { "type": "array", "items": { "type": "string" } },
+    "risks": { "type": "array", "items": { "type": "string" } },
+    "falsification_test": { "type": "string" },
+    "minimum_experiment": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": ["active", "repair", "rejected", "recommended", "deferred"]
+    },
+    "decision_reason": { "type": "string" },
+    "opportunity_type": {
+      "type": "string",
+      "enum": ["incremental", "architectural", "hybrid", "process", "research"]
+    },
+    "baseline": { "type": "string" },
+    "novelty_check": { "type": "string" },
+    "compatibility_constraints": { "type": "array", "items": { "type": "string" } },
+    "lineage_hash": { "type": "string" },
+    "tactical_opportunity_type": {
+      "type": "string",
+      "enum": [
+        "replace",
+        "simplify",
+        "decompose",
+        "constrain",
+        "automate",
+        "standardize",
+        "isolate",
+        "combine",
+        "remove",
+        "measure",
+        "change_incentives"
+      ]
+    },
+    "dependencies": { "type": "array", "items": { "type": "string" } },
+    "distinctiveness": { "type": "string" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "opportunity_type": { "const": "hybrid" } } },
+      "then": {
+        "properties": { "lineage": { "minItems": 2 } },
+        "required": ["assumptions"]
+      }
+    }
+  ]
+}

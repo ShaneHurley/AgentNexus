@@ -1,0 +1,5 @@
+{
+  "$schema": "ide-agents/policy/write-allowlist-agents.schema.stub",
+  "description": "Native IDE agents allowed to mutate files without ide-bridge. Default empty — audited writes go through ide-bridge + PolicyGateway only.",
+  "agents": []
+}

@@ -1,0 +1,7 @@
+role_id: methods_reviewer
+interface_version: "1.0.0"
+input_schema: source_record
+output_schema: methods_review
+budget_profile: M
+tools:
+  - recompute_sandbox

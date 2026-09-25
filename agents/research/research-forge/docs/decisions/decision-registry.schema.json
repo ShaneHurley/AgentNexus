@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://research-forge.local/schemas/decision-registry.schema.json",
+  "title": "Research Forge Decision Registry",
+  "type": "object",
+  "required": ["schema_version", "locked_defaults", "decisions"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.0.0" },
+    "locked_defaults": {
+      "type": "object",
+      "required": [
+        "source_systems",
+        "mock_by_default",
+        "paywall_disclosure",
+        "director_second_call",
+        "plan_reference"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "source_systems": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "mock_by_default": { "type": "boolean" },
+        "paywall_disclosure": { "type": "string" },
+        "director_second_call": { "type": "string" },
+        "plan_reference": { "type": "string" }
+      }
+    },
+    "decisions": {
+      "type": "array",
+      "minItems": 15,
+      "items": { "$ref": "#/$defs/decision_entry" }
+    }
+  },
+  "$defs": {
+    "decision_entry": {
+      "type": "object",
+      "required": [
+        "id",
+        "question",
+        "options",
+        "selected_value",
+        "status",
+        "owner",
+        "due_date",
+        "rationale",
+        "affected_waves",
+        "blocking",
+        "earliest_blocking_boundary"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^RF-DEC-[0-9]{2}$" },
+        "question": { "type": "string", "minLength": 1 },
+        "options": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "selected_value": { "type": ["string", "null"] },
+        "status": {
+          "type": "string",
+          "enum": ["resolved", "accepted_unknown", "blocked", "pending"]
+        },
+        "owner": { "type": "string" },
+        "due_date": { "type": "string" },
+        "rationale": { "type": "string" },
+        "affected_waves": {
+          "type": "array",
+          "items": { "type": "integer", "minimum": 0 }
+        },
+        "blocking": { "type": "boolean" },
+        "earliest_blocking_boundary": {
+          "type": "string",
+          "enum": [
+            "none",
+            "wave_0_scaffold",
+            "wave_1_mock",
+            "wave_1_live",
+            "wave_2_plus"
+          ]
+        },
+        "accepted_unknown": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "safe_fallback": { "type": "string" },
+            "risk": { "type": "string" },
+            "expiration": { "type": "string" },
+            "reconsideration_trigger": { "type": "string" }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "const": "accepted_unknown" } } },
+          "then": {
+            "required": ["accepted_unknown"],
+            "properties": {
+              "accepted_unknown": {
+                "required": [
+                  "safe_fallback",
+                  "risk",
+                  "expiration",
+                  "reconsideration_trigger"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

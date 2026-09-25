@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "run_id": "995d17be-4951-4ac7-974d-9c27a82aef11",
+  "kind": "code_review",
+  "producer_role": "code_reviewer",
+  "created_at": 1790102857.9951868,
+  "payload": {
+    "verdict": "pass",
+    "findings": [],
+    "reviewed_diff_first": true,
+    "limitations": [
+      "No diff"
+    ]
+  }
+}

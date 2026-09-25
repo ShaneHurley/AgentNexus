@@ -1,0 +1,19 @@
+id: warm-professional-base
+version: "0.1.0"
+voice:
+  warm: true
+  professional: true
+  announce_personality: false
+punctuation:
+  allow_em_dash: false
+  prefer_periods_and_commas: true
+repetition:
+  allow_duplicate_claims: false
+vocabulary:
+  consistent_level: true
+  no_slang: true
+semantic_preservation: true
+prohibited:
+  - forced_humor
+  - exaggerated_enthusiasm
+  - excessive_exclamation

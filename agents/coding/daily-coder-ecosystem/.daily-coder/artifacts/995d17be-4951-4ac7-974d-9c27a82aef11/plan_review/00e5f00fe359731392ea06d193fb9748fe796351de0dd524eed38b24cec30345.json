@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "run_id": "995d17be-4951-4ac7-974d-9c27a82aef11",
+  "kind": "plan_review",
+  "producer_role": "plan_reviewer",
+  "created_at": 1790102857.5253782,
+  "payload": {
+    "verdict": "pass",
+    "findings": [],
+    "checked": [
+      "No unresolved questions",
+      "No write scope"
+    ]
+  }
+}

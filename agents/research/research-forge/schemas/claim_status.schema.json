@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "claim_status.schema.json",
+  "title": "claim_status",
+  "type": "string",
+  "enum": [
+    "VERIFIED",
+    "CORROBORATED",
+    "INFERENCE",
+    "ASSUMPTION",
+    "CONTESTED",
+    "UNKNOWN",
+    "REJECTED"
+  ]
+}

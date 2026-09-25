@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "shared_result",
+  "type": "object",
+  "required": [
+    "task_id",
+    "role_id",
+    "role_version",
+    "status"
+  ],
+  "properties": {
+    "task_id": {
+      "type": "string"
+    },
+    "role_id": {
+      "type": "string"
+    },
+    "role_version": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "COMPLETE",
+        "PARTIAL",
+        "BLOCKED",
+        "NOT_APPLICABLE"
+      ]
+    },
+    "claims": {
+      "type": "array"
+    },
+    "evidence_refs": {
+      "type": "array"
+    },
+    "artifacts": {
+      "type": "array"
+    },
+    "unknowns": {
+      "type": "array"
+    },
+    "limitations": {
+      "type": "array"
+    }
+  }
+}

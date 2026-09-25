@@ -1,0 +1,70 @@
+{
+  "run_id": "run-w4-exit",
+  "skip_scrutiny": true,
+  "human_override": false,
+  "scrutiny_result": {
+    "acceptance_blocked": false,
+    "audit": { "veto": false },
+    "falsification": {
+      "tests": [{ "test_id": "T-good", "predictions": { "H1": "a", "H2": "b" } }]
+    }
+  },
+  "charter": {
+    "charter_id": "ch-w4",
+    "objective": "Improve widget reliability without unsafe rollout",
+    "charter_hash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+  },
+  "gaps": [
+    { "gap_id": "GAP-1", "decision_relevance": "high", "status": "open" }
+  ],
+  "downgraded_sources": ["SRC-B"],
+  "evidence": {
+    "EVD-A1": {
+      "evidence_id": "EVD-A1",
+      "source_id": "SRC-A",
+      "claim": "Canary rollout reduced incidents 12%",
+      "verifier_status": "passed",
+      "claim_status": "FACT"
+    },
+    "EVD-B1": {
+      "evidence_id": "EVD-B1",
+      "source_id": "SRC-B",
+      "claim": "Observational only",
+      "verifier_status": "passed",
+      "claim_status": "INFERENCE"
+    }
+  },
+  "ideator_drafts": [
+    {
+      "proposal": "Simplify retry policy to fixed backoff on widget path",
+      "root_cause": "Retry storms amplify failures",
+      "evidence_ids": ["EVD-A1"],
+      "components": ["retry-policy", "widget-path"],
+      "tactical_opportunity_type": "simplify"
+    },
+    {
+      "proposal": "Measure incident budget weekly before any architecture change",
+      "root_cause": "Unknown baseline variance",
+      "evidence_ids": ["EVD-A1"],
+      "components": ["metrics-dashboard"],
+      "tactical_opportunity_type": "measure"
+    },
+    {
+      "outcome": "NO DEFENSIBLE IDEA",
+      "reason": "Insufficient evidence for combine lever while GAP-1 open"
+    }
+  ],
+  "fusion_request": {
+    "parent_ids": [],
+    "selections": [
+      {
+        "component": "retry-policy",
+        "parent_idea": "IDEA-PLACEHOLDER-A",
+        "reason": "Proven incident reduction",
+        "evidence_id": "EVD-A1",
+        "interface": "HTTP client middleware"
+      }
+    ],
+    "baseline_idea_id": "IDEA-PLACEHOLDER-A"
+  }
+}

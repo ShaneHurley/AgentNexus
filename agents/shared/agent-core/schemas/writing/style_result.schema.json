@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "style_result",
+  "type": "object",
+  "required": [
+    "task_id",
+    "status",
+    "semantic_risk"
+  ],
+  "properties": {
+    "task_id": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "COMPLETE",
+        "PARTIAL",
+        "BLOCKED"
+      ]
+    },
+    "findings": {
+      "type": "array"
+    },
+    "patch_proposal": {
+      "type": "string"
+    },
+    "semantic_risk": {
+      "enum": [
+        "none",
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "needs_domain_review": {
+      "type": "boolean"
+    }
+  }
+}

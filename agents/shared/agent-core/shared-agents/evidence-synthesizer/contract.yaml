@@ -1,0 +1,11 @@
+id: evidence-synthesizer
+version: "0.1.0"
+outcome: Merge evidence packets; preserve contradictions; no fresh search
+permissions: [read]
+forbidden_actions:
+  - fresh_web_search
+  - drop_contradictions
+  - invent_evidence
+status_vocab: [COMPLETE, PARTIAL, BLOCKED, NOT_APPLICABLE]
+input_schema: schemas/shared/shared_task.schema.json
+output_schema: schemas/shared/shared_result.schema.json

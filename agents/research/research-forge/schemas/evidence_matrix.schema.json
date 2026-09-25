@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "evidence_matrix.schema.json",
+  "title": "evidence_matrix",
+  "type": "object",
+  "required": ["matrix_id", "cells", "propositions"],
+  "additionalProperties": false,
+  "properties": {
+    "matrix_id": { "type": "string" },
+    "propositions": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "cells": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source_id", "proposition_id", "evidence_id", "stance"],
+        "additionalProperties": false,
+        "properties": {
+          "source_id": { "type": "string" },
+          "proposition_id": { "type": "string" },
+          "evidence_id": { "type": "string" },
+          "stance": {
+            "type": "string",
+            "enum": ["supports", "contradicts", "qualifies", "no_bearing", "unknown"]
+          },
+          "qualification": { "type": "string" },
+          "decision_critical": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}

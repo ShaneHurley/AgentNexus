@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "claim_audit",
+  "type": "object",
+  "required": [
+    "claims"
+  ],
+  "properties": {
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "text",
+          "tag"
+        ],
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "tag": {
+            "enum": [
+              "VERIFIED",
+              "USER_CONFIRMED",
+              "UNKNOWN",
+              "UNSUPPORTED"
+            ]
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "freshness": {
+            "enum": [
+              "fresh",
+              "stale",
+              "expired",
+              "unknown"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

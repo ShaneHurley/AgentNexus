@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "created_at": 1790178549.0733168,
+  "config_hash": "890a3980c6be2de4a1695e5ae3b36aba49852bf680ebc3a2385bb7d8ea373d44",
+  "records": [
+    {
+      "scenario": "trivial",
+      "repeat": 0,
+      "run_id": "78712c9f-afa3-46cf-abde-225cf2924fa9",
+      "expected_profile": "S",
+      "profile": "S",
+      "status": "SIMULATED",
+      "calls": 7,
+      "tokens": 700,
+      "latency_ms": 2117.376,
+      "input_tokens": 350,
+      "output_tokens": 350,
+      "repairs": 0
+    },
+    {
+      "scenario": "contained",
+      "repeat": 0,
+      "run_id": "fd2b5dc9-9b1c-40e6-be20-1849e418d267",
+      "expected_profile": "M",
+      "profile": "M",
+      "status": "SIMULATED",
+      "calls": 14,
+      "tokens": 1400,
+      "latency_ms": 1684.604,
+      "input_tokens": 650,
+      "output_tokens": 650,
+      "repairs": 0
+    },
+    {
+      "scenario": "cross_cutting",
+      "repeat": 0,
+      "run_id": "97f80645-ba05-408c-8440-21db1a345f0a",
+      "expected_profile": "L",
+      "profile": "L",
+      "status": "SIMULATED",
+      "calls": 18,
+      "tokens": 1800,
+      "latency_ms": 2016.463,
+      "input_tokens": 800,
+      "output_tokens": 800,
+      "repairs": 0
+    },
+    {
+      "scenario": "high_risk",
+      "repeat": 0,
+      "run_id": "962c698f-5b70-4fd4-968c-1eccdcf5df05",
+      "expected_profile": "XL",
+      "profile": "XL",
+      "status": "SIMULATED",
+      "calls": 20,
+      "tokens": 2000,
+      "latency_ms": 3124.474,
+      "input_tokens": 850,
+      "output_tokens": 850,
+      "repairs": 0
+    }
+  ],
+  "summary": {
+    "runs": 4,
+    "verified_routes": 4,
+    "successful": 4,
+    "median_calls": 16.0,
+    "p90_calls": 20,
+    "median_tokens": 1600.0,
+    "p90_tokens": 2000,
+    "median_latency_ms": 2066.919,
+    "p90_latency_ms": 3124.474
+  }
+}

@@ -1,0 +1,318 @@
+{
+  "live": false,
+  "schema_version": "wave1-run-state/1.0",
+  "state": {
+    "charter": {
+      "access_rules": [
+        "read-only discovery",
+        "no credential URLs in queries"
+      ],
+      "assumptions": [
+        "Mock-first Wave 1; access levels honored."
+      ],
+      "audience": "researcher",
+      "charter_hash": "sha256:8f233470e74368a15e48d170fd059501a21e8eb4de336a5486071ef237f3a1c3",
+      "charter_id": "chr-3c2dd",
+      "constraints": [],
+      "depth": "standard",
+      "intended_use": "product decision",
+      "non_goals": [
+        "implementation execution"
+      ],
+      "objective": "Redis vs Memcached for sessions",
+      "output_contract": "brief",
+      "recency": "last 5 years unless historical",
+      "research_questions": [
+        "RQ-001"
+      ],
+      "scope": "Redis vs Memcached for sessions",
+      "version": 1
+    },
+    "clarification": {
+      "ambiguity_score": 0.15,
+      "assumptions": [
+        "Public sources unless seed_sources provided."
+      ],
+      "confidence": "HIGH",
+      "interpreted_objective": "Redis vs Memcached for sessions",
+      "non_goals": [],
+      "result_type": "ready"
+    },
+    "evidence": [
+      {
+        "access_level": "full",
+        "claim": "Alpha Paper body.",
+        "claim_status": "VERIFIED",
+        "confidence": "MEDIUM",
+        "confidence_reason": "Extracted at access_level=full",
+        "evidence_id": "EVD-3c7d4",
+        "is_material_numerical": false,
+        "limitations": [],
+        "locator": "section:1",
+        "question_addressed": "RQ-001",
+        "source_id": "SRC-0001",
+        "supporting_passage_or_data": "Alpha Paper body.",
+        "transfer_conditions": [
+          "population: UNKNOWN",
+          "environment: UNKNOWN"
+        ],
+        "verifier_notes": "ok",
+        "verifier_status": "passed"
+      },
+      {
+        "access_level": "full",
+        "claim": "Alpha claims 42% improvement (n=100).",
+        "claim_status": "VERIFIED",
+        "confidence": "MEDIUM",
+        "confidence_reason": "Extracted at access_level=full",
+        "evidence_id": "EVD-e6fd9",
+        "is_material_numerical": true,
+        "limitations": [],
+        "locator": "section:1",
+        "question_addressed": "RQ-001",
+        "source_id": "SRC-0001",
+        "supporting_passage_or_data": "Alpha claims 42% improvement (n=100).",
+        "transfer_conditions": [
+          "population: UNKNOWN",
+          "environment: UNKNOWN"
+        ],
+        "units_and_denominator": "percent; denominator=100",
+        "verifier_notes": "ok",
+        "verifier_status": "passed"
+      },
+      {
+        "access_level": "full",
+        "claim": "Methods described.",
+        "claim_status": "VERIFIED",
+        "confidence": "MEDIUM",
+        "confidence_reason": "Extracted at access_level=full",
+        "evidence_id": "EVD-f81d0",
+        "is_material_numerical": false,
+        "limitations": [],
+        "locator": "section:1",
+        "question_addressed": "RQ-001",
+        "source_id": "SRC-0001",
+        "supporting_passage_or_data": "Methods described.",
+        "transfer_conditions": [
+          "population: UNKNOWN",
+          "environment: UNKNOWN"
+        ],
+        "verifier_notes": "ok",
+        "verifier_status": "passed"
+      },
+      {
+        "access_level": "full",
+        "claim": "Beta Paper body.",
+        "claim_status": "VERIFIED",
+        "confidence": "MEDIUM",
+        "confidence_reason": "Extracted at access_level=full",
+        "evidence_id": "EVD-6c8d9",
+        "is_material_numerical": false,
+        "limitations": [],
+        "locator": "section:1",
+        "question_addressed": "RQ-001",
+        "source_id": "SRC-0002",
+        "supporting_passage_or_data": "Beta Paper body.",
+        "transfer_conditions": [
+          "population: UNKNOWN",
+          "environment: UNKNOWN"
+        ],
+        "verifier_notes": "ok",
+        "verifier_status": "passed"
+      },
+      {
+        "access_level": "full",
+        "claim": "Beta contradicts alpha at 38% in a separate cohort.",
+        "claim_status": "VERIFIED",
+        "confidence": "MEDIUM",
+        "confidence_reason": "Extracted at access_level=full",
+        "evidence_id": "EVD-3738b",
+        "is_material_numerical": true,
+        "limitations": [],
+        "locator": "section:1",
+        "question_addressed": "RQ-001",
+        "source_id": "SRC-0002",
+        "supporting_passage_or_data": "Beta contradicts alpha at 38% in a separate cohort.",
+        "transfer_conditions": [
+          "population: UNKNOWN",
+          "environment: UNKNOWN"
+        ],
+        "units_and_denominator": "percent; denominator=UNKNOWN",
+        "verifier_notes": "ok",
+        "verifier_status": "passed"
+      }
+    ],
+    "paused": false,
+    "phase": "done",
+    "plan": {
+      "budget_profile": "S",
+      "budget_profile_reason": "deterministic sizing from depth and question count",
+      "charter_question_map": {
+        "RQ-001": [
+          "cost"
+        ]
+      },
+      "exclusion_rules": [],
+      "inclusion_rules": [
+        "peer-reviewed or primary where available"
+      ],
+      "initial_queries": [
+        "Redis vs Memcached for sessions",
+        "cost"
+      ],
+      "negative_evidence_lane": {
+        "lane_id": "NEG-001",
+        "query_templates": [
+          "limitations Redis vs Memcached for sessions",
+          "failed replication Redis vs Memcached for sessions"
+        ]
+      },
+      "plan_id": "plan-3c2dd",
+      "recency": "last 5 years unless historical",
+      "source_classes": [
+        "scholarly",
+        "official",
+        "technical"
+      ]
+    },
+    "reads": {
+      "SRC-0001": {
+        "access_level": "full",
+        "chunks": [
+          {
+            "access_level": "full",
+            "chunk_id": "web-1",
+            "locator": "section:1",
+            "text": "Alpha Paper body. Alpha claims 42% improvement (n=100). Methods described."
+          }
+        ],
+        "metadata": {
+          "content_hash": "sha256:097d25bf99e243984461a316c362c4fad8fbc2307152f80f98ef9a4bd7d3dc41",
+          "mime": "text/plain",
+          "url": "https://example.org/a"
+        },
+        "raw_byte_ref": "ref://sha256:097d25bf99e243984461a316c362c4fad8fbc2307152f80f98ef9a4bd7d3dc41"
+      },
+      "SRC-0002": {
+        "access_level": "full",
+        "chunks": [
+          {
+            "access_level": "full",
+            "chunk_id": "web-1",
+            "locator": "section:1",
+            "text": "Beta Paper body. Beta contradicts alpha at 38% in a separate cohort."
+          }
+        ],
+        "metadata": {
+          "content_hash": "sha256:d17fc9b126d716d0cbec9c4a2fffcc021d6d5a0dc5d2092b53957e776063055f",
+          "mime": "text/plain",
+          "url": "https://example.org/b"
+        },
+        "raw_byte_ref": "ref://sha256:d17fc9b126d716d0cbec9c4a2fffcc021d6d5a0dc5d2092b53957e776063055f"
+      }
+    },
+    "request": {
+      "_clarification_provenance": {
+        "answers": {
+          "CLQ-001": "product decision",
+          "CLQ-002": "brief",
+          "CLQ-003": "cost"
+        },
+        "original_request": {
+          "topic": "Redis vs Memcached for sessions"
+        }
+      },
+      "intended_decision_or_use": "product decision",
+      "required_output": "brief",
+      "specific_questions": [
+        "cost"
+      ],
+      "topic": "Redis vs Memcached for sessions"
+    },
+    "resume_token": "pause-90bcc113",
+    "run_id": "run-12930",
+    "search_completed": true,
+    "search_log": [
+      {
+        "adapter_id": "mock_search_v1",
+        "cursor": 0,
+        "duration_ms": 0,
+        "exact_query": "Redis vs Memcached for sessions",
+        "filters": {},
+        "next_cursor": null,
+        "query": "Redis vs Memcached for sessions",
+        "query_family": "initial",
+        "results": [
+          {
+            "authors_or_owner": [
+              "A. Author"
+            ],
+            "canonical_title": "Alpha Paper",
+            "canonical_url": "https://example.org/a",
+            "date": "2024-01-01",
+            "provider_rank": 0,
+            "result_id": "res-alpha",
+            "retrieved_at": "2026-09-23T17:01:38.523323+00:00",
+            "snippet": "Alpha claims 42% improvement (n=100).",
+            "source_type": "paper"
+          },
+          {
+            "authors_or_owner": [
+              "B. Author"
+            ],
+            "canonical_title": "Beta Paper",
+            "canonical_url": "https://example.org/b",
+            "date": "2024-02-01",
+            "provider_rank": 1,
+            "result_id": "res-beta",
+            "retrieved_at": "2026-09-23T17:01:38.523323+00:00",
+            "snippet": "Beta contradicts alpha at 38%.",
+            "source_type": "paper"
+          }
+        ]
+      }
+    ],
+    "selected_urls": [
+      "https://example.org/a",
+      "https://example.org/b"
+    ],
+    "sources": {
+      "SRC-0001": {
+        "access_level": "full",
+        "authors_or_owner": [
+          "A. Author"
+        ],
+        "canonical_title": "Alpha Paper",
+        "canonical_url": "https://example.org/a",
+        "content_hash": "sha256:18bb181f7baa4f5a850fedf2590800f2453edda8ca4312bc3a009e68838bfc58",
+        "content_hash_algorithm": "sha256-v1",
+        "date": "2024-01-01",
+        "primary_or_derivative": "primary",
+        "publication_state": "published",
+        "registry_status": "deep_read",
+        "retrieval_method": "mock_search_v1",
+        "retrieved_at": "2026-09-23T17:01:38.523323+00:00",
+        "source_id": "SRC-0001",
+        "source_type": "paper"
+      },
+      "SRC-0002": {
+        "access_level": "full",
+        "authors_or_owner": [
+          "B. Author"
+        ],
+        "canonical_title": "Beta Paper",
+        "canonical_url": "https://example.org/b",
+        "content_hash": "sha256:7f8992fee334dab5ea949e257ab2c28c8ba7278d8f07974046a7ede15ac9e992",
+        "content_hash_algorithm": "sha256-v1",
+        "date": "2024-02-01",
+        "primary_or_derivative": "primary",
+        "publication_state": "published",
+        "registry_status": "deep_read",
+        "retrieval_method": "mock_search_v1",
+        "retrieved_at": "2026-09-23T17:01:38.523323+00:00",
+        "source_id": "SRC-0002",
+        "source_type": "paper"
+      }
+    }
+  }
+}

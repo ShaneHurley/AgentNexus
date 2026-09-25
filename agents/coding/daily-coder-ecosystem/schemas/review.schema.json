@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "findings",
+    "verdict"
+  ],
+  "properties": {
+    "verdict": {
+      "type": "string",
+      "enum": [
+        "pass",
+        "revise",
+        "block"
+      ]
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["severity", "claim", "locator"],
+        "properties": {
+          "severity": { "type": "string", "enum": ["blocking", "major", "minor", "question"] },
+          "claim": { "type": "string" },
+          "locator": { "type": "string" },
+          "evidence": { "type": "string" },
+          "suggested_fix": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "checked": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "reviewed_diff_first": {
+      "type": "boolean"
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

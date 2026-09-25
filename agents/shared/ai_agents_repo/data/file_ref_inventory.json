@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "description": "F0d inventory of #file: producers and in-process resolvers (editor loaders are checklist-only).",
+  "producers": [
+    {
+      "id": "canonical-agents",
+      "path": "ide-pack/ide-agents/canonical/",
+      "syntax": "#file:ide-agents/..."
+    },
+    {
+      "id": "contracts",
+      "path": "ide-pack/ide-agents/contracts/",
+      "syntax": "nested #file:ide-agents/..."
+    },
+    {
+      "id": "sync-projections",
+      "path": "ide-pack/ide-agents/scripts/sync_ide_agents.py",
+      "syntax": "copies canonical verbatim into .cursor/.github agents"
+    }
+  ],
+  "resolvers_in_process": [
+    {
+      "id": "audit_prompt_bytes",
+      "path": "ide-pack/ide-agents/scripts/audit_prompt_bytes.py",
+      "mechanism": "resolve_file_ref -> ai_agents_repo.resolve_ref"
+    },
+    {
+      "id": "resolve_ref",
+      "path": "ai_agents_repo/src/ai_agents_repo/resolve_ref.py",
+      "mechanism": "logical prefix map to ide_pack_root"
+    }
+  ],
+  "resolvers_editor_native_unproven": [
+    "Cursor agent loader",
+    "VS Code Copilot .github/agents loader",
+    "Claude Code .claude/agents loader"
+  ],
+  "chosen_strategy": "logical ide-agents/ prefix + in-process resolve_ref; projections generated; editor verification manual (see docs/ide-agents/file-ref-verification-checklist.md)"
+}

@@ -1,0 +1,35 @@
+{
+  "tasks": [
+    {
+      "task_id": "w4-open-strategy",
+      "stratum": "open_strategy",
+      "expect_abstention": false,
+      "notes": ["Expect multiple distinct tactical levers"]
+    },
+    {
+      "task_id": "w4-constrained-design",
+      "stratum": "constrained_design",
+      "expect_abstention": false,
+      "expect_simple_solution": true,
+      "notes": ["Simple baseline must remain in comparison set"]
+    },
+    {
+      "task_id": "w4-insufficient-evidence",
+      "stratum": "insufficient_evidence",
+      "expect_abstention": true,
+      "notes": ["NO DEFENSIBLE IDEA acceptable"]
+    },
+    {
+      "task_id": "w4-incompatible-hybrid",
+      "stratum": "incompatible_hybrid",
+      "expect_abstention": false,
+      "notes": ["Hybrid blocked or staged when incompatible"]
+    },
+    {
+      "task_id": "w4-obvious-simple",
+      "stratum": "obvious_simple_solution",
+      "expect_simple_solution": true,
+      "notes": ["Do not over-engineer beyond measure/simplify"]
+    }
+  ]
+}

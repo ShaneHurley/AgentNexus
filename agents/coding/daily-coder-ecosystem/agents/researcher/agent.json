@@ -1,0 +1,20 @@
+{
+  "id": "researcher",
+  "model_tier": "lowest",
+  "job": "Investigate one bounded angle using read-only evidence only.",
+  "tools": [
+    "filesystem.read",
+    "filesystem.list",
+    "filesystem.search",
+    "repository.history",
+    "repository.diff",
+    "web.fetch",
+    "web.search",
+    "github.repo.metadata",
+    "github.pull.list"
+  ],
+  "output_schema": "research_card",
+  "max_output_tokens": 2200,
+  "max_retries": 1,
+  "write_scope": "none"
+}

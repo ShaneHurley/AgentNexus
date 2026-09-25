@@ -1,0 +1,5 @@
+{
+  "conditional_deep_research_lanes": false,
+  "lane_contract_shards": false,
+  "_comment": "All flags default false — deep-research still fans out six lanes with full lane contracts. See docs/ide-agents/token-efficiency-experiments.md"
+}

@@ -1,0 +1,7 @@
+role_id: contradiction_mapper
+interface_version: "1.0.0"
+input_schema: evidence_matrix
+output_schema: contradiction
+budget_profile: M
+tools:
+  - proposition_registry

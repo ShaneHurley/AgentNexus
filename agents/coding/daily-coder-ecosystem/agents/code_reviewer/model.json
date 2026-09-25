@@ -1,0 +1,7 @@
+{
+  "tier": "high",
+  "model_ref": "tier:high",
+  "fallback_policy": "configured-tier-fallback",
+  "temperature": "provider_default",
+  "reasoning": "adaptive"
+}

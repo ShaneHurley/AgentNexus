@@ -1,0 +1,7 @@
+id: peer-collaborative-f1
+version: "0.1.0"
+extends: warm-professional-base
+formality: F1
+audience: [classmate, peer, teammate]
+delta:
+  tone: polished_conversational

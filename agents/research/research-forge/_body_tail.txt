@@ -1,0 +1,23 @@
+## 20. Definition of done
+
+All bullets from master §20 (clarification, Charter integrity, lane coverage, read-only scouts, access-level honesty, citation verification, no source laundering, negative evidence, multi-hypothesis, ≥3 routes when permitted, falsifiable experiments, compressed Director packet, writer ≠ auditor, no fabrication, gateway enforcement, hard budgets, beat single-agent baseline, adapter-based extension, consumable machine packet, honest PARTIAL/CONTESTED/UNKNOWN/INSUFFICIENT).
+
+## 21. Open decisions (must resolve or accept before live Wave 1+)
+
+Initial domains/source systems; public vs internal; model providers and tier map; spend ceilings; citation style; high-stakes SME review; retention/confidentiality; cache policy; authorized databases/hosts; paywall policy; languages/geography; locked eval set; second-Director threshold; future experiment capabilities; ownership of prompt/skill/routing changes.
+
+**Default until user overrides:** public-web + arXiv + local files first; CommandProvider for LLMs; no paywalled full-text claims beyond disclosed access level; second Director call off by default except XL with explicit approval flag.
+
+## 22. Pre-code handoff (implementation agent must return)
+
+Before writing beyond Wave 0 scaffold: folder structure; ledger schema; all packet schemas; 17-role boundaries; tier/budget map; first-release adapters; Policy Gateway guarantees; DAG and phase rules; clarification/sizing/early-stop; context/compaction; Director packet + escalation; human+machine contracts; test matrix/fixtures/baselines/promotion thresholds; smallest safe prototype + stop/rollback/cost ceiling; open decisions and UNKNOWNs.
+
+**STRICT:** Do not begin implementation until the smallest safe prototype has resolved required decisions, budgets, read-only boundary, evaluation baseline, and rollback — **or you explicitly approve starting Wave 0 scaffolding with those items still listed as accepted UNKNOWNs.**
+
+## 23. Source basis
+
+Supplied: master_spec, research_library, AGENTS.md, README.md, GAP_AND_COST_PLAN.md. Catalogued papers listed in master §23 justify design hypotheses; they do not prove this exact system. Locked baselines and evaluation remain mandatory.
+
+## Relationship to daily-coder
+
+Research Forge stays a **sibling product**. Daily-coder may later call it via a skill that shells out to `research-forge run` and consumes `research_packet` as read-only prior art for planning — never auto-implements research recommendations.

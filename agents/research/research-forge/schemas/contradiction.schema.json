@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "contradiction.schema.json",
+  "title": "contradiction",
+  "type": "object",
+  "required": [
+    "contradiction_id",
+    "proposition",
+    "positions",
+    "contradiction_type",
+    "severity",
+    "decision_relevance",
+    "resolution_status",
+    "follow_up_query"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "contradiction_id": { "type": "string", "pattern": "^CTR-" },
+    "proposition": { "type": "string" },
+    "positions": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["source_id", "evidence_id", "stance", "summary"],
+        "additionalProperties": false,
+        "properties": {
+          "source_id": { "type": "string" },
+          "evidence_id": { "type": "string" },
+          "stance": { "type": "string" },
+          "summary": { "type": "string" }
+        }
+      }
+    },
+    "contradiction_type": {
+      "type": "string",
+      "enum": ["factual", "methodological", "interpretive", "scope"]
+    },
+    "severity": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+    "decision_relevance": { "type": "string" },
+    "resolution_status": {
+      "type": "string",
+      "enum": ["open", "qualified", "resolved", "deferred"]
+    },
+    "follow_up_query": { "type": "string" }
+  }
+}

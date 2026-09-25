@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "experiment_post_review.schema.json",
+  "title": "experiment_post_review",
+  "type": "object",
+  "required": [
+    "experiment_id",
+    "observed_class",
+    "summary",
+    "limitations",
+    "evidence_usability",
+    "transfer_boundary",
+    "status",
+    "not_a_causal_conclusion",
+    "token_budget"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "experiment_id": { "type": "string", "pattern": "^EXP-" },
+    "observed_class": {
+      "type": "string",
+      "enum": ["support", "reject", "inconclusive"]
+    },
+    "summary": { "type": "string", "minLength": 1 },
+    "limitations": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "evidence_usability": {
+      "type": "string",
+      "enum": ["usable_descriptive", "weak", "unusable"]
+    },
+    "transfer_boundary": { "type": "string", "minLength": 1 },
+    "status": { "type": "string", "const": "LOCAL_OBSERVATION" },
+    "not_a_causal_conclusion": { "type": "boolean", "const": true },
+    "token_budget": { "type": "integer", "const": 0 },
+    "reviewed_at": { "type": "string" }
+  }
+}

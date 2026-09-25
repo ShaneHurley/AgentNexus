@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "skill_route",
+  "type": "object",
+  "required": [
+    "request_id",
+    "selected_skill",
+    "confidence"
+  ],
+  "properties": {
+    "request_id": {
+      "type": "string"
+    },
+    "selected_skill": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "mode": {
+      "type": "string"
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "clarify": {
+      "type": "boolean"
+    },
+    "escalate_to": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "rationale": {
+      "type": "string"
+    }
+  }
+}

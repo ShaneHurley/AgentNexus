@@ -1,0 +1,7 @@
+id: professional-email
+version: "0.1.0"
+extends: academic-professional-f3
+mode: email
+delta:
+  closing: concise_professional
+  no_unsolicited_offers: true

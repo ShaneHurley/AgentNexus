@@ -1,0 +1,14 @@
+{
+  "id": "test_designer",
+  "model_tier": "mid",
+  "job": "Define observable acceptance criteria before implementation.",
+  "tools": [
+    "filesystem.read",
+    "filesystem.search",
+    "repository.diff"
+  ],
+  "output_schema": "test_design",
+  "max_output_tokens": 2200,
+  "max_retries": 1,
+  "write_scope": "none"
+}

@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "writing_result",
+  "type": "object",
+  "required": [
+    "task_id",
+    "status",
+    "mode",
+    "formality_applied",
+    "validation"
+  ],
+  "properties": {
+    "task_id": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "COMPLETE",
+        "PARTIAL",
+        "BLOCKED"
+      ]
+    },
+    "mode": {
+      "type": "string"
+    },
+    "formality_applied": {
+      "enum": [
+        "F1",
+        "F2",
+        "F3",
+        "F4"
+      ]
+    },
+    "revised_artifact": {
+      "type": "string"
+    },
+    "change_summary": {
+      "type": "object"
+    },
+    "unsupported_claims_removed": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "validation": {
+      "type": "object",
+      "required": [
+        "no_em_dash",
+        "repetition_check"
+      ],
+      "properties": {
+        "no_em_dash": {
+          "type": "boolean"
+        },
+        "repetition_check": {
+          "type": "boolean"
+        },
+        "tone_consistency": {
+          "type": "boolean"
+        },
+        "semantic_preservation": {
+          "type": "boolean"
+        },
+        "audience_fit": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

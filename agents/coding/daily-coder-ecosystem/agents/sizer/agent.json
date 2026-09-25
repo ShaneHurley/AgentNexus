@@ -1,0 +1,10 @@
+{
+  "id": "sizer",
+  "model_tier": "lowest",
+  "job": "Classify task size without changing scope.",
+  "tools": [],
+  "output_schema": "sizing",
+  "max_output_tokens": 1000,
+  "max_retries": 1,
+  "write_scope": "none"
+}

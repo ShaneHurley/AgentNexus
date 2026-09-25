@@ -1,0 +1,10 @@
+{
+  "id": "frontier_advisor",
+  "model_tier": "frontier",
+  "job": "Resolve one compressed, qualifying hard decision; do no routine work.",
+  "tools": [],
+  "output_schema": "frontier_advice",
+  "max_output_tokens": 3500,
+  "max_retries": 0,
+  "write_scope": "none"
+}

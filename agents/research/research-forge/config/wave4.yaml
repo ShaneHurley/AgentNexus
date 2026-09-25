@@ -1,0 +1,10 @@
+version: "1.0.0"
+parallel_ideators: 3
+min_distinct_ideas: 3
+repair:
+  max_attempts: 2
+audit_sample_seed: 42
+cost_estimate_usd: 0.55
+portfolio:
+  require_experiment_per_survivor: true
+  preserve_rejected: true

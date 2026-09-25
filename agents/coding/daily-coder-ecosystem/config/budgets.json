@@ -1,0 +1,39 @@
+{
+  "profiles": {
+    "S": {
+      "total_tokens": 40000,
+      "max_calls": 12,
+      "research_lanes": 1,
+      "brainstorm_lanes": 0,
+      "frontier_calls": 0
+    },
+    "M": {
+      "total_tokens": 80000,
+      "max_calls": 24,
+      "research_lanes": 3,
+      "brainstorm_lanes": 0,
+      "frontier_calls": 1,
+      "early_stop_min_cards": 2
+    },
+    "L": {
+      "total_tokens": 140000,
+      "max_calls": 40,
+      "research_lanes": 5,
+      "brainstorm_lanes": 1,
+      "frontier_calls": 1
+    },
+    "XL": {
+      "total_tokens": 220000,
+      "max_calls": 50,
+      "research_lanes": 6,
+      "brainstorm_lanes": 3,
+      "frontier_calls": 1
+    }
+  },
+  "thresholds": {
+    "warn_fraction": 0.7,
+    "checkpoint_fraction": 0.8,
+    "hard_stop_fraction": 0.9,
+    "reserve_fraction": 0.1
+  }
+}

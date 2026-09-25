@@ -1,0 +1,8 @@
+id: technical-documentation-f4
+version: "0.1.0"
+extends: warm-professional-base
+formality: F4
+audience: [contributor, reviewer, maintainer]
+delta:
+  tone: formal_technical
+  require_source_alignment: true

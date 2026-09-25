@@ -1,0 +1,7 @@
+{
+  "tier": "mid",
+  "model_ref": "tier:mid",
+  "fallback_policy": "configured-tier-fallback",
+  "temperature": "provider_default",
+  "reasoning": "adaptive"
+}

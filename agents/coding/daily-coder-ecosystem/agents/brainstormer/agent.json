@@ -1,0 +1,10 @@
+{
+  "id": "brainstormer",
+  "model_tier": "mid",
+  "job": "Generate materially different options, including one non-obvious option when justified; returning none is valid.",
+  "tools": [],
+  "output_schema": "brainstorm",
+  "max_output_tokens": 1800,
+  "max_retries": 1,
+  "write_scope": "none"
+}

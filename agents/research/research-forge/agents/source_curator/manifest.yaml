@@ -1,0 +1,7 @@
+role_id: source_curator
+interface_version: "1.0.0"
+input_schema: scout_result
+output_schema: curator_triage
+budget_profile: S
+tools:
+  - source_registry

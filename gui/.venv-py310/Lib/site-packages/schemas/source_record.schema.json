@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "source_record.schema.json",
+  "title": "source_record",
+  "type": "object",
+  "required": [
+    "source_id",
+    "canonical_title",
+    "authors_or_owner",
+    "source_type",
+    "publication_state",
+    "date",
+    "canonical_url",
+    "retrieved_at",
+    "primary_or_derivative",
+    "access_level",
+    "content_hash",
+    "content_hash_algorithm",
+    "retrieval_method",
+    "registry_status"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "source_id": { "type": "string", "pattern": "^SRC-" },
+    "canonical_title": { "type": "string" },
+    "authors_or_owner": { "type": "array", "items": { "type": "string" } },
+    "source_type": {
+      "type": "string",
+      "enum": [
+        "paper",
+        "standard",
+        "official_doc",
+        "code",
+        "dataset",
+        "review",
+        "postmortem",
+        "other"
+      ]
+    },
+    "publication_state": {
+      "type": "string",
+      "enum": ["published", "preprint", "draft", "retracted", "corrected", "unknown"]
+    },
+    "date": { "type": "string" },
+    "version": { "type": "string" },
+    "canonical_url": { "type": "string" },
+    "retrieved_at": { "type": "string" },
+    "primary_or_derivative": {
+      "type": "string",
+      "enum": ["primary", "independent_secondary", "derivative", "unknown"]
+    },
+    "provenance_parent_ids": { "type": "array", "items": { "type": "string" } },
+    "conflicts_of_interest": { "type": "array", "items": { "type": "string" } },
+    "retraction_or_correction_status": { "type": "string" },
+    "access_level": {
+      "type": "string",
+      "enum": ["full", "abstract", "snippet", "metadata"]
+    },
+    "content_hash": { "type": "string" },
+    "content_hash_algorithm": { "type": "string" },
+    "retrieval_method": { "type": "string" },
+    "license": { "type": "string" },
+    "language": { "type": "string" },
+    "identifiers": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "registry_status": {
+      "type": "string",
+      "enum": ["screen", "deep_read", "reference_only", "reject", "follow_citations"]
+    },
+    "rejection_reason": { "type": ["string", "null"] }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "run_id": "74c99fdf-3c94-49d0-a7c7-4b1a9fafae2d",
+  "kind": "acceptance",
+  "producer_role": "orchestrator",
+  "created_at": 1790101964.8608084,
+  "payload": {
+    "verdict": "simulated",
+    "basis": "mock provider run; contracts exercised, repository correctness not certified",
+    "checks": {
+      "artifact:decide": true,
+      "artifact:plan": true,
+      "artifact:plan_review": true,
+      "decision_has_criteria": true,
+      "plan_resolved": true,
+      "plan_review_pass": true,
+      "plan_approved": true,
+      "scope_clean": true,
+      "tests_pass": true,
+      "code_review_pass": true,
+      "alignment_pass": true,
+      "revision_pinned": true
+    },
+    "failures": []
+  }
+}

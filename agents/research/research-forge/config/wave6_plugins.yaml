@@ -1,0 +1,25 @@
+plugins:
+  - plugin_id: mock_scholarly
+    entrypoint: research_forge.wave6.adapters.scholarly:MockScholarlySearchAdapter
+    approved: true
+    signature: a1b2c3d4e5f67890
+    manifest:
+      adapter_id: mock_scholarly
+      version: "1.0.0"
+      protocol_version: "1.0.0"
+      capabilities:
+        read: true
+        write: false
+        network: false
+        pagination: true
+        rate_limit: true
+        hash_content: true
+        locator: true
+        access_disclosure: true
+        data_class: public
+      allowed_operations:
+        - search
+        - read
+      network: false
+      credential: false
+      data_class: public

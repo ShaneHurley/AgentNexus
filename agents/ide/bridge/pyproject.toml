@@ -1,0 +1,16 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ide-bridge"
+version = "0.1.0"
+description = "Thin CLI wrappers from IDE agents to Daily Coder and Research Forge (mock default)"
+readme = "README.md"
+requires-python = ">=3.10"
+
+[project.scripts]
+ide-bridge = "ide_bridge.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["ide_bridge"]

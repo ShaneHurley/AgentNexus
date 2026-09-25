@@ -1,0 +1,51 @@
+{
+  "tiers": {
+    "lowest": {
+      "models": [
+        "gpt-4o-mini"
+      ],
+      "fallback": [
+        "qwen2.5-coder"
+      ],
+      "reasoning": false
+    },
+    "mid": {
+      "models": [
+        "claude-haiku-4-5"
+      ],
+      "fallback": [
+        "gpt-4o-mini"
+      ],
+      "reasoning": false
+    },
+    "high": {
+      "models": [
+        "claude-sonnet-4-5"
+      ],
+      "fallback": [
+        "gpt-4o"
+      ],
+      "reasoning": false
+    },
+    "frontier": {
+      "models": [
+        "claude-opus-4-5"
+      ],
+      "fallback": [
+        "claude-sonnet-4-5"
+      ],
+      "reasoning": true
+    }
+  },
+  "frontier_policy": {
+    "max_calls_per_run": 1,
+    "requires_documented_lower_tier_failure": true,
+    "requires_compressed_decision_brief": true,
+    "triggers": [
+      "high_risk_irreversible",
+      "unresolved_architecture_choice",
+      "contradictory_verified_evidence",
+      "two_failed_repair_cycles"
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+version: "1.0.0"
+curator_weights:
+  relevance: 0.2
+  authority: 0.15
+  independence: 0.15
+  uniqueness: 0.1
+  access: 0.1
+  recency: 0.1
+  contradiction_value: 0.1
+  expected_information_gain: 0.1
+routing_scores:
+  fan_out_coverage_delta_min: 0.1
+  fan_out_cost_regression_max: 1.25

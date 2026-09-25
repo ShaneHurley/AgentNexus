@@ -1,0 +1,5 @@
+mode: mock
+ledger_path: runs/ledger.jsonl
+run_workspace: runs/workspace
+policy_config: config/policies.yaml
+budget_config: config/budgets.yaml

@@ -1,0 +1,40 @@
+{
+  "pairs": [
+    {
+      "left": {
+        "idea_id": "IDEA-P1",
+        "title": "Alpha modular monolith",
+        "proposal": "Deploy modular monolith with service module Alpha handling widgets",
+        "root_cause_model": "Tight coupling causes outages",
+        "components": ["module Alpha", "widget cache"],
+        "falsification_test": "Outage rate unchanged"
+      },
+      "right": {
+        "idea_id": "IDEA-P2",
+        "title": "Beta modular monolith",
+        "proposal": "Deploy modular monolith with service module Beta handling widgets",
+        "root_cause_model": "Tight coupling causes outages",
+        "components": ["module Beta", "widget cache"],
+        "falsification_test": "Outage rate unchanged"
+      },
+      "expect_flags": ["paraphrase", "renamed_modules_same_architecture"]
+    },
+    {
+      "left": {
+        "idea_id": "IDEA-G1",
+        "proposal": "Follow industry best practice holistic digital transformation",
+        "root_cause_model": "Unknown",
+        "components": [],
+        "falsification_test": "N/A"
+      },
+      "right": {
+        "idea_id": "IDEA-G2",
+        "proposal": "Apply best practice synergy program",
+        "root_cause_model": "Unknown",
+        "components": [],
+        "falsification_test": "N/A"
+      },
+      "expect_flags": ["generic_best_practice"]
+    }
+  ]
+}

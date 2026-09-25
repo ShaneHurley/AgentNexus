@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "scout_result.schema.json",
+  "title": "scout_result",
+  "type": "object",
+  "required": ["lane_id", "query_events", "candidates", "stopped_reason"],
+  "additionalProperties": true,
+  "properties": {
+    "lane_id": { "type": "string" },
+    "query_events": { "type": "array" },
+    "candidates": { "type": "array" },
+    "stopped_reason": { "type": "string" },
+    "spent_usd": { "type": "number" }
+  }
+}

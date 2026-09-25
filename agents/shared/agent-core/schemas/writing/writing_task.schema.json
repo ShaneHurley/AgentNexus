@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "writing_task",
+  "type": "object",
+  "required": [
+    "task_id",
+    "mode",
+    "purpose"
+  ],
+  "properties": {
+    "task_id": {
+      "type": "string"
+    },
+    "mode": {
+      "enum": [
+        "email",
+        "discussion_post",
+        "message",
+        "small_rewrite",
+        "page_review",
+        "technical_documentation",
+        "code_comment",
+        "readme",
+        "design_document",
+        "change_summary",
+        "style_review"
+      ]
+    },
+    "audience": {
+      "type": "object"
+    },
+    "purpose": {
+      "type": "string"
+    },
+    "source_text": {
+      "type": "string"
+    },
+    "formality": {
+      "enum": [
+        "F1",
+        "F2",
+        "F3",
+        "F4",
+        "auto"
+      ]
+    },
+    "rewrite_scope": {
+      "enum": [
+        "correct_only",
+        "minimal",
+        "moderate",
+        "substantial",
+        "new_from_context",
+        "review_only"
+      ]
+    },
+    "required_facts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "prohibited_claims": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

@@ -1,0 +1,264 @@
+schema_version: "1.0.0"
+locked_defaults:
+  source_systems:
+    - public_web
+    - arxiv
+    - local_files
+  mock_by_default: true
+  paywall_disclosure: >-
+    No paywalled full-text claims beyond disclosed access level; metadata and
+    abstract-only access must be labeled explicitly on every evidence card.
+  director_second_call: >-
+    Second Principal Director call disabled except explicitly approved XL runs
+    with approval token, conflict flag, and budget reserve.
+  plan_reference: >-
+    deep_researcher_ecosystem_38ffc398.plan.md locked defaults (package path,
+    mock-by-default, read-only discovery).
+decisions:
+  - id: RF-DEC-01
+    question: Initial domains and source systems in scope
+    options:
+      - general_technical
+      - domain_specific_list
+      - user_declared_per_run
+    selected_value: public_web, arxiv, local_files (locked defaults)
+    status: resolved
+    owner: product
+    due_date: "2026-09-01"
+    rationale: Wave 0 mock scaffold uses locked defaults from master plan.
+    affected_waves: [0, 1]
+    blocking: false
+    earliest_blocking_boundary: none
+  - id: RF-DEC-02
+    question: Public-only versus internal enterprise research
+    options:
+      - public_only_v1
+      - internal_with_policy
+      - hybrid
+    selected_value: null
+    status: accepted_unknown
+    owner: security
+    due_date: "2026-10-01"
+    rationale: v1 scaffold is public/mock; enterprise routing deferred.
+    affected_waves: [1, 2]
+    blocking: true
+    earliest_blocking_boundary: wave_1_live
+    accepted_unknown:
+      safe_fallback: public confidentiality only until internal adapters approved
+      risk: internal sources unavailable in live mode until resolved
+      expiration: "2026-12-31"
+      reconsideration_trigger: first internal_knowledge adapter promotion gate
+  - id: RF-DEC-03
+    question: Available model providers and concrete tier mapping
+    options:
+      - mock_only_wave0
+      - multi_provider
+    selected_value: mock_only_wave0
+    status: resolved
+    owner: platform
+    due_date: "2026-09-01"
+    rationale: Wave 0 requires deterministic mock model only.
+    affected_waves: [0]
+    blocking: false
+    earliest_blocking_boundary: none
+  - id: RF-DEC-04
+    question: Per-task and daily spend ceilings
+    options:
+      - profile_defaults_SMLXL
+      - custom_enterprise
+    selected_value: null
+    status: accepted_unknown
+    owner: finance
+    due_date: "2026-10-15"
+    rationale: S/M/L/XL profiles encoded in config; enterprise daily cap TBD.
+    affected_waves: [1]
+    blocking: true
+    earliest_blocking_boundary: wave_1_live
+    accepted_unknown:
+      safe_fallback: use budget profiles from config/budgets.yaml and user maximum_cost
+      risk: daily aggregate cap not enforced until configured
+      expiration: "2026-11-30"
+      reconsideration_trigger: Wave 1 live gate review
+  - id: RF-DEC-05
+    question: Required citation style and artifact formats
+    options:
+      - apa
+      - chicago
+      - ieee
+      - markdown_ids
+    selected_value: null
+    status: accepted_unknown
+    owner: editorial
+    due_date: "2026-10-01"
+    rationale: Wave 0 uses source IDs; display adapter deferred to Wave 1.
+    affected_waves: [1]
+    blocking: true
+    earliest_blocking_boundary: wave_1_mock
+    accepted_unknown:
+      safe_fallback: canonical source_id + locator in report; formatting adapter stub
+      risk: external style compliance not guaranteed in mock slice
+      expiration: "2026-10-31"
+      reconsideration_trigger: Report Composer Wave 1 task
+  - id: RF-DEC-06
+    question: High-stakes domains requiring human or SME review
+    options:
+      - none_v1
+      - configured_list
+    selected_value: null
+    status: accepted_unknown
+    owner: compliance
+    due_date: "2026-11-01"
+    rationale: Policy gateway can deny by domain tag when list exists.
+    affected_waves: [2, 3]
+    blocking: true
+    earliest_blocking_boundary: wave_2_plus
+    accepted_unknown:
+      safe_fallback: flag sensitive domains in Charter; no auto-release without audit pass
+      risk: under-review for medical/legal/financial until list published
+      expiration: "2027-03-31"
+      reconsideration_trigger: promotion gate 18.4
+  - id: RF-DEC-07
+    question: Data retention, deletion, confidentiality, and export rules
+    options:
+      - local_run_workspace
+      - enterprise_dlp
+    selected_value: null
+    status: accepted_unknown
+    owner: legal
+    due_date: "2026-12-01"
+    rationale: Ledger export with redaction in Wave 0; enterprise DLP later.
+    affected_waves: [1, 6]
+    blocking: true
+    earliest_blocking_boundary: wave_1_live
+    accepted_unknown:
+      safe_fallback: configurable retention.yaml; default local run dir purge manual
+      risk: no automated enterprise deletion until integrated
+      expiration: "2027-06-30"
+      reconsideration_trigger: Wave 6 maintenance tasks
+  - id: RF-DEC-08
+    question: Whether local source files may be cached and for how long
+    options:
+      - no_cache
+      - content_hash_cache
+      - ttl_cache
+    selected_value: content_hash_cache
+    status: resolved
+    owner: platform
+    due_date: "2026-09-01"
+    rationale: Hash-based dedupe in Wave 0; TTL policy in retention.yaml placeholder.
+    affected_waves: [0, 1]
+    blocking: false
+    earliest_blocking_boundary: none
+  - id: RF-DEC-09
+    question: Authorized scholarly databases, standards, code hosts, internal tools
+    options:
+      - mock_adapters_only
+      - approved_live_list
+    selected_value: mock_adapters_only
+    status: resolved
+    owner: platform
+    due_date: "2026-09-01"
+    rationale: Wave 0 mock search/reader only; live list gated at Wave 1.
+    affected_waves: [0, 1]
+    blocking: false
+    earliest_blocking_boundary: none
+  - id: RF-DEC-10
+    question: Paywalled sources and access level disclosure
+    options:
+      - disallow
+      - metadata_only
+      - disclosed_partial
+    selected_value: disclosed_partial
+    status: resolved
+    owner: editorial
+    due_date: "2026-09-01"
+    rationale: Locked default paywall disclosure enforced on evidence cards.
+    affected_waves: [0, 1]
+    blocking: false
+    earliest_blocking_boundary: none
+  - id: RF-DEC-11
+    question: Required languages and geographic coverage
+    options:
+      - english_default
+      - multilingual
+    selected_value: null
+    status: accepted_unknown
+    owner: product
+    due_date: "2026-10-01"
+    rationale: Charter field available; default English for Wave 1 mock.
+    affected_waves: [1]
+    blocking: true
+    earliest_blocking_boundary: wave_1_mock
+    accepted_unknown:
+      safe_fallback: English unless Charter specifies otherwise
+      risk: non-English sources may be under-covered
+      expiration: "2026-12-31"
+      reconsideration_trigger: Charter Planner localization review
+  - id: RF-DEC-12
+    question: Locked evaluation set and expert-review process
+    options:
+      - wave1_baseline_25
+      - extended_suite
+    selected_value: null
+    status: accepted_unknown
+    owner: eval
+    due_date: "2026-11-15"
+    rationale: Wave 1-J defines baseline; full suite locks at promotion.
+    affected_waves: [1, 2]
+    blocking: true
+    earliest_blocking_boundary: wave_2_plus
+    accepted_unknown:
+      safe_fallback: contract tests + adversarial fixtures in repo
+      risk: expert rubric not calibrated until Wave 1-J
+      expiration: "2027-01-31"
+      reconsideration_trigger: Wave 1-J completion
+  - id: RF-DEC-13
+    question: Threshold for a second Principal Director call
+    options:
+      - disabled
+      - xl_conflict_only
+    selected_value: xl_conflict_only
+    status: resolved
+    owner: product
+    due_date: "2026-09-01"
+    rationale: Locked default; Budget Manager enforces counter.
+    affected_waves: [0, 5]
+    blocking: false
+    earliest_blocking_boundary: none
+  - id: RF-DEC-14
+    question: Future experiment capabilities separate from read-only research
+    options:
+      - read_only_only_v1
+      - optional_experiment_planner
+      - local_token_free_experiments_human_gated
+    selected_value: local_token_free_experiments_human_gated
+    status: resolved
+    owner: product
+    due_date: "2026-09-22"
+    rationale: >
+      Wave 4 Experiment Architect plans remain non-executing.
+      Local typed experiments (dataset_profile, group_comparison,
+      python_unittest_benchmark) may run only via human-gated CLI with
+      adversarial pre-review, explicit approvals, and token_budget=0.
+      Results are LOCAL_OBSERVATION until a human or auditor promotes transfer.
+    affected_waves: [0, 4]
+    blocking: false
+    earliest_blocking_boundary: none
+  - id: RF-DEC-15
+    question: Ownership and approval for prompt, skill, routing, source-policy changes
+    options:
+      - human_review_required
+      - automated_canary
+    selected_value: null
+    status: accepted_unknown
+    owner: eng_lead
+    due_date: "2026-12-01"
+    rationale: Wave 6 proposals; Wave 0 records requirement only.
+    affected_waves: [6]
+    blocking: true
+    earliest_blocking_boundary: wave_2_plus
+    accepted_unknown:
+      safe_fallback: no silent merge; versioned config only via reviewed PR
+      risk: routing self-activation blocked by host code in Wave 6 design
+      expiration: "2027-06-30"
+      reconsideration_trigger: Wave 6-E proposals task

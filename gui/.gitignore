@@ -1,0 +1,16 @@
+.venv/
+.agent-dashboard/
+*.token
+*.secret
+*.pem
+*.key
+.env
+.env.*
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+dist/
+build/
+*.log
+*.log.err

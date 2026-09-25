@@ -1,0 +1,11 @@
+default_deny: true
+read_only: true
+live_requires_flag: true
+allowed_env_keys:
+  - RF_MODE
+  - RF_RUN_DIR
+blocked_http_methods:
+  - POST
+  - PUT
+  - PATCH
+  - DELETE

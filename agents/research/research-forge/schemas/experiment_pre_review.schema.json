@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "experiment_pre_review.schema.json",
+  "title": "experiment_pre_review",
+  "type": "object",
+  "required": [
+    "experiment_id",
+    "scores",
+    "verdict",
+    "rationale",
+    "requires_long_approval",
+    "requires_code_approval",
+    "requires_external_data_approval",
+    "token_budget"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "experiment_id": { "type": "string", "pattern": "^EXP-" },
+    "scores": {
+      "type": "object",
+      "required": [
+        "actionable",
+        "usable_data",
+        "information_gain",
+        "time_cost",
+        "safety"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "actionable": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "usable_data": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "information_gain": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "time_cost": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "safety": { "type": "integer", "minimum": 1, "maximum": 5 }
+      }
+    },
+    "verdict": { "type": "string", "enum": ["PASS", "REJECT"] },
+    "rationale": { "type": "string", "minLength": 1 },
+    "rejection_reasons": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "requires_long_approval": { "type": "boolean" },
+    "requires_code_approval": { "type": "boolean" },
+    "requires_external_data_approval": { "type": "boolean" },
+    "token_budget": { "type": "integer", "const": 0 },
+    "reviewed_at": { "type": "string" }
+  }
+}

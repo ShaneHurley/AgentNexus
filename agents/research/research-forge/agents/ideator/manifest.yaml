@@ -1,0 +1,11 @@
+role_id: ideator
+
+interface_version: "1.0.0"
+
+input_schema: research_charter
+
+output_schema: candidate_idea
+
+budget_profile: M
+
+tools: []

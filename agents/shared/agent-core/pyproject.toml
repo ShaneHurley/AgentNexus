@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agent-core"
+version = "0.1.0"
+description = "Shared contracts, style profiles, and deterministic helpers for personal skills"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["PyYAML>=6.0"]
+
+[project.scripts]
+personal-store = "agent_core.personal_store:main"
+writing-lint = "agent_core.writing_lint:main"
+agent-core = "agent_core.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["agent_core*"]
+
+[tool.setuptools.package-data]
+agent_core = ["py.typed"]

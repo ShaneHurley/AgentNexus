@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "failure_class",
+    "first_failing_signal",
+    "evidence",
+    "recommended_action",
+    "rationale"
+  ],
+  "properties": {
+    "failure_class": {
+      "type": "string",
+      "enum": ["plan", "implementation", "test", "environment", "orchestration"]
+    },
+    "first_failing_signal": { "type": "string" },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["claim", "locator"],
+        "properties": {
+          "claim": { "type": "string" },
+          "locator": { "type": "string" },
+          "label": { "type": "string", "enum": ["VERIFIED", "INFERENCE", "ASSUMPTION", "HYPOTHESIS", "UNKNOWN"] }
+        },
+        "additionalProperties": false
+      }
+    },
+    "recommended_action": { "type": "string", "enum": ["repair", "stop", "escalate"] },
+    "target_phase": { "type": "string" },
+    "rationale": { "type": "string" },
+    "unknowns": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": false
+}

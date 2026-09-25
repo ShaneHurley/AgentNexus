@@ -1,0 +1,16 @@
+{
+  "tasks": [
+    {
+      "task_id": "exit-value-1",
+      "stratum": "multi_idea_fusion",
+      "expectations": {
+        "director_quality": 0.84,
+        "no_director_quality": 0.73,
+        "director_unsupported": 0,
+        "no_director_unsupported": 1,
+        "director_cost_usd": 1.25,
+        "skip_classes": ["quick_summary", "none"]
+      }
+    }
+  ]
+}

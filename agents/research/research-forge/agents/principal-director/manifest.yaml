@@ -1,0 +1,12 @@
+role_id: principal_research_director
+
+interface_version: "1.0.0"
+
+input_schema: director_packet
+
+output_schema: director_synthesis
+
+budget_profile: L
+
+tools:
+  - structured_synthesis

@@ -1,0 +1,4 @@
+{
+  "documentation_curator_after_document": false,
+  "_comment": "All flags default false — current production behavior unchanged. See docs/ide-agents/token-efficiency-experiments.md"
+}

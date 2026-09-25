@@ -1,0 +1,66 @@
+{
+  "ideas": [
+    {
+      "fixture_id": "invented_source",
+      "idea": {
+        "idea_id": "IDEA-FAB-1",
+        "title": "Bad cite",
+        "lineage": [],
+        "root_cause_model": "X",
+        "proposal": "Do Y",
+        "evidence_ids": ["EVD-INVENTED"],
+        "assumptions": [],
+        "falsification_test": "test",
+        "status": "active",
+        "opportunity_type": "incremental",
+        "baseline": "baseline",
+        "lineage_hash": "sha256:aa"
+      },
+      "expect_issues": ["invented_source:EVD-INVENTED"]
+    },
+    {
+      "fixture_id": "unsupported_novelty",
+      "idea": {
+        "idea_id": "IDEA-FAB-2",
+        "title": "Novel",
+        "lineage": [],
+        "root_cause_model": "X",
+        "proposal": "This is the first novel approach ever",
+        "evidence_ids": [],
+        "assumptions": [],
+        "falsification_test": "test",
+        "status": "active",
+        "opportunity_type": "research",
+        "baseline": "baseline",
+        "lineage_hash": "sha256:bb"
+      },
+      "expect_issues": ["unsupported_novelty_language"]
+    },
+    {
+      "fixture_id": "template_rag",
+      "idea": {
+        "idea_id": "IDEA-FAB-3",
+        "title": "RAG",
+        "lineage": [],
+        "root_cause_model": "",
+        "proposal": "Add generic RAG pipeline",
+        "components": ["vector store"],
+        "evidence_ids": [],
+        "assumptions": [],
+        "falsification_test": "",
+        "status": "active",
+        "opportunity_type": "architectural",
+        "baseline": "baseline",
+        "lineage_hash": "sha256:cc"
+      },
+      "expect_issues_prefix": "template_default:"
+    }
+  ],
+  "evidence_index": {
+    "EVD-A1": {
+      "evidence_id": "EVD-A1",
+      "source_id": "SRC-A",
+      "verifier_status": "passed"
+    }
+  }
+}

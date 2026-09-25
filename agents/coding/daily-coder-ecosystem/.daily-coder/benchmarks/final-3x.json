@@ -1,0 +1,219 @@
+{
+  "version": 1,
+  "created_at": 1790102856.384983,
+  "config_hash": "92b1b3a3b262670f6ef3b5d71c1bd0af929136ca5c702bcaf24226ae164af185",
+  "records": [
+    {
+      "scenario": "trivial",
+      "repeat": 0,
+      "run_id": "cc23eddd-ef18-4f96-88b0-744ec6f72672",
+      "expected_profile": "S",
+      "profile": "S",
+      "status": "SIMULATED",
+      "calls": 9,
+      "tokens": 900,
+      "latency_ms": 2063.398,
+      "input_tokens": 450,
+      "output_tokens": 450,
+      "repairs": 0
+    },
+    {
+      "scenario": "trivial",
+      "repeat": 1,
+      "run_id": "58800157-5b8c-4128-b9f0-cbdcf59b954f",
+      "expected_profile": "S",
+      "profile": "S",
+      "status": "SIMULATED",
+      "calls": 9,
+      "tokens": 900,
+      "latency_ms": 2227.992,
+      "input_tokens": 450,
+      "output_tokens": 450,
+      "repairs": 0
+    },
+    {
+      "scenario": "trivial",
+      "repeat": 2,
+      "run_id": "f7ef58a1-4855-46a1-9ebb-c2be9ff6b80d",
+      "expected_profile": "S",
+      "profile": "S",
+      "status": "SIMULATED",
+      "calls": 9,
+      "tokens": 900,
+      "latency_ms": 6939.814,
+      "input_tokens": 450,
+      "output_tokens": 450,
+      "repairs": 0
+    },
+    {
+      "scenario": "contained",
+      "repeat": 0,
+      "run_id": "5df0a9d1-00cd-4e90-bc7a-ed9aa0182677",
+      "expected_profile": "M",
+      "profile": "M",
+      "status": "SIMULATED",
+      "calls": 14,
+      "tokens": 1400,
+      "latency_ms": 2308.335,
+      "input_tokens": 650,
+      "output_tokens": 650,
+      "repairs": 0
+    },
+    {
+      "scenario": "contained",
+      "repeat": 1,
+      "run_id": "4a61ac02-7406-4a88-bffe-df1732f56479",
+      "expected_profile": "M",
+      "profile": "M",
+      "status": "SIMULATED",
+      "calls": 14,
+      "tokens": 1400,
+      "latency_ms": 1848.682,
+      "input_tokens": 650,
+      "output_tokens": 650,
+      "repairs": 0
+    },
+    {
+      "scenario": "contained",
+      "repeat": 2,
+      "run_id": "f186e291-99de-4ef2-a148-30ce03ab651c",
+      "expected_profile": "M",
+      "profile": "M",
+      "status": "SIMULATED",
+      "calls": 14,
+      "tokens": 1400,
+      "latency_ms": 1725.507,
+      "input_tokens": 650,
+      "output_tokens": 650,
+      "repairs": 0
+    },
+    {
+      "scenario": "cross_cutting",
+      "repeat": 0,
+      "run_id": "f111f1c2-329b-4812-a98a-de6d4ad9c58a",
+      "expected_profile": "L",
+      "profile": "L",
+      "status": "SIMULATED",
+      "calls": 18,
+      "tokens": 1800,
+      "latency_ms": 3478.334,
+      "input_tokens": 800,
+      "output_tokens": 800,
+      "repairs": 0
+    },
+    {
+      "scenario": "cross_cutting",
+      "repeat": 1,
+      "run_id": "c5336bb4-bc21-4874-a2dc-de3d2ff9debf",
+      "expected_profile": "L",
+      "profile": "L",
+      "status": "SIMULATED",
+      "calls": 18,
+      "tokens": 1800,
+      "latency_ms": 1960.59,
+      "input_tokens": 800,
+      "output_tokens": 800,
+      "repairs": 0
+    },
+    {
+      "scenario": "cross_cutting",
+      "repeat": 2,
+      "run_id": "6b721b0b-02cb-4c21-a58e-ea2946fe29a0",
+      "expected_profile": "L",
+      "profile": "L",
+      "status": "SIMULATED",
+      "calls": 18,
+      "tokens": 1800,
+      "latency_ms": 5586.68,
+      "input_tokens": 800,
+      "output_tokens": 800,
+      "repairs": 0
+    },
+    {
+      "scenario": "high_risk",
+      "repeat": 0,
+      "run_id": "c9414ec5-8d9e-4973-87ae-3b183da0679c",
+      "expected_profile": "XL",
+      "profile": "XL",
+      "status": "SIMULATED",
+      "calls": 20,
+      "tokens": 2000,
+      "latency_ms": 3304.937,
+      "input_tokens": 850,
+      "output_tokens": 850,
+      "repairs": 0
+    },
+    {
+      "scenario": "high_risk",
+      "repeat": 1,
+      "run_id": "bb8ee62c-1871-425f-aa94-e764cb7a13a2",
+      "expected_profile": "XL",
+      "profile": "XL",
+      "status": "SIMULATED",
+      "calls": 20,
+      "tokens": 2000,
+      "latency_ms": 1982.439,
+      "input_tokens": 850,
+      "output_tokens": 850,
+      "repairs": 0
+    },
+    {
+      "scenario": "high_risk",
+      "repeat": 2,
+      "run_id": "1afcea5b-c74a-474b-9384-1e82f6defb90",
+      "expected_profile": "XL",
+      "profile": "XL",
+      "status": "SIMULATED",
+      "calls": 20,
+      "tokens": 2000,
+      "latency_ms": 4227.006,
+      "input_tokens": 850,
+      "output_tokens": 850,
+      "repairs": 0
+    }
+  ],
+  "summary": {
+    "runs": 12,
+    "verified_routes": 12,
+    "successful": 12,
+    "median_calls": 16.0,
+    "p90_calls": 20,
+    "median_tokens": 1600.0,
+    "p90_tokens": 2000,
+    "median_latency_ms": 2268.164,
+    "p90_latency_ms": 5586.68
+  },
+  "comparison": {
+    "median_calls": {
+      "before": 16.0,
+      "after": 16.0,
+      "percent": 0.0
+    },
+    "p90_calls": {
+      "before": 20,
+      "after": 20,
+      "percent": 0.0
+    },
+    "median_tokens": {
+      "before": 1600.0,
+      "after": 1600.0,
+      "percent": 0.0
+    },
+    "p90_tokens": {
+      "before": 2000,
+      "after": 2000,
+      "percent": 0.0
+    },
+    "median_latency_ms": {
+      "before": 2224.023,
+      "after": 2268.164,
+      "percent": 1.98
+    },
+    "p90_latency_ms": {
+      "before": 4592.854,
+      "after": 5586.68,
+      "percent": 21.64
+    },
+    "success_regression": false
+  }
+}

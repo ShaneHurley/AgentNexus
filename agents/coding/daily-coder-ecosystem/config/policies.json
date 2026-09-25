@@ -1,0 +1,49 @@
+{
+  "path_policy": {
+    "deny": [
+      ".git/**",
+      "**/.env",
+      "**/.env.*",
+      "**/*secret*",
+      "**/*credential*",
+      "**/id_rsa*",
+      "**/*.pem",
+      ".daily-coder/**"
+    ],
+    "write_requires_plan_allowlist": true,
+    "resolve_symlinks": true,
+    "repo_root_jail": true
+  },
+  "command_policy": {
+    "allow": ["python", "python3", "py", "pytest", "npm", "npx", "node", "go", "cargo", "dotnet", "git", "make", "ruff", "mypy"],
+    "max_timeout_s": 21600
+  },
+  "network_policy": {
+    "default": "deny",
+    "read_only_web_enabled": true,
+    "research_read_only": true,
+    "external_write_requires_human": true,
+    "search_backend": "brave",
+    "allow_domains": [],
+    "deny_domains": ["localhost", "metadata.google.internal", "169.254.169.254"],
+    "timeout_s": 20,
+    "max_calls_per_run": 20
+  },
+  "review_separation": {
+    "reviewer_cannot_equal_author": true,
+    "review_reads_diff_before_author_commentary": true,
+    "test_executor_cannot_equal_test_author": true
+  },
+  "state_policy": {
+    "authority": "sqlite",
+    "artifacts": "immutable_evidence",
+    "idempotency_key_required": true
+  },
+  "claim_labels": [
+    "VERIFIED",
+    "INFERENCE",
+    "ASSUMPTION",
+    "HYPOTHESIS",
+    "UNKNOWN"
+  ]
+}

@@ -1,0 +1,64 @@
+[
+  {
+    "fixture_kind": "misleading_average",
+    "source_id": "SRC-F1",
+    "evidence": {
+      "evidence_id": "EVD-F1",
+      "claim": "Average throughput increased 40%",
+      "is_material_numerical": true,
+      "methods_fixture_kind": "misleading_average"
+    }
+  },
+  {
+    "fixture_kind": "missing_denominator",
+    "source_id": "SRC-F2",
+    "evidence": {
+      "evidence_id": "EVD-F2",
+      "claim": "Error rate is 2%",
+      "is_material_numerical": true,
+      "methods_fixture_kind": "missing_denominator"
+    }
+  },
+  {
+    "fixture_kind": "no_variance",
+    "source_id": "SRC-F3",
+    "evidence": {
+      "evidence_id": "EVD-F3",
+      "claim": "Accuracy 99%",
+      "is_material_numerical": true,
+      "units_and_denominator": "99/100",
+      "methods_fixture_kind": "no_variance"
+    }
+  },
+  {
+    "fixture_kind": "weak_baseline",
+    "source_id": "SRC-F4",
+    "evidence": {
+      "evidence_id": "EVD-F4",
+      "claim": "Beats weak baseline by 10 points",
+      "weak_baseline": true,
+      "methods_fixture_kind": "weak_baseline"
+    }
+  },
+  {
+    "fixture_kind": "leakage",
+    "source_id": "SRC-F5",
+    "evidence": {
+      "evidence_id": "EVD-F5",
+      "claim": "SOTA on benchmark with test set leak suspected",
+      "leakage_risk": true,
+      "methods_fixture_kind": "leakage"
+    }
+  },
+  {
+    "fixture_kind": "causal_overclaim",
+    "source_id": "SRC-F6",
+    "study_types": ["observational"],
+    "evidence": {
+      "evidence_id": "EVD-F6",
+      "claim": "Intervention X causes higher retention",
+      "causal_overclaim": true,
+      "methods_fixture_kind": "causal_overclaim"
+    }
+  }
+]

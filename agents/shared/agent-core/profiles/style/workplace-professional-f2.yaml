@@ -1,0 +1,7 @@
+id: workplace-professional-f2
+version: "0.1.0"
+extends: warm-professional-base
+formality: F2
+audience: [coworker, engineer, ta, partner]
+delta:
+  tone: professional_collaborative

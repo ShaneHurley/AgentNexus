@@ -1,0 +1,7 @@
+{
+  "tier": "frontier",
+  "model_ref": "tier:frontier",
+  "fallback_policy": "return-to-master",
+  "temperature": "provider_default",
+  "reasoning": "high"
+}

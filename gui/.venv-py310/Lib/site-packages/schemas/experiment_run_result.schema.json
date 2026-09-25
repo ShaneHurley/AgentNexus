@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "experiment_run_result.schema.json",
+  "title": "experiment_run_result",
+  "type": "object",
+  "required": [
+    "experiment_id",
+    "kind",
+    "exit_code",
+    "duration_seconds",
+    "metrics",
+    "token_budget",
+    "raw_stdout_tail",
+    "raw_stderr_tail"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "experiment_id": { "type": "string", "pattern": "^EXP-" },
+    "kind": {
+      "type": "string",
+      "enum": ["dataset_profile", "group_comparison", "python_unittest_benchmark"]
+    },
+    "exit_code": { "type": "integer" },
+    "duration_seconds": { "type": "number", "minimum": 0 },
+    "metrics": { "type": "object" },
+    "token_budget": { "type": "integer", "const": 0 },
+    "raw_stdout_tail": { "type": "string" },
+    "raw_stderr_tail": { "type": "string" },
+    "error": { "type": "string" },
+    "finished_at": { "type": "string" }
+  }
+}

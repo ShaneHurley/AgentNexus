@@ -1,0 +1,8 @@
+id: academic-professional-f3
+version: "0.1.0"
+extends: warm-professional-base
+formality: F3
+audience: [professor, advisor, manager, recruiter]
+delta:
+  tone: formal_professional
+  structure: purpose_early_specific_request

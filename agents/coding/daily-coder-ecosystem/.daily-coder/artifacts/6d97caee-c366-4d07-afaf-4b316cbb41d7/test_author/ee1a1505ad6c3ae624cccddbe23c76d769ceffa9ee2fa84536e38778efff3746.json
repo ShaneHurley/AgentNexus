@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "run_id": "6d97caee-c366-4d07-afaf-4b316cbb41d7",
+  "kind": "test_author",
+  "producer_role": "test_author",
+  "created_at": 1790094220.81468,
+  "payload": {
+    "changed_test_files": [],
+    "criterion_mapping": [],
+    "negative_control": "not_applicable"
+  }
+}

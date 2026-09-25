@@ -1,0 +1,6 @@
+allowed_schemes:
+  - https
+  - http
+  - file
+mock_search_adapter: adapters.web_search.mock
+mock_reader_adapter: adapters.local_files.mock

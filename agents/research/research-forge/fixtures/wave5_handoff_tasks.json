@@ -1,0 +1,36 @@
+{
+  "policy_version": "1.0.0",
+  "regression_fingerprint": "a1b2c3d4e5f67890",
+  "tasks": [
+    {
+      "task_id": "handoff-easy-1",
+      "stratum": "easy_synthesis",
+      "expectations": {
+        "quality": 0.75,
+        "packet_boost": 0.07,
+        "raw_penalty": 0.04,
+        "unsupported_claims": { "raw_trajectory": 1, "director_packet": 0, "minimal_brief": 1 },
+        "contradiction_retention": { "raw_trajectory": 0.9, "director_packet": 1.0, "minimal_brief": 0.85 },
+        "latency_ms": { "raw_trajectory": 4000, "director_packet": 2500, "minimal_brief": 1200 },
+        "tokens": { "raw_trajectory": 90000, "director_packet": 12000, "minimal_brief": 3000 },
+        "cost_usd": { "raw_trajectory": 2.5, "director_packet": 1.1, "minimal_brief": 0.3 },
+        "audit_failures": { "raw_trajectory": 2, "director_packet": 0, "minimal_brief": 1 }
+      }
+    },
+    {
+      "task_id": "handoff-ctr-1",
+      "stratum": "contradiction_heavy",
+      "expectations": {
+        "quality": 0.68,
+        "packet_boost": 0.12,
+        "raw_penalty": 0.08,
+        "unsupported_claims": { "raw_trajectory": 2, "director_packet": 0, "minimal_brief": 2 },
+        "contradiction_retention": { "raw_trajectory": 0.7, "director_packet": 1.0, "minimal_brief": 0.6 },
+        "latency_ms": { "raw_trajectory": 5000, "director_packet": 2800, "minimal_brief": 1500 },
+        "tokens": { "raw_trajectory": 120000, "director_packet": 14000, "minimal_brief": 3500 },
+        "cost_usd": { "raw_trajectory": 3.0, "director_packet": 1.4, "minimal_brief": 0.35 },
+        "audit_failures": { "raw_trajectory": 3, "director_packet": 0, "minimal_brief": 2 }
+      }
+    }
+  ]
+}

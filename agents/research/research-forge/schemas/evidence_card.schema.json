@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "evidence_card.schema.json",
+  "title": "evidence_card",
+  "type": "object",
+  "required": [
+    "evidence_id",
+    "source_id",
+    "question_addressed",
+    "claim",
+    "claim_status",
+    "locator",
+    "access_level",
+    "confidence",
+    "confidence_reason",
+    "verifier_status"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "evidence_id": { "type": "string", "pattern": "^EVD-" },
+    "source_id": { "type": "string", "pattern": "^SRC-" },
+    "question_addressed": { "type": "string" },
+    "claim": { "type": "string", "minLength": 1 },
+    "claim_status": { "$ref": "claim_status.schema.json" },
+    "locator": { "type": "string" },
+    "supporting_passage_or_data": { "type": "string" },
+    "method": { "type": "string" },
+    "population_or_domain": { "type": "string" },
+    "result": { "type": "string" },
+    "units_and_denominator": { "type": "string" },
+    "uncertainty": { "type": "string" },
+    "limitations": { "type": "array", "items": { "type": "string" } },
+    "transfer_conditions": { "type": "array", "items": { "type": "string" } },
+    "supports_source_ids": { "type": "array", "items": { "type": "string" } },
+    "contradicts_source_ids": { "type": "array", "items": { "type": "string" } },
+    "access_level": {
+      "type": "string",
+      "enum": ["full", "abstract", "snippet", "metadata"]
+    },
+    "confidence": { "type": "string", "enum": ["HIGH", "MEDIUM", "LOW", "UNKNOWN"] },
+    "confidence_reason": { "type": "string", "minLength": 1 },
+    "verifier_status": {
+      "type": "string",
+      "enum": ["pending", "passed", "failed"]
+    },
+    "verifier_notes": { "type": "string" },
+    "is_material_numerical": { "type": "boolean", "default": false },
+    "supersedes_evidence_id": { "type": "string" },
+    "supersession_reason": { "type": "string" },
+    "active": { "type": "boolean", "default": true }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "is_material_numerical": { "const": true } },
+        "required": ["is_material_numerical"]
+      },
+      "then": {
+        "required": ["units_and_denominator"],
+        "properties": {
+          "units_and_denominator": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  ]
+}

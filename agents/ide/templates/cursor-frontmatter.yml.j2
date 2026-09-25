@@ -1,0 +1,8 @@
+# Cursor projection extras (merged with portable frontmatter in sync_ide_agents.py)
+# Variables: name, description, readonly, model, is_background, user_invocable
+
+name: "{{ name }}"
+description: "{{ description }}"
+readonly: {{ readonly | default(true) }}
+model: {{ model | default('inherit') }}
+is_background: {{ is_background | default(false) }}

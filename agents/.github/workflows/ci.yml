@@ -1,0 +1,68 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  monorepo:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Research Forge (pytest)
+        working-directory: agents/research/research-forge
+        run: |
+          pip install -e ".[dev]"
+          pytest -q
+
+      - name: Daily Coder (unittest)
+        working-directory: agents/coding/daily-coder-ecosystem
+        run: |
+          pip install -e .
+          python -m unittest discover -s tests -v
+          daily-coder benchmark --baseline baselines/orchestration-v1.json --gate
+
+      - name: Agent Dashboard (smoke)
+        working-directory: gui
+        run: |
+          pip install -e ../agents/coding/daily-coder-ecosystem
+          pip install -e .
+          python -m unittest discover -s tests -v
+
+      - name: IDE Agent Pack (sync + hooks)
+        run: |
+          pip install pyyaml
+          pip install -e ./agents/shared/ai_agents_repo
+          python agents/ide/scripts/import_daily_coder_agents.py --check
+          python agents/ide/scripts/import_rf_agents.py --check
+          python agents/ide/scripts/sync_ide_agents.py --check
+          python agents/ide/scripts/audit_prompt_bytes.py --fail-on-missing
+          python -m unittest discover -s agents/ide/tests -v
+
+      - name: Agent Core + personal skills
+        run: |
+          pip install -e ./agents/shared/agent-core
+          python -m agent_core validate-registry
+          python -m unittest discover -s agents/shared/agent-core/tests -v
+          python -m unittest discover -s tests/personal-skills/routing -v
+          python -m unittest discover -s tests/personal-skills/contract -v
+          python -m unittest discover -s tests/personal-skills/integrity -v
+          python -m unittest discover -s tests/personal-skills/privacy -v
+          python -m unittest discover -s tests/personal-skills/regression -v
+          python -m unittest discover -s tests/writing -v
+          python -m unittest discover -s tests/toolkit -v
+
+      - name: Layout contract (F0)
+        run: |
+          pip install pyyaml
+          pip install -e ./agents/shared/ai_agents_repo
+          python -m ai_agents_repo.validate --phase F0

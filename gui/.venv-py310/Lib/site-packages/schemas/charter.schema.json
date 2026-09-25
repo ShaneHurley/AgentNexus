@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "charter.schema.json",
+  "title": "research_charter",
+  "type": "object",
+  "required": [
+    "charter_id",
+    "version",
+    "objective",
+    "intended_use",
+    "scope",
+    "non_goals",
+    "research_questions",
+    "constraints",
+    "assumptions",
+    "access_rules",
+    "recency",
+    "audience",
+    "depth",
+    "output_contract",
+    "charter_hash"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "charter_id": { "type": "string" },
+    "version": { "type": "integer", "minimum": 1 },
+    "objective": { "type": "string" },
+    "intended_use": { "type": "string" },
+    "scope": { "type": "string" },
+    "non_goals": { "type": "array", "items": { "type": "string" } },
+    "research_questions": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^RQ-" }
+    },
+    "constraints": { "type": "array", "items": { "type": "string" } },
+    "assumptions": { "type": "array", "items": { "type": "string" } },
+    "access_rules": { "type": "array", "items": { "type": "string" } },
+    "recency": { "type": "string" },
+    "audience": { "type": "string" },
+    "depth": {
+      "type": "string",
+      "enum": ["quick", "standard", "deep", "thesis"]
+    },
+    "output_contract": { "type": "string" },
+    "charter_hash": { "type": "string", "pattern": "^sha256:" }
+  }
+}

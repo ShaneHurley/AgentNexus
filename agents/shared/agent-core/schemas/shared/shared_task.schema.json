@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "shared_task",
+  "type": "object",
+  "required": [
+    "task_id",
+    "caller_id",
+    "role_id",
+    "role_version",
+    "output_schema",
+    "budget"
+  ],
+  "properties": {
+    "task_id": {
+      "type": "string"
+    },
+    "task_anchor": {
+      "type": "string"
+    },
+    "caller_id": {
+      "type": "string"
+    },
+    "role_id": {
+      "type": "string"
+    },
+    "role_version": {
+      "type": "string"
+    },
+    "mode": {
+      "type": "string"
+    },
+    "input_refs": {
+      "type": "array"
+    },
+    "profile_refs": {
+      "type": "array"
+    },
+    "permissions": {
+      "type": "array"
+    },
+    "forbidden_actions": {
+      "type": "array"
+    },
+    "output_schema": {
+      "type": "string"
+    },
+    "budget": {
+      "type": "object"
+    }
+  }
+}

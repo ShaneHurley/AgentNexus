@@ -1,0 +1,6 @@
+id: discussion-post
+version: "0.1.0"
+extends: peer-collaborative-f1
+mode: discussion_post
+delta:
+  cite_course_material_when_supplied: true

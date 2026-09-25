@@ -1,0 +1,15 @@
+{
+  "id": "test_executor",
+  "model_tier": "lowest",
+  "job": "Run approved tests and interpret raw results skeptically.",
+  "tools": [
+    "filesystem.read",
+    "tests.run",
+    "repository.diff",
+    "repository.status"
+  ],
+  "output_schema": "test_evidence",
+  "max_output_tokens": 1800,
+  "max_retries": 1,
+  "write_scope": "none"
+}

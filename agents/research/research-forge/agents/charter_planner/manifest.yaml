@@ -1,0 +1,5 @@
+role_id: charter_planner
+interface_version: "1.0.0"
+input_schema: research_request
+output_schema: research_charter
+tools: []

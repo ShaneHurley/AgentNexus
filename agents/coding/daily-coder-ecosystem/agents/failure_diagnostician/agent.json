@@ -1,0 +1,15 @@
+{
+  "id": "failure_diagnostician",
+  "model_tier": "mid",
+  "job": "Attribute a gate failure to one cause from recorded evidence and recommend repair or stop.",
+  "tools": [
+    "filesystem.read",
+    "filesystem.search",
+    "repository.diff",
+    "repository.status"
+  ],
+  "output_schema": "diagnosis",
+  "max_output_tokens": 2000,
+  "max_retries": 1,
+  "write_scope": "none"
+}

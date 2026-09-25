@@ -1,0 +1,7 @@
+{
+  "cases": [
+    { "name": "duplicate_idempotency", "same_key_twice": true },
+    { "name": "second_call_without_xl", "expect_blocked": true },
+    { "name": "malicious_packet_field", "forbidden_key": "raw_transcript" }
+  ]
+}

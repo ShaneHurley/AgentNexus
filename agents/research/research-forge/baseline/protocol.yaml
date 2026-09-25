@@ -1,0 +1,10 @@
+protocol_version: "1.0.0"
+description: Wave 1 single-agent baseline — same budget/output contract as Forge mock slice
+cost_ceiling_usd: 5.0
+budget_profile: S
+output_contract: brief
+task_set: baseline/tasks.json
+min_tasks: 25
+comparison_targets:
+  min_pass_rate: 0.8
+  metrics: [pass_rate, report_hash_stability, gateway_audit_count]

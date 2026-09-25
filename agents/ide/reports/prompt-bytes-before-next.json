@@ -1,0 +1,1527 @@
+{
+  "generated_at": "2026-09-23T15:50:39.954930+00:00",
+  "repo_root": "C:\\Users\\WZ69B7\\Downloads\\ai_agents",
+  "agent_count": 82,
+  "total_bytes_all_agents": 708329,
+  "median_bytes": 7221,
+  "p90_bytes": 13606,
+  "missing_file_refs": [],
+  "agents": [
+    {
+      "agent": "deep-research",
+      "path": ".cursor/agents/deep-research.md",
+      "body_bytes": 4382,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/evidence-and-source-rubric.md",
+          "resolved": "ide-pack/ide-agents/contracts/evidence-and-source-rubric.md",
+          "bytes": 3482,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/recommendation-scoring.md",
+          "resolved": "ide-pack/ide-agents/contracts/recommendation-scoring.md",
+          "bytes": 2806,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/ecosystem-compatibility.md",
+          "resolved": "ide-pack/ide-agents/contracts/ecosystem-compatibility.md",
+          "bytes": 2748,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/output-template.md",
+          "resolved": "ide-pack/ide-agents/contracts/output-template.md",
+          "bytes": 2885,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/research-draft-1.0.schema.json",
+          "resolved": "ide-pack/ide-agents/contracts/research-draft-1.0.schema.json",
+          "bytes": 5776,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/research-intelligence-packet-1.0.schema.json",
+          "resolved": "ide-pack/ide-agents/contracts/research-intelligence-packet-1.0.schema.json",
+          "bytes": 10523,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/recommendation-scoring.md",
+          "resolved": "ide-pack/ide-agents/contracts/recommendation-scoring.md",
+          "bytes": 2806,
+          "missing": false
+        }
+      ],
+      "total_bytes": 43498
+    },
+    {
+      "agent": "deep-research",
+      "path": "ide-pack/ide-agents/canonical/deep-research.md",
+      "body_bytes": 4192,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/evidence-and-source-rubric.md",
+          "resolved": "ide-pack/ide-agents/contracts/evidence-and-source-rubric.md",
+          "bytes": 3482,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/recommendation-scoring.md",
+          "resolved": "ide-pack/ide-agents/contracts/recommendation-scoring.md",
+          "bytes": 2806,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/ecosystem-compatibility.md",
+          "resolved": "ide-pack/ide-agents/contracts/ecosystem-compatibility.md",
+          "bytes": 2748,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/output-template.md",
+          "resolved": "ide-pack/ide-agents/contracts/output-template.md",
+          "bytes": 2885,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/research-draft-1.0.schema.json",
+          "resolved": "ide-pack/ide-agents/contracts/research-draft-1.0.schema.json",
+          "bytes": 5776,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/research-intelligence-packet-1.0.schema.json",
+          "resolved": "ide-pack/ide-agents/contracts/research-intelligence-packet-1.0.schema.json",
+          "bytes": 10523,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/recommendation-scoring.md",
+          "resolved": "ide-pack/ide-agents/contracts/recommendation-scoring.md",
+          "bytes": 2806,
+          "missing": false
+        }
+      ],
+      "total_bytes": 43308
+    },
+    {
+      "agent": "research-messenger",
+      "path": ".cursor/agents/research-messenger.md",
+      "body_bytes": 2403,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/research-messenger-skill-reference.md",
+          "resolved": "ide-pack/ide-agents/contracts/research-messenger-skill-reference.md",
+          "bytes": 5361,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/messenger-output-contract.md",
+          "resolved": "ide-pack/ide-agents/contracts/messenger-output-contract.md",
+          "bytes": 2501,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/ecosystem-compatibility.md",
+          "resolved": "ide-pack/ide-agents/contracts/ecosystem-compatibility.md",
+          "bytes": 2748,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/output-template.md",
+          "resolved": "ide-pack/ide-agents/contracts/output-template.md",
+          "bytes": 2885,
+          "missing": false
+        }
+      ],
+      "total_bytes": 15898
+    },
+    {
+      "agent": "research-messenger",
+      "path": "ide-pack/ide-agents/canonical/research-messenger.md",
+      "body_bytes": 2198,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/research-messenger-skill-reference.md",
+          "resolved": "ide-pack/ide-agents/contracts/research-messenger-skill-reference.md",
+          "bytes": 5361,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/messenger-output-contract.md",
+          "resolved": "ide-pack/ide-agents/contracts/messenger-output-contract.md",
+          "bytes": 2501,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/ecosystem-compatibility.md",
+          "resolved": "ide-pack/ide-agents/contracts/ecosystem-compatibility.md",
+          "bytes": 2748,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/output-template.md",
+          "resolved": "ide-pack/ide-agents/contracts/output-template.md",
+          "bytes": 2885,
+          "missing": false
+        }
+      ],
+      "total_bytes": 15693
+    },
+    {
+      "agent": "evidence-integrator",
+      "path": ".cursor/agents/evidence-integrator.md",
+      "body_bytes": 1483,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/research-draft-1.0.schema.json",
+          "resolved": "ide-pack/ide-agents/contracts/research-draft-1.0.schema.json",
+          "bytes": 5776,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/evidence-and-source-rubric.md",
+          "resolved": "ide-pack/ide-agents/contracts/evidence-and-source-rubric.md",
+          "bytes": 3482,
+          "missing": false
+        }
+      ],
+      "total_bytes": 15579
+    },
+    {
+      "agent": "evidence-integrator",
+      "path": "ide-pack/ide-agents/canonical/evidence-integrator.md",
+      "body_bytes": 1271,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/research-draft-1.0.schema.json",
+          "resolved": "ide-pack/ide-agents/contracts/research-draft-1.0.schema.json",
+          "bytes": 5776,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/evidence-and-source-rubric.md",
+          "resolved": "ide-pack/ide-agents/contracts/evidence-and-source-rubric.md",
+          "bytes": 3482,
+          "missing": false
+        }
+      ],
+      "total_bytes": 15367
+    },
+    {
+      "agent": "recommendation-scorer",
+      "path": ".cursor/agents/recommendation-scorer.md",
+      "body_bytes": 1388,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/recommendation-scoring.md",
+          "resolved": "ide-pack/ide-agents/contracts/recommendation-scoring.md",
+          "bytes": 2806,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/research-intelligence-packet-1.0.schema.json",
+          "resolved": "ide-pack/ide-agents/contracts/research-intelligence-packet-1.0.schema.json",
+          "bytes": 10523,
+          "missing": false
+        }
+      ],
+      "total_bytes": 14717
+    },
+    {
+      "agent": "recommendation-scorer",
+      "path": "ide-pack/ide-agents/canonical/recommendation-scorer.md",
+      "body_bytes": 1174,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/recommendation-scoring.md",
+          "resolved": "ide-pack/ide-agents/contracts/recommendation-scoring.md",
+          "bytes": 2806,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/research-intelligence-packet-1.0.schema.json",
+          "resolved": "ide-pack/ide-agents/contracts/research-intelligence-packet-1.0.schema.json",
+          "bytes": 10523,
+          "missing": false
+        }
+      ],
+      "total_bytes": 14503
+    },
+    {
+      "agent": "internal-authority-scout",
+      "path": ".cursor/agents/internal-authority-scout.md",
+      "body_bytes": 2034,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/evidence-and-source-rubric.md",
+          "resolved": "ide-pack/ide-agents/contracts/evidence-and-source-rubric.md",
+          "bytes": 3482,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "total_bytes": 13606
+    },
+    {
+      "agent": "internal-authority-scout",
+      "path": "ide-pack/ide-agents/canonical/internal-authority-scout.md",
+      "body_bytes": 1817,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/evidence-and-source-rubric.md",
+          "resolved": "ide-pack/ide-agents/contracts/evidence-and-source-rubric.md",
+          "bytes": 3482,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "total_bytes": 13389
+    },
+    {
+      "agent": "plan-prep",
+      "path": ".cursor/agents/plan-prep.md",
+      "body_bytes": 5293,
+      "file_refs": [
+        {
+          "ref": "docs/README.md",
+          "resolved": "docs/README.md",
+          "bytes": 7112,
+          "missing": false
+        }
+      ],
+      "total_bytes": 12405
+    },
+    {
+      "agent": "plan-prep",
+      "path": "ide-pack/ide-agents/canonical/plan-prep.md",
+      "body_bytes": 5097,
+      "file_refs": [
+        {
+          "ref": "docs/README.md",
+          "resolved": "docs/README.md",
+          "bytes": 7112,
+          "missing": false
+        }
+      ],
+      "total_bytes": 12209
+    },
+    {
+      "agent": "academic-evidence-scout",
+      "path": ".cursor/agents/academic-evidence-scout.md",
+      "body_bytes": 1460,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/evidence-and-source-rubric.md",
+          "resolved": "ide-pack/ide-agents/contracts/evidence-and-source-rubric.md",
+          "bytes": 3482,
+          "missing": false
+        }
+      ],
+      "total_bytes": 9780
+    },
+    {
+      "agent": "academic-evidence-scout",
+      "path": "ide-pack/ide-agents/canonical/academic-evidence-scout.md",
+      "body_bytes": 1242,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/evidence-and-source-rubric.md",
+          "resolved": "ide-pack/ide-agents/contracts/evidence-and-source-rubric.md",
+          "bytes": 3482,
+          "missing": false
+        }
+      ],
+      "total_bytes": 9562
+    },
+    {
+      "agent": "use-master",
+      "path": ".cursor/agents/use-master.md",
+      "body_bytes": 5556,
+      "file_refs": [
+        {
+          "ref": "ide-agents/canonical/master-orchestrator.md",
+          "resolved": "ide-pack/ide-agents/canonical/master-orchestrator.md",
+          "bytes": 3548,
+          "missing": false
+        }
+      ],
+      "total_bytes": 9104
+    },
+    {
+      "agent": "use-master",
+      "path": "ide-pack/ide-agents/canonical/use-master.md",
+      "body_bytes": 5447,
+      "file_refs": [
+        {
+          "ref": "ide-agents/canonical/master-orchestrator.md",
+          "resolved": "ide-pack/ide-agents/canonical/master-orchestrator.md",
+          "bytes": 3548,
+          "missing": false
+        }
+      ],
+      "total_bytes": 8995
+    },
+    {
+      "agent": "code-reviewer",
+      "path": ".cursor/agents/code-reviewer.md",
+      "body_bytes": 2820,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/code_reviewer/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/code_reviewer/prompt.md",
+          "bytes": 1754,
+          "missing": false
+        }
+      ],
+      "total_bytes": 7826
+    },
+    {
+      "agent": "failure-diagnostician",
+      "path": ".cursor/agents/failure-diagnostician.md",
+      "body_bytes": 2864,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/failure_diagnostician/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/failure_diagnostician/prompt.md",
+          "bytes": 1694,
+          "missing": false
+        }
+      ],
+      "total_bytes": 7810
+    },
+    {
+      "agent": "documenter",
+      "path": ".cursor/agents/documenter.md",
+      "body_bytes": 3264,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/documenter/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/documenter/prompt.md",
+          "bytes": 1286,
+          "missing": false
+        }
+      ],
+      "total_bytes": 7802
+    },
+    {
+      "agent": "implementer",
+      "path": ".cursor/agents/implementer.md",
+      "body_bytes": 2887,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/implementer/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/implementer/prompt.md",
+          "bytes": 1648,
+          "missing": false
+        }
+      ],
+      "total_bytes": 7787
+    },
+    {
+      "agent": "researcher",
+      "path": ".cursor/agents/researcher.md",
+      "body_bytes": 2846,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/researcher/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/researcher/prompt.md",
+          "bytes": 1638,
+          "missing": false
+        }
+      ],
+      "total_bytes": 7736
+    },
+    {
+      "agent": "test-executor",
+      "path": ".cursor/agents/test-executor.md",
+      "body_bytes": 2726,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/test_executor/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/test_executor/prompt.md",
+          "bytes": 1717,
+          "missing": false
+        }
+      ],
+      "total_bytes": 7695
+    },
+    {
+      "agent": "skill-curator",
+      "path": ".cursor/agents/skill-curator.md",
+      "body_bytes": 2713,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/skill_curator/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/skill_curator/prompt.md",
+          "bytes": 1700,
+          "missing": false
+        }
+      ],
+      "total_bytes": 7665
+    },
+    {
+      "agent": "planner",
+      "path": ".cursor/agents/planner.md",
+      "body_bytes": 2716,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/planner/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/planner/prompt.md",
+          "bytes": 1662,
+          "missing": false
+        }
+      ],
+      "total_bytes": 7630
+    },
+    {
+      "agent": "code-reviewer",
+      "path": "ide-pack/ide-agents/canonical/code-reviewer.md",
+      "body_bytes": 2610,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/code_reviewer/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/code_reviewer/prompt.md",
+          "bytes": 1754,
+          "missing": false
+        }
+      ],
+      "total_bytes": 7616
+    },
+    {
+      "agent": "plan-reviewer",
+      "path": ".cursor/agents/plan-reviewer.md",
+      "body_bytes": 2707,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/plan_reviewer/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/plan_reviewer/prompt.md",
+          "bytes": 1654,
+          "missing": false
+        }
+      ],
+      "total_bytes": 7613
+    },
+    {
+      "agent": "documenter",
+      "path": "ide-pack/ide-agents/canonical/documenter.md",
+      "body_bytes": 3057,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/documenter/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/documenter/prompt.md",
+          "bytes": 1286,
+          "missing": false
+        }
+      ],
+      "total_bytes": 7595
+    },
+    {
+      "agent": "failure-diagnostician",
+      "path": "ide-pack/ide-agents/canonical/failure-diagnostician.md",
+      "body_bytes": 2646,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/failure_diagnostician/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/failure_diagnostician/prompt.md",
+          "bytes": 1694,
+          "missing": false
+        }
+      ],
+      "total_bytes": 7592
+    },
+    {
+      "agent": "implementer",
+      "path": "ide-pack/ide-agents/canonical/implementer.md",
+      "body_bytes": 2679,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/implementer/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/implementer/prompt.md",
+          "bytes": 1648,
+          "missing": false
+        }
+      ],
+      "total_bytes": 7579
+    },
+    {
+      "agent": "researcher",
+      "path": "ide-pack/ide-agents/canonical/researcher.md",
+      "body_bytes": 2639,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/researcher/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/researcher/prompt.md",
+          "bytes": 1638,
+          "missing": false
+        }
+      ],
+      "total_bytes": 7529
+    },
+    {
+      "agent": "test-executor",
+      "path": "ide-pack/ide-agents/canonical/test-executor.md",
+      "body_bytes": 2516,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/test_executor/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/test_executor/prompt.md",
+          "bytes": 1717,
+          "missing": false
+        }
+      ],
+      "total_bytes": 7485
+    },
+    {
+      "agent": "skill-curator",
+      "path": "ide-pack/ide-agents/canonical/skill-curator.md",
+      "body_bytes": 2503,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/skill_curator/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/skill_curator/prompt.md",
+          "bytes": 1700,
+          "missing": false
+        }
+      ],
+      "total_bytes": 7455
+    },
+    {
+      "agent": "alignment-checker",
+      "path": ".cursor/agents/alignment-checker.md",
+      "body_bytes": 2721,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/alignment_checker/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/alignment_checker/prompt.md",
+          "bytes": 1467,
+          "missing": false
+        }
+      ],
+      "total_bytes": 7440
+    },
+    {
+      "agent": "test-author",
+      "path": ".cursor/agents/test-author.md",
+      "body_bytes": 2847,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/test_author/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/test_author/prompt.md",
+          "bytes": 1330,
+          "missing": false
+        }
+      ],
+      "total_bytes": 7429
+    },
+    {
+      "agent": "planner",
+      "path": "ide-pack/ide-agents/canonical/planner.md",
+      "body_bytes": 2512,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/planner/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/planner/prompt.md",
+          "bytes": 1662,
+          "missing": false
+        }
+      ],
+      "total_bytes": 7426
+    },
+    {
+      "agent": "plan-reviewer",
+      "path": "ide-pack/ide-agents/canonical/plan-reviewer.md",
+      "body_bytes": 2497,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/plan_reviewer/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/plan_reviewer/prompt.md",
+          "bytes": 1654,
+          "missing": false
+        }
+      ],
+      "total_bytes": 7403
+    },
+    {
+      "agent": "master",
+      "path": ".cursor/agents/master.md",
+      "body_bytes": 2734,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/master/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/master/prompt.md",
+          "bytes": 1319,
+          "missing": false
+        }
+      ],
+      "total_bytes": 7305
+    },
+    {
+      "agent": "brainstormer",
+      "path": ".cursor/agents/brainstormer.md",
+      "body_bytes": 2695,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/brainstormer/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/brainstormer/prompt.md",
+          "bytes": 1356,
+          "missing": false
+        }
+      ],
+      "total_bytes": 7303
+    },
+    {
+      "agent": "test-designer",
+      "path": ".cursor/agents/test-designer.md",
+      "body_bytes": 2705,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/test_designer/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/test_designer/prompt.md",
+          "bytes": 1306,
+          "missing": false
+        }
+      ],
+      "total_bytes": 7263
+    },
+    {
+      "agent": "alignment-checker",
+      "path": "ide-pack/ide-agents/canonical/alignment-checker.md",
+      "body_bytes": 2507,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/alignment_checker/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/alignment_checker/prompt.md",
+          "bytes": 1467,
+          "missing": false
+        }
+      ],
+      "total_bytes": 7226
+    },
+    {
+      "agent": "test-author",
+      "path": "ide-pack/ide-agents/canonical/test-author.md",
+      "body_bytes": 2639,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/test_author/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/test_author/prompt.md",
+          "bytes": 1330,
+          "missing": false
+        }
+      ],
+      "total_bytes": 7221
+    },
+    {
+      "agent": "master",
+      "path": "ide-pack/ide-agents/canonical/master.md",
+      "body_bytes": 2531,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/master/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/master/prompt.md",
+          "bytes": 1319,
+          "missing": false
+        }
+      ],
+      "total_bytes": 7102
+    },
+    {
+      "agent": "brainstormer",
+      "path": "ide-pack/ide-agents/canonical/brainstormer.md",
+      "body_bytes": 2486,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/brainstormer/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/brainstormer/prompt.md",
+          "bytes": 1356,
+          "missing": false
+        }
+      ],
+      "total_bytes": 7094
+    },
+    {
+      "agent": "test-designer",
+      "path": "ide-pack/ide-agents/canonical/test-designer.md",
+      "body_bytes": 2495,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/test_designer/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/test_designer/prompt.md",
+          "bytes": 1306,
+          "missing": false
+        }
+      ],
+      "total_bytes": 7053
+    },
+    {
+      "agent": "sizer",
+      "path": ".cursor/agents/sizer.md",
+      "body_bytes": 2489,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/sizer/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/sizer/prompt.md",
+          "bytes": 1275,
+          "missing": false
+        }
+      ],
+      "total_bytes": 7016
+    },
+    {
+      "agent": "sizer",
+      "path": "ide-pack/ide-agents/canonical/sizer.md",
+      "body_bytes": 2287,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/sizer/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/sizer/prompt.md",
+          "bytes": 1275,
+          "missing": false
+        }
+      ],
+      "total_bytes": 6814
+    },
+    {
+      "agent": "principal-director",
+      "path": ".cursor/agents/principal-director.md",
+      "body_bytes": 3461,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "total_bytes": 6713
+    },
+    {
+      "agent": "adversarial-skeptic",
+      "path": ".cursor/agents/adversarial-skeptic.md",
+      "body_bytes": 3409,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "total_bytes": 6661
+    },
+    {
+      "agent": "intake-clarifier",
+      "path": ".cursor/agents/intake-clarifier.md",
+      "body_bytes": 3396,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "total_bytes": 6648
+    },
+    {
+      "agent": "source-scout",
+      "path": ".cursor/agents/source-scout.md",
+      "body_bytes": 3366,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "total_bytes": 6618
+    },
+    {
+      "agent": "frontier-advisor",
+      "path": ".cursor/agents/frontier-advisor.md",
+      "body_bytes": 2651,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/frontier_advisor/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/frontier_advisor/prompt.md",
+          "bytes": 714,
+          "missing": false
+        }
+      ],
+      "total_bytes": 6617
+    },
+    {
+      "agent": "evidence-extractor",
+      "path": ".cursor/agents/evidence-extractor.md",
+      "body_bytes": 3363,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "total_bytes": 6615
+    },
+    {
+      "agent": "charter-planner",
+      "path": ".cursor/agents/charter-planner.md",
+      "body_bytes": 3332,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "total_bytes": 6584
+    },
+    {
+      "agent": "report-composer",
+      "path": ".cursor/agents/report-composer.md",
+      "body_bytes": 3299,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "total_bytes": 6551
+    },
+    {
+      "agent": "citation-verifier",
+      "path": ".cursor/agents/citation-verifier.md",
+      "body_bytes": 3272,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "total_bytes": 6524
+    },
+    {
+      "agent": "principal-director",
+      "path": "ide-pack/ide-agents/canonical/principal-director.md",
+      "body_bytes": 3246,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "total_bytes": 6498
+    },
+    {
+      "agent": "research-planner",
+      "path": ".cursor/agents/research-planner.md",
+      "body_bytes": 1610,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        }
+      ],
+      "total_bytes": 6448
+    },
+    {
+      "agent": "adversarial-skeptic",
+      "path": "ide-pack/ide-agents/canonical/adversarial-skeptic.md",
+      "body_bytes": 3193,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "total_bytes": 6445
+    },
+    {
+      "agent": "intake-clarifier",
+      "path": "ide-pack/ide-agents/canonical/intake-clarifier.md",
+      "body_bytes": 3183,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "total_bytes": 6435
+    },
+    {
+      "agent": "source-scout",
+      "path": "ide-pack/ide-agents/canonical/source-scout.md",
+      "body_bytes": 3157,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "total_bytes": 6409
+    },
+    {
+      "agent": "frontier-advisor",
+      "path": "ide-pack/ide-agents/canonical/frontier-advisor.md",
+      "body_bytes": 2438,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/frontier_advisor/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/frontier_advisor/prompt.md",
+          "bytes": 714,
+          "missing": false
+        }
+      ],
+      "total_bytes": 6404
+    },
+    {
+      "agent": "evidence-extractor",
+      "path": "ide-pack/ide-agents/canonical/evidence-extractor.md",
+      "body_bytes": 3148,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "total_bytes": 6400
+    },
+    {
+      "agent": "charter-planner",
+      "path": "ide-pack/ide-agents/canonical/charter-planner.md",
+      "body_bytes": 3120,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "total_bytes": 6372
+    },
+    {
+      "agent": "report-composer",
+      "path": "ide-pack/ide-agents/canonical/report-composer.md",
+      "body_bytes": 3087,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "total_bytes": 6339
+    },
+    {
+      "agent": "official-standards-scout",
+      "path": ".cursor/agents/official-standards-scout.md",
+      "body_bytes": 1501,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        }
+      ],
+      "total_bytes": 6339
+    },
+    {
+      "agent": "citation-verifier",
+      "path": "ide-pack/ide-agents/canonical/citation-verifier.md",
+      "body_bytes": 3058,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "total_bytes": 6310
+    },
+    {
+      "agent": "adversarial-evidence-reviewer",
+      "path": ".cursor/agents/adversarial-evidence-reviewer.md",
+      "body_bytes": 1436,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        }
+      ],
+      "total_bytes": 6274
+    },
+    {
+      "agent": "targeted-gap-researcher",
+      "path": ".cursor/agents/targeted-gap-researcher.md",
+      "body_bytes": 1411,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        }
+      ],
+      "total_bytes": 6249
+    },
+    {
+      "agent": "research-planner",
+      "path": "ide-pack/ide-agents/canonical/research-planner.md",
+      "body_bytes": 1397,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        }
+      ],
+      "total_bytes": 6235
+    },
+    {
+      "agent": "practitioner-implementation-scout",
+      "path": ".cursor/agents/practitioner-implementation-scout.md",
+      "body_bytes": 1365,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        }
+      ],
+      "total_bytes": 6203
+    },
+    {
+      "agent": "failure-unfavorable-scout",
+      "path": ".cursor/agents/failure-unfavorable-scout.md",
+      "body_bytes": 1353,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        }
+      ],
+      "total_bytes": 6191
+    },
+    {
+      "agent": "alternatives-analogy-scout",
+      "path": ".cursor/agents/alternatives-analogy-scout.md",
+      "body_bytes": 1285,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        }
+      ],
+      "total_bytes": 6123
+    },
+    {
+      "agent": "official-standards-scout",
+      "path": "ide-pack/ide-agents/canonical/official-standards-scout.md",
+      "body_bytes": 1282,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        }
+      ],
+      "total_bytes": 6120
+    },
+    {
+      "agent": "adversarial-evidence-reviewer",
+      "path": "ide-pack/ide-agents/canonical/adversarial-evidence-reviewer.md",
+      "body_bytes": 1212,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        }
+      ],
+      "total_bytes": 6050
+    },
+    {
+      "agent": "targeted-gap-researcher",
+      "path": "ide-pack/ide-agents/canonical/targeted-gap-researcher.md",
+      "body_bytes": 1193,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        }
+      ],
+      "total_bytes": 6031
+    },
+    {
+      "agent": "practitioner-implementation-scout",
+      "path": "ide-pack/ide-agents/canonical/practitioner-implementation-scout.md",
+      "body_bytes": 1137,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        }
+      ],
+      "total_bytes": 5975
+    },
+    {
+      "agent": "failure-unfavorable-scout",
+      "path": "ide-pack/ide-agents/canonical/failure-unfavorable-scout.md",
+      "body_bytes": 1133,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        }
+      ],
+      "total_bytes": 5971
+    },
+    {
+      "agent": "alternatives-analogy-scout",
+      "path": "ide-pack/ide-agents/canonical/alternatives-analogy-scout.md",
+      "body_bytes": 1064,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        }
+      ],
+      "total_bytes": 5902
+    },
+    {
+      "agent": "master-orchestrator",
+      "path": ".cursor/agents/master-orchestrator.md",
+      "body_bytes": 3764,
+      "file_refs": [],
+      "total_bytes": 3764
+    },
+    {
+      "agent": "master-orchestrator",
+      "path": "ide-pack/ide-agents/canonical/master-orchestrator.md",
+      "body_bytes": 3548,
+      "file_refs": [],
+      "total_bytes": 3548
+    },
+    {
+      "agent": "daily-coder",
+      "path": ".cursor/agents/daily-coder.md",
+      "body_bytes": 3424,
+      "file_refs": [],
+      "total_bytes": 3424
+    },
+    {
+      "agent": "daily-coder",
+      "path": "ide-pack/ide-agents/canonical/daily-coder.md",
+      "body_bytes": 3216,
+      "file_refs": [],
+      "total_bytes": 3216
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+version: "1.0.0"
+packet:
+  token_ceiling: 12000
+provider:
+  name: mock
+  model: mock-director
+  timeout_seconds: 120
+  cost_per_1k_tokens: 0.002
+  max_cost_usd: 2.0
+handoff:
+  policy_version: "1.0.0"
+  regression_subset: wave5_handoff_tasks.json
+challenge:
+  default_off: true
+exit:
+  unsupported_claim_threshold: 0

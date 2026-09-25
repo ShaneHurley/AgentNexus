@@ -1,0 +1,17 @@
+{
+  "note": "Estimated rates in USD per 1000 tokens. Update to match your account. 'default' applies to unlisted models.",
+  "default": { "input_per_1k": 0.0, "output_per_1k": 0.0 },
+  "mock": { "input_per_1k": 0.0, "output_per_1k": 0.0 },
+  "gpt-4o-mini": { "input_per_1k": 0.00015, "output_per_1k": 0.0006 },
+  "gpt-4o": { "input_per_1k": 0.0025, "output_per_1k": 0.01 },
+  "claude-haiku-4-5": { "input_per_1k": 0.001, "output_per_1k": 0.005 },
+  "claude-sonnet-4-5": { "input_per_1k": 0.003, "output_per_1k": 0.015 },
+  "claude-opus-4-5": { "input_per_1k": 0.005, "output_per_1k": 0.025 },
+  "gemini-2.5-flash": { "input_per_1k": 0.0003, "output_per_1k": 0.0025 },
+  "gemini-2.5-pro": { "input_per_1k": 0.00125, "output_per_1k": 0.01 },
+  "openai/gpt-4o-mini": { "input_per_1k": 0.00015, "output_per_1k": 0.0006 },
+  "anthropic/claude-haiku-4.5": { "input_per_1k": 0.001, "output_per_1k": 0.005 },
+  "anthropic/claude-sonnet-4.5": { "input_per_1k": 0.003, "output_per_1k": 0.015 },
+  "anthropic/claude-opus-4.5": { "input_per_1k": 0.005, "output_per_1k": 0.025 },
+  "qwen2.5-coder": { "input_per_1k": 0.0, "output_per_1k": 0.0 }
+}

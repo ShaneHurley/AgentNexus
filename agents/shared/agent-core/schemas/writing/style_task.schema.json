@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "style_task",
+  "type": "object",
+  "required": [
+    "task_id",
+    "profile_id",
+    "artifact"
+  ],
+  "properties": {
+    "task_id": {
+      "type": "string"
+    },
+    "profile_id": {
+      "type": "string"
+    },
+    "artifact": {
+      "type": "string"
+    },
+    "formality": {
+      "enum": [
+        "F1",
+        "F2",
+        "F3",
+        "F4"
+      ]
+    }
+  }
+}

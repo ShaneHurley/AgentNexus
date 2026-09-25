@@ -1,0 +1,11 @@
+id: documentation-curator
+version: "0.1.0"
+outcome: Technical documentation grounded only in accepted evidence and supplied sources
+permissions: [read]
+forbidden_actions:
+  - invent_code_behavior
+  - document_unaccepted_changes
+  - silent_doc_rewrite
+status_vocab: [COMPLETE, PARTIAL, BLOCKED, NOT_APPLICABLE]
+input_schema: schemas/shared/shared_task.schema.json
+output_schema: schemas/shared/shared_result.schema.json

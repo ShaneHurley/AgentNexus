@@ -1,0 +1,14 @@
+{
+  "id": "alignment_checker",
+  "model_tier": "lowest",
+  "job": "Reject outputs that do not serve the original request.",
+  "tools": [
+    "filesystem.read",
+    "repository.diff",
+    "repository.status"
+  ],
+  "output_schema": "alignment",
+  "max_output_tokens": 1800,
+  "max_retries": 1,
+  "write_scope": "none"
+}

@@ -1,0 +1,14 @@
+{
+  "id": "plan_reviewer",
+  "model_tier": "mid",
+  "job": "Adversarially try to disprove plan completeness and executability.",
+  "tools": [
+    "filesystem.read",
+    "filesystem.search",
+    "repository.diff"
+  ],
+  "output_schema": "review",
+  "max_output_tokens": 2500,
+  "max_retries": 1,
+  "write_scope": "none"
+}

@@ -1,0 +1,8 @@
+role_id: followup_coordinator
+interface_version: "1.0.0"
+input_schema: follow_up_request
+output_schema: scout_result
+budget_profile: S
+tools:
+  - scout_lane
+  - curator_triage

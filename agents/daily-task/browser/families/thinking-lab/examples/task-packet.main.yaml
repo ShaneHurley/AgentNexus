@@ -1,0 +1,7 @@
+# Minimal stub — fill before paste
+browser_family: ""  # set to this folder slug
+browser_variant: ""  # omit for main AGENT_MESSAGE
+task_id: example-001
+objective: ""
+acceptance_criteria: []
+inputs: { files: [], urls: [] }

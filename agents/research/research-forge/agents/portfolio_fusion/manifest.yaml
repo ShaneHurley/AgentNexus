@@ -1,0 +1,11 @@
+role_id: portfolio_fusion
+
+interface_version: "1.0.0"
+
+input_schema: candidate_idea
+
+output_schema: candidate_idea
+
+budget_profile: M
+
+tools: []

@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "package": "browser-agent-pack",
+  "version": "3.0.0-federated",
+  "families": [
+    "plans-and-places",
+    "kitchen-cooking",
+    "learning-coach",
+    "writing-studio",
+    "thinking-lab",
+    "mission-control",
+    "code-crafter",
+    "code-reviewer",
+    "document-reviewer",
+    "research-desk"
+  ],
+  "shards": [
+    {
+      "id": "daily-task",
+      "root": "agents/daily-task/browser/families",
+      "manifest": "agents/daily-task/browser/families/MANIFEST.json",
+      "family_ids": [
+        "plans-and-places",
+        "kitchen-cooking",
+        "learning-coach",
+        "writing-studio",
+        "thinking-lab",
+        "mission-control"
+      ]
+    },
+    {
+      "id": "coder",
+      "root": "agents/coding/browser",
+      "manifest": "agents/coding/browser/MANIFEST.json",
+      "family_ids": [
+        "code-crafter",
+        "code-reviewer",
+        "document-reviewer"
+      ]
+    },
+    {
+      "id": "deep-research",
+      "root": "agents/research/browser",
+      "manifest": "agents/research/browser/MANIFEST.json",
+      "family_ids": ["research-desk"]
+    }
+  ],
+  "shared": {
+    "root": "agents/shared/browser",
+    "_shared": "agents/shared/browser/_shared",
+    "profiles": "agents/shared/browser/profiles",
+    "scripts": "agents/shared/browser/scripts"
+  },
+  "router": "agents/daily-task/ROUTER.yaml"
+}

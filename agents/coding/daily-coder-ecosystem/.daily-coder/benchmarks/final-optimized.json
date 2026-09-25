@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "created_at": 1790102564.28534,
+  "config_hash": "92b1b3a3b262670f6ef3b5d71c1bd0af929136ca5c702bcaf24226ae164af185",
+  "records": [
+    {
+      "scenario": "trivial",
+      "repeat": 0,
+      "run_id": "68c2eea2-ceae-4e26-b74e-c3ebd693e180",
+      "expected_profile": "S",
+      "profile": "S",
+      "status": "SIMULATED",
+      "calls": 9,
+      "tokens": 900,
+      "latency_ms": 2804.358,
+      "input_tokens": 450,
+      "output_tokens": 450,
+      "repairs": 0
+    },
+    {
+      "scenario": "contained",
+      "repeat": 0,
+      "run_id": "a26e9cdc-6996-4c17-8f12-f2354c293cb5",
+      "expected_profile": "M",
+      "profile": "M",
+      "status": "SIMULATED",
+      "calls": 14,
+      "tokens": 1400,
+      "latency_ms": 1897.225,
+      "input_tokens": 650,
+      "output_tokens": 650,
+      "repairs": 0
+    },
+    {
+      "scenario": "cross_cutting",
+      "repeat": 0,
+      "run_id": "0d6d0f48-f66b-43fe-82ca-9c06704d73b6",
+      "expected_profile": "L",
+      "profile": "L",
+      "status": "SIMULATED",
+      "calls": 18,
+      "tokens": 1800,
+      "latency_ms": 2460.857,
+      "input_tokens": 800,
+      "output_tokens": 800,
+      "repairs": 0
+    },
+    {
+      "scenario": "high_risk",
+      "repeat": 0,
+      "run_id": "c0de2101-c041-452b-89eb-354b9209f318",
+      "expected_profile": "XL",
+      "profile": "XL",
+      "status": "SIMULATED",
+      "calls": 20,
+      "tokens": 2000,
+      "latency_ms": 2152.808,
+      "input_tokens": 850,
+      "output_tokens": 850,
+      "repairs": 0
+    }
+  ],
+  "summary": {
+    "runs": 4,
+    "verified_routes": 4,
+    "successful": 4,
+    "median_calls": 16.0,
+    "p90_calls": 20,
+    "median_tokens": 1600.0,
+    "p90_tokens": 2000,
+    "median_latency_ms": 2306.832,
+    "p90_latency_ms": 2804.358
+  },
+  "comparison": {
+    "median_calls": {
+      "before": 16.0,
+      "after": 16.0,
+      "percent": 0.0
+    },
+    "p90_calls": {
+      "before": 20,
+      "after": 20,
+      "percent": 0.0
+    },
+    "median_tokens": {
+      "before": 1600.0,
+      "after": 1600.0,
+      "percent": 0.0
+    },
+    "p90_tokens": {
+      "before": 2000,
+      "after": 2000,
+      "percent": 0.0
+    },
+    "median_latency_ms": {
+      "before": 2224.023,
+      "after": 2306.832,
+      "percent": 3.72
+    },
+    "p90_latency_ms": {
+      "before": 4592.854,
+      "after": 2804.358,
+      "percent": -38.94
+    },
+    "success_regression": false
+  }
+}

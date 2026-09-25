@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "experiment.schema.json",
+  "title": "experiment",
+  "type": "object",
+  "required": [
+    "experiment_id",
+    "hypothesis",
+    "counter_hypothesis",
+    "baseline",
+    "controls",
+    "variables",
+    "metrics",
+    "thresholds",
+    "confounders",
+    "costs",
+    "safety",
+    "stop_rule",
+    "rollback",
+    "rejection_criterion",
+    "intervention",
+    "competing_predictions",
+    "next_steps"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "idea_id": { "type": "string", "pattern": "^IDEA-" },
+    "experiment_id": { "type": "string", "pattern": "^EXP-" },
+    "hypothesis": { "type": "string" },
+    "counter_hypothesis": { "type": "string" },
+    "baseline": { "type": "string" },
+    "controls": { "type": "array", "items": { "type": "string" } },
+    "variables": { "type": "array", "items": { "type": "string" } },
+    "metrics": { "type": "array", "items": { "type": "string" } },
+    "thresholds": { "type": "object", "additionalProperties": { "type": "string" } },
+    "confounders": { "type": "array", "items": { "type": "string" } },
+    "costs": { "type": "array", "items": { "type": "string" } },
+    "safety": { "type": "array", "items": { "type": "string" } },
+    "stop_rule": { "type": "string" },
+    "rollback": { "type": "string" },
+    "rejection_criterion": { "type": "string", "minLength": 1 },
+    "intervention": { "type": "string" },
+    "competing_predictions": { "type": "array", "items": { "type": "string" } },
+    "resource_plan": { "type": "array", "items": { "type": "string" } },
+    "environment_pin": { "type": "string" },
+    "human_approval_required": { "type": "boolean" },
+    "next_steps": {
+      "type": "object",
+      "required": ["accept", "reject", "inconclusive"],
+      "additionalProperties": false,
+      "properties": {
+        "accept": { "type": "string" },
+        "reject": { "type": "string" },
+        "inconclusive": { "type": "string" }
+      }
+    }
+  }
+}

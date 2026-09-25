@@ -1,0 +1,23 @@
+version: "1.0.0"
+scheduler:
+  max_active_scouts: 4
+  max_adapter_calls_per_lane: 6
+  max_calls_per_domain: 20
+  overlap_merge_threshold: 0.65
+saturation:
+  duplicate_window_rounds: 2
+  min_new_sources_per_round: 1
+  max_rounds_without_gain: 2
+scout:
+  result_cap: 8
+  duplicate_rate_stop: 0.75
+  no_new_source_rounds: 2
+curator:
+  source_class_floors:
+    scholarly: 1
+    standards: 1
+    implementation: 1
+routing:
+  fanout_min_depth: standard
+  fanout_min_questions: 2
+  trivial_max_questions: 1

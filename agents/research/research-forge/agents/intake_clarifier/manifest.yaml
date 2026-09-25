@@ -1,0 +1,6 @@
+role_id: intake_clarifier
+interface_version: "1.0.0"
+input_schema: research_request
+output_schema: clarification_result
+budget_profile: S
+tools: []

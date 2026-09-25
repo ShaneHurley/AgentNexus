@@ -1,0 +1,6 @@
+id: code-comment
+version: "0.1.0"
+extends: technical-documentation-f4
+mode: code_comment
+delta:
+  prefer_why_over_what: true

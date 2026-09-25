@@ -1,0 +1,4 @@
+role_id: report_composer
+interface_version: "1.0.0"
+output_schema: research_packet
+tools: []

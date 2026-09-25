@@ -1,0 +1,21 @@
+# Local experiment subsystem (token-free, human-gated)
+workspace_relative: ".research-forge/experiments"
+data_allowlist_relative:
+  - ".research-forge/data"
+  - "fixtures"
+long_runtime_seconds: 300
+long_repetitions: 5
+min_group_n: 2
+raw_tail_chars: 4000
+pre_review_thresholds:
+  actionable: 3
+  usable_data: 3
+  information_gain: 3
+  time_cost_max: 5
+  safety_min: 3
+token_budget: 0
+kinds:
+  - dataset_profile
+  - group_comparison
+  - python_unittest_benchmark
+ledger_run_prefix: "exp-"

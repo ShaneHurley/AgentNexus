@@ -1,0 +1,7 @@
+id: resume
+version: "0.1.0"
+extends: warm-professional-base
+mode: resume
+delta:
+  no_invented_metrics: true
+  claim_audit_required: true

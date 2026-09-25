@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "reason",
+    "verdict"
+  ],
+  "properties": {
+    "verdict": {
+      "type": "string",
+      "enum": [
+        "candidate",
+        "no_candidate",
+        "reject"
+      ]
+    },
+    "reason": {
+      "type": "string"
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["prompt", "skill", "router", "harness"]
+    },
+    "target": {
+      "type": "string"
+    },
+    "proposed_text": {
+      "type": "string"
+    },
+    "provenance": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": false
+}

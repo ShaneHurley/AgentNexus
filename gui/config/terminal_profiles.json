@@ -1,0 +1,28 @@
+{
+  "profiles": [
+    {
+      "id": "echo",
+      "label": "Echo (smoke)",
+      "enabled": true,
+      "command": ["python", "-c", "print('log-shell-ok')"]
+    },
+    {
+      "id": "sleep",
+      "label": "Sleep 30s (log poll)",
+      "enabled": true,
+      "command": ["python", "-c", "import time; time.sleep(30); print('done')"]
+    },
+    {
+      "id": "vsdev",
+      "label": "Visual Studio dev shell",
+      "enabled": false,
+      "command": ["cmd", "/c", "echo vsdev not probed"]
+    },
+    {
+      "id": "assembler",
+      "label": "Assembler toolchain",
+      "enabled": false,
+      "command": ["cmd", "/c", "echo assembler not probed"]
+    }
+  ]
+}

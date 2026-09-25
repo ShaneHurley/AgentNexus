@@ -1,0 +1,18 @@
+[
+  {
+    "failure_id": "fail-001",
+    "verified": true,
+    "component": "adapter",
+    "description": "Scholarly adapter dropped correction link",
+    "evidence_refs": ["ledger-9001"],
+    "proposed_change": {"kind": "config_patch", "field": "map_corrections"},
+    "test_cases": ["scholarly-correction-01"]
+  },
+  {
+    "failure_id": "fail-noise",
+    "verified": false,
+    "component": "prompt",
+    "description": "User unhappy",
+    "source": "unaudited_feedback"
+  }
+]

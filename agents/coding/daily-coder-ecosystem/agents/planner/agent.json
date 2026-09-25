@@ -1,0 +1,15 @@
+{
+  "id": "planner",
+  "model_tier": "mid",
+  "job": "Produce atomic exact-change tasks with zero unresolved design decisions.",
+  "tools": [
+    "filesystem.read",
+    "filesystem.list",
+    "filesystem.search",
+    "repository.diff"
+  ],
+  "output_schema": "change_plan",
+  "max_output_tokens": 4000,
+  "max_retries": 1,
+  "write_scope": "none"
+}

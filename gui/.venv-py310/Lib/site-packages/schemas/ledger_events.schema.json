@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ledger_events.schema.json",
+  "title": "ledger_event_envelope",
+  "type": "object",
+  "required": [
+    "event_id",
+    "run_id",
+    "sequence",
+    "timestamp",
+    "actor",
+    "schema_version",
+    "event_type",
+    "payload",
+    "payload_hash",
+    "previous_hash"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "event_id": { "type": "string" },
+    "run_id": { "type": "string" },
+    "sequence": { "type": "integer", "minimum": 1 },
+    "timestamp": { "type": "string" },
+    "actor": { "type": "string" },
+    "schema_version": { "type": "string" },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "run_manifest",
+        "task_card",
+        "transition",
+        "tool_call",
+        "budget_debit",
+        "failure",
+        "audit",
+        "checkpoint",
+        "source_registered",
+        "evidence_added",
+        "policy_decision"
+      ]
+    },
+    "payload": { "type": "object" },
+    "payload_hash": { "type": "string" },
+    "previous_hash": { "type": "string" },
+    "idempotency_key": { "type": "string" }
+  }
+}

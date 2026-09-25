@@ -1,0 +1,78 @@
+{
+  "candidates": [
+    {
+      "candidate_id": "c1",
+      "fixture_kind": "preprint_published",
+      "doi": "10.1000/preprint",
+      "canonical_reference": "10.1000/preprint",
+      "url": "https://example.org/preprint",
+      "title": "Study v1 preprint",
+      "source_type": "paper"
+    },
+    {
+      "candidate_id": "c2",
+      "fixture_kind": "preprint_published",
+      "doi": "10.1000/preprint",
+      "canonical_reference": "10.1000/preprint",
+      "url": "https://example.org/published",
+      "title": "Study v1 published",
+      "source_type": "paper"
+    },
+    {
+      "candidate_id": "c3",
+      "fixture_kind": "mirror",
+      "original_url": "https://example.org/original",
+      "url": "https://mirror.example.org/original",
+      "title": "Mirror copy",
+      "source_type": "web"
+    },
+    {
+      "candidate_id": "c4",
+      "fixture_kind": "mirror",
+      "original_url": "https://example.org/original",
+      "url": "https://another-mirror.example.org/original",
+      "title": "Mirror copy 2",
+      "source_type": "web"
+    },
+    {
+      "candidate_id": "c5",
+      "fixture_kind": "news_summary",
+      "original_url": "https://example.org/original-paper",
+      "url": "https://news.example.org/summary",
+      "title": "News summary of paper",
+      "source_type": "news"
+    },
+    {
+      "candidate_id": "c6",
+      "fixture_kind": "vendor_repost",
+      "content_hash": "sha256:abc",
+      "url": "https://vendor.example/a",
+      "title": "Vendor repost A",
+      "source_type": "web"
+    },
+    {
+      "candidate_id": "c7",
+      "fixture_kind": "vendor_repost",
+      "content_hash": "sha256:abc",
+      "url": "https://vendor.example/b",
+      "title": "Vendor repost B",
+      "source_type": "web"
+    },
+    {
+      "candidate_id": "c8",
+      "fixture_kind": "same_dataset",
+      "dataset_id": "ds-42",
+      "url": "https://example.org/paper-a",
+      "title": "Paper using dataset 42",
+      "source_type": "paper"
+    },
+    {
+      "candidate_id": "c9",
+      "fixture_kind": "same_dataset",
+      "dataset_id": "ds-42",
+      "url": "https://example.org/paper-b",
+      "title": "Another paper using dataset 42",
+      "source_type": "paper"
+    }
+  ]
+}

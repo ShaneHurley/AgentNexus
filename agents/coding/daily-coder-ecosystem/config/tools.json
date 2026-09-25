@@ -1,0 +1,125 @@
+{
+  "deny_by_default": true,
+  "ecosystem_catalog": [
+    "filesystem.read",
+    "filesystem.list",
+    "filesystem.search",
+    "filesystem.write",
+    "patch.apply",
+    "repository.diff",
+    "repository.status",
+    "repository.history",
+    "shell.readonly",
+    "tests.run",
+    "web.fetch",
+    "web.search",
+    "docs.read",
+    "code.search",
+    "company.search",
+    "email.search",
+    "calendar.lookup",
+    "external.write",
+    "github.repo.metadata",
+    "github.pull.list"
+  ],
+  "disabled_until_adapter_configured": [
+    "docs.read",
+    "code.search",
+    "company.search",
+    "email.search",
+    "calendar.lookup",
+    "external.write"
+  ],
+  "role_allowlists": {
+    "sizer": [],
+    "researcher": [
+      "filesystem.read",
+      "filesystem.list",
+      "filesystem.search",
+      "repository.history",
+      "repository.diff",
+      "web.fetch",
+      "web.search",
+      "github.repo.metadata",
+      "github.pull.list"
+    ],
+    "master": [
+      "filesystem.read",
+      "repository.diff",
+      "repository.status",
+      "github.repo.metadata"
+    ],
+    "brainstormer": [],
+    "test_designer": [
+      "filesystem.read",
+      "filesystem.search",
+      "repository.diff"
+    ],
+    "planner": [
+      "filesystem.read",
+      "filesystem.list",
+      "filesystem.search",
+      "repository.diff"
+    ],
+    "plan_reviewer": [
+      "filesystem.read",
+      "filesystem.search",
+      "repository.diff"
+    ],
+    "implementer": [
+      "filesystem.read",
+      "filesystem.list",
+      "filesystem.search",
+      "filesystem.write",
+      "patch.apply",
+      "tests.run",
+      "repository.diff",
+      "repository.status"
+    ],
+    "test_author": [
+      "filesystem.read",
+      "filesystem.search",
+      "filesystem.write",
+      "patch.apply",
+      "tests.run",
+      "repository.diff"
+    ],
+    "test_executor": [
+      "filesystem.read",
+      "tests.run",
+      "repository.diff",
+      "repository.status"
+    ],
+    "code_reviewer": [
+      "filesystem.read",
+      "filesystem.search",
+      "repository.diff",
+      "repository.status",
+      "github.repo.metadata",
+      "github.pull.list"
+    ],
+    "documenter": [
+      "filesystem.read",
+      "filesystem.write",
+      "patch.apply",
+      "repository.diff"
+    ],
+    "alignment_checker": [
+      "filesystem.read",
+      "repository.diff",
+      "repository.status"
+    ],
+    "failure_diagnostician": [
+      "filesystem.read",
+      "filesystem.search",
+      "repository.diff",
+      "repository.status"
+    ],
+    "skill_curator": [
+      "filesystem.read",
+      "filesystem.search",
+      "repository.history"
+    ],
+    "frontier_advisor": []
+  }
+}

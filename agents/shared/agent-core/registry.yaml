@@ -1,0 +1,49 @@
+version: "0.1.0"
+roles:
+  - id: source-inspector
+    version: "0.1.0"
+    kind: shared_subagent
+    primary_outcome: Source-bound facts with exact locators
+    lifecycle: experimental
+    contract: shared-agents/source-inspector/contract.yaml
+    callers: [writing-improver, documentation-curator, datasheet-extractor, daily-coder]
+  - id: artifact-style-enforcer
+    version: "0.1.0"
+    kind: shared_subagent
+    primary_outcome: Conform artifact to one style profile without semantic change
+    lifecycle: experimental
+    contract: shared-agents/artifact-style-enforcer/contract.yaml
+    callers: [writing-improver, resume-tailor, documentation-curator]
+  - id: documentation-curator
+    version: "0.1.0"
+    kind: shared_subagent
+    primary_outcome: Technical docs grounded in accepted evidence only
+    lifecycle: experimental
+    contract: shared-agents/documentation-curator/contract.yaml
+    callers: [daily-coder, writing-improver]
+    opt_in:
+      flag: documentation_curator_after_document
+      config: agents/coding/daily-coder-ecosystem/config/token_experiments.json
+      default: false
+      excluded_domains: [resume, career, personal-store]
+  - id: evidence-synthesizer
+    version: "0.1.0"
+    kind: shared_subagent
+    primary_outcome: Merge evidence packets; preserve contradictions
+    lifecycle: experimental
+    contract: shared-agents/evidence-synthesizer/contract.yaml
+    callers: [claim-auditor, deep-research]
+  - id: writing-lint
+    version: "0.1.0"
+    kind: deterministic
+    primary_outcome: Fail-closed punctuation and repetition checks
+    lifecycle: active
+    contract: services/writing_lint
+    callers: [writing-improver]
+  - id: personal-store
+    version: "0.1.0"
+    kind: deterministic
+    primary_outcome: Validate and apply confirmed career-store diffs
+    lifecycle: active
+    contract: services/personal_store
+    callers: [career-tools]

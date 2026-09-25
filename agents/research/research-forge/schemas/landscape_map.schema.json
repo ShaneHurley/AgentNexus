@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "landscape_map.schema.json",
+  "title": "landscape_map",
+  "type": "object",
+  "required": ["map_id", "charter_id", "angle_taxonomy", "terminology", "lanes"],
+  "additionalProperties": true,
+  "properties": {
+    "map_id": { "type": "string" },
+    "charter_id": { "type": "string" },
+    "angle_taxonomy": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "terminology": { "type": "array", "items": { "type": "object" } },
+    "lanes": { "type": "array", "items": { "type": "object" } }
+  }
+}

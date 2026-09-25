@@ -1,0 +1,41 @@
+{
+  "host": "127.0.0.1",
+  "port": 8866,
+  "auth_required": false,
+  "agents": [
+    {
+      "id": "daily-coder",
+      "name": "Daily Coder",
+      "description": "Artifact-driven coding orchestration (PolicyGateway, phases, REST)",
+      "adapter": "daily_coder",
+      "enabled": true,
+      "options": {
+        "base_url": "http://127.0.0.1:8765",
+        "repo_root": "../agents/coding/daily-coder-ecosystem",
+        "provider": "mock",
+        "default_repo": ".."
+      }
+    },
+    {
+      "id": "research-forge",
+      "name": "Research Forge",
+      "description": "Evidence-first research pipeline (Waves 0–6, JSONL ledger)",
+      "adapter": "research_forge",
+      "enabled": true,
+      "options": {
+        "package_root": "../agents/research/research-forge",
+        "workspace_root": "../agents/research/research-forge"
+      }
+    },
+    {
+      "id": "daily-task",
+      "name": "Daily Task",
+      "description": "Browser RCC paste families (lifestyle + mission-control router)",
+      "adapter": "daily_task",
+      "enabled": true,
+      "options": {
+        "package_root": "../agents/daily-task"
+      }
+    }
+  ]
+}

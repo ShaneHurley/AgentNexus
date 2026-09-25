@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "browser_handoff",
+  "type": "object",
+  "required": [
+    "role_id",
+    "status",
+    "persisted"
+  ],
+  "properties": {
+    "role_id": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "COMPLETE",
+        "PARTIAL",
+        "BLOCKED",
+        "NOT_APPLICABLE"
+      ]
+    },
+    "persisted": {
+      "type": "boolean",
+      "const": false
+    },
+    "draft": {
+      "type": "string"
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+wave: 6
+mock_by_default: true
+plugins:
+  config_path: config/wave6_plugins.yaml
+routing:
+  baseline_version: wave2-static-v1
+  shadow_min_agreement: 0.0
+  guardrails:
+    min_usd_for_fanout: 2.0
+proposals:
+  automatic_merge: false
+maintenance:
+  drift_thresholds:
+    citation_quality_min: 0.85
+    unsupported_claim_rate_max: 0.05

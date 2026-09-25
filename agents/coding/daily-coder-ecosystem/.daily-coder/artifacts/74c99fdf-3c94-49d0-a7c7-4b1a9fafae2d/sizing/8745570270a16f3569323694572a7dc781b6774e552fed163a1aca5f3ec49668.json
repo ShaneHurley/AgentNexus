@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "run_id": "74c99fdf-3c94-49d0-a7c7-4b1a9fafae2d",
+  "kind": "sizing",
+  "producer_role": "sizer",
+  "created_at": 1790101963.469595,
+  "payload": {
+    "profile": "S",
+    "score": 0,
+    "reasons": [
+      "contained-explicit-request"
+    ]
+  }
+}

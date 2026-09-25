@@ -1,0 +1,13 @@
+id: artifact-style-enforcer
+version: "0.1.0"
+outcome: Findings or patch_proposal conforming to one style profile without semantic change
+permissions: [read]
+forbidden_actions:
+  - approve_own_patch
+  - judge_factual_accuracy
+  - invent_facts
+semantic_invariants: true
+requires_semantic_risk_review_for: [F3, F4, public]
+input_schema: schemas/writing/style_task.schema.json
+output_schema: schemas/writing/style_result.schema.json
+profile_root: profiles/style

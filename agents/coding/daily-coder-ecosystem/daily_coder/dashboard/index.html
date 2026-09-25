@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Daily Coder API</title>
+<style>
+  :root { color-scheme: dark; --bg:#0f1115; --text:#e6e8ee; --muted:#9aa3b2; --line:#272b35; --accent:#5b8def; }
+  body { margin:0; font:15px/1.5 system-ui,Segoe UI,sans-serif; background:var(--bg); color:var(--text);
+    min-height:100vh; display:grid; place-items:center; padding:24px; }
+  main { max-width:520px; border:1px solid var(--line); border-radius:12px; padding:28px; background:#171a21; }
+  h1 { font-size:1.1rem; margin:0 0 8px; }
+  p { color:var(--muted); margin:0 0 14px; }
+  a { color:var(--accent); }
+  code { background:#11141a; padding:2px 6px; border-radius:4px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Daily Coder — API only</h1>
+  <p>
+    The shared orchestration UI moved out of this package so it can cover
+    Daily Coder, Research Forge, and future agents.
+  </p>
+  <p>
+    Open the hub at
+    <a href="http://127.0.0.1:8866/">http://127.0.0.1:8866/</a>
+    (start it from <code>gui</code> with <code>start.bat</code>,
+    <code>./start.sh</code>, or <code>python start.py</code>).
+  </p>
+  <p>
+    This process still serves <code>/api/*</code> for the hub adapter.
+    Health: <a href="/api/health"><code>/api/health</code></a>
+  </p>
+</main>
+</body>
+</html>

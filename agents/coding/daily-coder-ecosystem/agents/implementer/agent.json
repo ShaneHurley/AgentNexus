@@ -1,0 +1,19 @@
+{
+  "id": "implementer",
+  "model_tier": "lowest",
+  "job": "Mechanically apply only the frozen plan inside its file allowlist.",
+  "tools": [
+    "filesystem.read",
+    "filesystem.list",
+    "filesystem.search",
+    "filesystem.write",
+    "patch.apply",
+    "tests.run",
+    "repository.diff",
+    "repository.status"
+  ],
+  "output_schema": "implementation",
+  "max_output_tokens": 3000,
+  "max_retries": 1,
+  "write_scope": "implementer"
+}

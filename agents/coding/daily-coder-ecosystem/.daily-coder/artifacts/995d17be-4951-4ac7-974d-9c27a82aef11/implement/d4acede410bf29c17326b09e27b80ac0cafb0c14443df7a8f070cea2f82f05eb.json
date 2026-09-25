@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "run_id": "995d17be-4951-4ac7-974d-9c27a82aef11",
+  "kind": "implement",
+  "producer_role": "implementer",
+  "created_at": 1790102857.6908402,
+  "payload": {
+    "changed_files": [],
+    "commands": [],
+    "observations": [
+      "Mock provider made no edits."
+    ],
+    "blocked": false
+  }
+}

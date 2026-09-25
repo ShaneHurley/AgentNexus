@@ -1,0 +1,907 @@
+{
+  "package": "browser-agent-pack",
+  "version": "3.0.0-federated",
+  "families": [
+    "plans-and-places",
+    "kitchen-cooking",
+    "learning-coach",
+    "writing-studio",
+    "research-desk",
+    "code-crafter",
+    "code-reviewer",
+    "document-reviewer",
+    "mission-control",
+    "thinking-lab"
+  ],
+  "agent_count": 96,
+  "default_paste": [
+    "AGENT_MESSAGE.md",
+    "TASK_PACKET",
+    "evidence"
+  ],
+  "agents": [
+    {
+      "family": "plans-and-places",
+      "variant": null,
+      "display_name": "Plans & Places",
+      "path": "plans-and-places",
+      "carousel": true,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "plans-and-places",
+      "variant": "budget-optimizer",
+      "display_name": "Plans & Places \u2014 Budget Optimizer",
+      "path": "plans-and-places/variants/budget-optimizer",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "plans-and-places",
+      "variant": "dietary-cross-check",
+      "display_name": "Plans & Places \u2014 Dietary Cross Check",
+      "path": "plans-and-places/variants/dietary-cross-check",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "plans-and-places",
+      "variant": "discover-events",
+      "display_name": "Plans & Places \u2014 Discover Events",
+      "path": "plans-and-places/variants/discover-events",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "plans-and-places",
+      "variant": "errand-route",
+      "display_name": "Plans & Places \u2014 Errand Route",
+      "path": "plans-and-places/variants/errand-route",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "plans-and-places",
+      "variant": "event-run-of-show",
+      "display_name": "Plans & Places \u2014 Event Run Of Show",
+      "path": "plans-and-places/variants/event-run-of-show",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "plans-and-places",
+      "variant": "group-constraints",
+      "display_name": "Plans & Places \u2014 Group Constraints",
+      "path": "plans-and-places/variants/group-constraints",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "plans-and-places",
+      "variant": "packing-list",
+      "display_name": "Plans & Places \u2014 Packing List",
+      "path": "plans-and-places/variants/packing-list",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "plans-and-places",
+      "variant": "trip-itinerary",
+      "display_name": "Plans & Places \u2014 Trip Itinerary",
+      "path": "plans-and-places/variants/trip-itinerary",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "plans-and-places",
+      "variant": "weather-contingency",
+      "display_name": "Plans & Places \u2014 Weather Contingency",
+      "path": "plans-and-places/variants/weather-contingency",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "kitchen-cooking",
+      "variant": null,
+      "display_name": "Kitchen Companion",
+      "path": "kitchen-cooking",
+      "carousel": true,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "kitchen-cooking",
+      "variant": "allergy-diet-scan",
+      "display_name": "Kitchen Companion \u2014 Allergy Diet Scan",
+      "path": "kitchen-cooking/variants/allergy-diet-scan",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "kitchen-cooking",
+      "variant": "batch-prep",
+      "display_name": "Kitchen Companion \u2014 Batch Prep",
+      "path": "kitchen-cooking/variants/batch-prep",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "kitchen-cooking",
+      "variant": "brainstorm",
+      "display_name": "Kitchen Companion \u2014 Brainstorm",
+      "path": "kitchen-cooking/variants/brainstorm",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "kitchen-cooking",
+      "variant": "equipment-limited",
+      "display_name": "Kitchen Companion \u2014 Equipment Limited",
+      "path": "kitchen-cooking/variants/equipment-limited",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "kitchen-cooking",
+      "variant": "leftover-rescue",
+      "display_name": "Kitchen Companion \u2014 Leftover Rescue",
+      "path": "kitchen-cooking/variants/leftover-rescue",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "kitchen-cooking",
+      "variant": "meal-plan",
+      "display_name": "Kitchen Companion \u2014 Meal Plan",
+      "path": "kitchen-cooking/variants/meal-plan",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "kitchen-cooking",
+      "variant": "recipe",
+      "display_name": "Kitchen Companion \u2014 Recipe",
+      "path": "kitchen-cooking/variants/recipe",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "kitchen-cooking",
+      "variant": "vibe-cook",
+      "display_name": "Kitchen Companion \u2014 Vibe Cook",
+      "path": "kitchen-cooking/variants/vibe-cook",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "learning-coach",
+      "variant": null,
+      "display_name": "Learning Coach",
+      "path": "learning-coach",
+      "carousel": true,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "learning-coach",
+      "variant": "exam-prep",
+      "display_name": "Learning Coach \u2014 Exam Prep",
+      "path": "learning-coach/variants/exam-prep",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "learning-coach",
+      "variant": "flashcards",
+      "display_name": "Learning Coach \u2014 Flashcards",
+      "path": "learning-coach/variants/flashcards",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "learning-coach",
+      "variant": "map-topic",
+      "display_name": "Learning Coach \u2014 Map Topic",
+      "path": "learning-coach/variants/map-topic",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "learning-coach",
+      "variant": "mental-model",
+      "display_name": "Learning Coach \u2014 Mental Model",
+      "path": "learning-coach/variants/mental-model",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "learning-coach",
+      "variant": "quiz",
+      "display_name": "Learning Coach \u2014 Quiz",
+      "path": "learning-coach/variants/quiz",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "learning-coach",
+      "variant": "rubric-review",
+      "display_name": "Learning Coach \u2014 Rubric Review",
+      "path": "learning-coach/variants/rubric-review",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "learning-coach",
+      "variant": "socratic",
+      "display_name": "Learning Coach \u2014 Socratic",
+      "path": "learning-coach/variants/socratic",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "learning-coach",
+      "variant": "source-synthesis",
+      "display_name": "Learning Coach \u2014 Source Synthesis",
+      "path": "learning-coach/variants/source-synthesis",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "learning-coach",
+      "variant": "study-plan",
+      "display_name": "Learning Coach \u2014 Study Plan",
+      "path": "learning-coach/variants/study-plan",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "learning-coach",
+      "variant": "teach",
+      "display_name": "Learning Coach \u2014 Teach",
+      "path": "learning-coach/variants/teach",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "writing-studio",
+      "variant": null,
+      "display_name": "Writing Studio",
+      "path": "writing-studio",
+      "carousel": true,
+      "ide_counterpart": "personal skills / style profiles",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "writing-studio",
+      "variant": "ads-marketing",
+      "display_name": "Writing Studio \u2014 Ads Marketing",
+      "path": "writing-studio/variants/ads-marketing",
+      "carousel": false,
+      "ide_counterpart": "personal skills / style profiles",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "writing-studio",
+      "variant": "cover-letter",
+      "display_name": "Writing Studio \u2014 Cover Letter",
+      "path": "writing-studio/variants/cover-letter",
+      "carousel": false,
+      "ide_counterpart": "personal skills / style profiles",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "writing-studio",
+      "variant": "email",
+      "display_name": "Writing Studio \u2014 Email",
+      "path": "writing-studio/variants/email",
+      "carousel": false,
+      "ide_counterpart": "personal skills / style profiles",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "writing-studio",
+      "variant": "form-explain",
+      "display_name": "Writing Studio \u2014 Form Explain",
+      "path": "writing-studio/variants/form-explain",
+      "carousel": false,
+      "ide_counterpart": "personal skills / style profiles",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "writing-studio",
+      "variant": "github-issue",
+      "display_name": "Writing Studio \u2014 Github Issue",
+      "path": "writing-studio/variants/github-issue",
+      "carousel": false,
+      "ide_counterpart": "personal skills / style profiles",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "writing-studio",
+      "variant": "github-pr",
+      "display_name": "Writing Studio \u2014 Github Pr",
+      "path": "writing-studio/variants/github-pr",
+      "carousel": false,
+      "ide_counterpart": "personal skills / style profiles",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "writing-studio",
+      "variant": "github-readme",
+      "display_name": "Writing Studio \u2014 Github Readme",
+      "path": "writing-studio/variants/github-readme",
+      "carousel": false,
+      "ide_counterpart": "personal skills / style profiles",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "writing-studio",
+      "variant": "homework",
+      "display_name": "Writing Studio \u2014 Homework",
+      "path": "writing-studio/variants/homework",
+      "carousel": false,
+      "ide_counterpart": "personal skills / style profiles",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "writing-studio",
+      "variant": "meeting-notes",
+      "display_name": "Writing Studio \u2014 Meeting Notes",
+      "path": "writing-studio/variants/meeting-notes",
+      "carousel": false,
+      "ide_counterpart": "personal skills / style profiles",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "writing-studio",
+      "variant": "personal-project",
+      "display_name": "Writing Studio \u2014 Personal Project",
+      "path": "writing-studio/variants/personal-project",
+      "carousel": false,
+      "ide_counterpart": "personal skills / style profiles",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "writing-studio",
+      "variant": "resume",
+      "display_name": "Writing Studio \u2014 Resume",
+      "path": "writing-studio/variants/resume",
+      "carousel": false,
+      "ide_counterpart": "personal skills / style profiles",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "writing-studio",
+      "variant": "self-review-only",
+      "display_name": "Writing Studio \u2014 Self Review Only",
+      "path": "writing-studio/variants/self-review-only",
+      "carousel": false,
+      "ide_counterpart": "personal skills / style profiles",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "writing-studio",
+      "variant": "slack-update",
+      "display_name": "Writing Studio \u2014 Slack Update",
+      "path": "writing-studio/variants/slack-update",
+      "carousel": false,
+      "ide_counterpart": "personal skills / style profiles",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "writing-studio",
+      "variant": "study-guide",
+      "display_name": "Writing Studio \u2014 Study Guide",
+      "path": "writing-studio/variants/study-guide",
+      "carousel": false,
+      "ide_counterpart": "personal skills / style profiles",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "writing-studio",
+      "variant": "tech-doc",
+      "display_name": "Writing Studio \u2014 Tech Doc",
+      "path": "writing-studio/variants/tech-doc",
+      "carousel": false,
+      "ide_counterpart": "personal skills / style profiles",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "writing-studio",
+      "variant": "tone-match",
+      "display_name": "Writing Studio \u2014 Tone Match",
+      "path": "writing-studio/variants/tone-match",
+      "carousel": false,
+      "ide_counterpart": "personal skills / style profiles",
+      "deprecated_aliases": [
+        "voice-tone-chameleon"
+      ]
+    },
+    {
+      "family": "research-desk",
+      "variant": null,
+      "display_name": "Research Desk",
+      "path": "research-desk",
+      "carousel": true,
+      "ide_counterpart": "/deep-research",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "research-desk",
+      "variant": "assemble-given",
+      "display_name": "Research Desk \u2014 Assemble Given",
+      "path": "research-desk/variants/assemble-given",
+      "carousel": false,
+      "ide_counterpart": "/deep-research",
+      "deprecated_aliases": [
+        "doc-reader",
+        "browser_idea:doc-reader"
+      ]
+    },
+    {
+      "family": "research-desk",
+      "variant": "compare-options",
+      "display_name": "Research Desk \u2014 Compare Options",
+      "path": "research-desk/variants/compare-options",
+      "carousel": false,
+      "ide_counterpart": "/deep-research",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "research-desk",
+      "variant": "contradiction-audit",
+      "display_name": "Research Desk \u2014 Contradiction Audit",
+      "path": "research-desk/variants/contradiction-audit",
+      "carousel": false,
+      "ide_counterpart": "/deep-research",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "research-desk",
+      "variant": "deep",
+      "display_name": "Research Desk \u2014 Deep",
+      "path": "research-desk/variants/deep",
+      "carousel": false,
+      "ide_counterpart": "/deep-research",
+      "deprecated_aliases": [
+        "deep-research",
+        "browser_idea:deep-research"
+      ]
+    },
+    {
+      "family": "research-desk",
+      "variant": "field-extract",
+      "display_name": "Research Desk \u2014 Field Extract",
+      "path": "research-desk/variants/field-extract",
+      "carousel": false,
+      "ide_counterpart": "/deep-research",
+      "deprecated_aliases": [
+        "information-condenser"
+      ]
+    },
+    {
+      "family": "research-desk",
+      "variant": "gap-finder",
+      "display_name": "Research Desk \u2014 Gap Finder",
+      "path": "research-desk/variants/gap-finder",
+      "carousel": false,
+      "ide_counterpart": "/deep-research",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "research-desk",
+      "variant": "medium",
+      "display_name": "Research Desk \u2014 Medium",
+      "path": "research-desk/variants/medium",
+      "carousel": false,
+      "ide_counterpart": "/deep-research",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "research-desk",
+      "variant": "obligation-register",
+      "display_name": "Research Desk \u2014 Obligation Register",
+      "path": "research-desk/variants/obligation-register",
+      "carousel": false,
+      "ide_counterpart": "/deep-research",
+      "deprecated_aliases": [
+        "bureaucracy-translator"
+      ]
+    },
+    {
+      "family": "research-desk",
+      "variant": "phd",
+      "display_name": "Research Desk \u2014 Phd",
+      "path": "research-desk/variants/phd",
+      "carousel": false,
+      "ide_counterpart": "/deep-research",
+      "deprecated_aliases": [
+        "deep-research",
+        "browser_idea:deep-research"
+      ]
+    },
+    {
+      "family": "research-desk",
+      "variant": "quick",
+      "display_name": "Research Desk \u2014 Quick",
+      "path": "research-desk/variants/quick",
+      "carousel": false,
+      "ide_counterpart": "/deep-research",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "research-desk",
+      "variant": "source-check",
+      "display_name": "Research Desk \u2014 Source Check",
+      "path": "research-desk/variants/source-check",
+      "carousel": false,
+      "ide_counterpart": "/deep-research",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "research-desk",
+      "variant": "table-capture",
+      "display_name": "Research Desk \u2014 Table Capture",
+      "path": "research-desk/variants/table-capture",
+      "carousel": false,
+      "ide_counterpart": "/deep-research",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "code-crafter",
+      "variant": null,
+      "display_name": "Code Crafter",
+      "path": "code-crafter",
+      "carousel": true,
+      "ide_counterpart": "/daily-coder + ide-bridge",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "code-crafter",
+      "variant": "bridge-handoff",
+      "display_name": "Code Crafter \u2014 Bridge Handoff",
+      "path": "code-crafter/variants/bridge-handoff",
+      "carousel": false,
+      "ide_counterpart": "/daily-coder + ide-bridge",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "code-crafter",
+      "variant": "debug-root-cause",
+      "display_name": "Code Crafter \u2014 Debug Root Cause",
+      "path": "code-crafter/variants/debug-root-cause",
+      "carousel": false,
+      "ide_counterpart": "/daily-coder + ide-bridge",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "code-crafter",
+      "variant": "patch-draft",
+      "display_name": "Code Crafter \u2014 Patch Draft",
+      "path": "code-crafter/variants/patch-draft",
+      "carousel": false,
+      "ide_counterpart": "/daily-coder + ide-bridge",
+      "deprecated_aliases": [
+        "daily-coder",
+        "browser_idea:daily-coder"
+      ]
+    },
+    {
+      "family": "code-crafter",
+      "variant": "rollback-plan",
+      "display_name": "Code Crafter \u2014 Rollback Plan",
+      "path": "code-crafter/variants/rollback-plan",
+      "carousel": false,
+      "ide_counterpart": "/daily-coder + ide-bridge",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "code-crafter",
+      "variant": "self-review-only",
+      "display_name": "Code Crafter \u2014 Self Review Only",
+      "path": "code-crafter/variants/self-review-only",
+      "carousel": false,
+      "ide_counterpart": "/daily-coder + ide-bridge",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "code-crafter",
+      "variant": "test-checklist",
+      "display_name": "Code Crafter \u2014 Test Checklist",
+      "path": "code-crafter/variants/test-checklist",
+      "carousel": false,
+      "ide_counterpart": "/daily-coder + ide-bridge",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "code-reviewer",
+      "variant": null,
+      "display_name": "Code Reviewer",
+      "path": "code-reviewer",
+      "carousel": true,
+      "ide_counterpart": "/code-reviewer",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "code-reviewer",
+      "variant": "diff-adversarial",
+      "display_name": "Code Reviewer \u2014 Diff Adversarial",
+      "path": "code-reviewer/variants/diff-adversarial",
+      "carousel": false,
+      "ide_counterpart": "/code-reviewer",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "code-reviewer",
+      "variant": "pr-checklist",
+      "display_name": "Code Reviewer \u2014 Pr Checklist",
+      "path": "code-reviewer/variants/pr-checklist",
+      "carousel": false,
+      "ide_counterpart": "/code-reviewer",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "code-reviewer",
+      "variant": "regression-hunt",
+      "display_name": "Code Reviewer \u2014 Regression Hunt",
+      "path": "code-reviewer/variants/regression-hunt",
+      "carousel": false,
+      "ide_counterpart": "/code-reviewer",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "code-reviewer",
+      "variant": "security-focus",
+      "display_name": "Code Reviewer \u2014 Security Focus",
+      "path": "code-reviewer/variants/security-focus",
+      "carousel": false,
+      "ide_counterpart": "/code-reviewer",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "code-reviewer",
+      "variant": "test-gap",
+      "display_name": "Code Reviewer \u2014 Test Gap",
+      "path": "code-reviewer/variants/test-gap",
+      "carousel": false,
+      "ide_counterpart": "/code-reviewer",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "document-reviewer",
+      "variant": null,
+      "display_name": "Document Reviewer",
+      "path": "document-reviewer",
+      "carousel": true,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "document-reviewer",
+      "variant": "academic-integrity",
+      "display_name": "Document Reviewer \u2014 Academic Integrity",
+      "path": "document-reviewer/variants/academic-integrity",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "document-reviewer",
+      "variant": "audience-clarity",
+      "display_name": "Document Reviewer \u2014 Audience Clarity",
+      "path": "document-reviewer/variants/audience-clarity",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "document-reviewer",
+      "variant": "claims-evidence",
+      "display_name": "Document Reviewer \u2014 Claims Evidence",
+      "path": "document-reviewer/variants/claims-evidence",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "document-reviewer",
+      "variant": "docx-adversarial",
+      "display_name": "Document Reviewer \u2014 Docx Adversarial",
+      "path": "document-reviewer/variants/docx-adversarial",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "document-reviewer",
+      "variant": "pdf-adversarial",
+      "display_name": "Document Reviewer \u2014 Pdf Adversarial",
+      "path": "document-reviewer/variants/pdf-adversarial",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "document-reviewer",
+      "variant": "policy-compliance",
+      "display_name": "Document Reviewer \u2014 Policy Compliance",
+      "path": "document-reviewer/variants/policy-compliance",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "document-reviewer",
+      "variant": "spec-completeness",
+      "display_name": "Document Reviewer \u2014 Spec Completeness",
+      "path": "document-reviewer/variants/spec-completeness",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "mission-control",
+      "variant": null,
+      "display_name": "Mission Control",
+      "path": "mission-control",
+      "carousel": true,
+      "ide_counterpart": "/use-master",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "mission-control",
+      "variant": "phase-assemble",
+      "display_name": "Mission Control \u2014 Phase Assemble",
+      "path": "mission-control/variants/phase-assemble",
+      "carousel": false,
+      "ide_counterpart": "/use-master",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "mission-control",
+      "variant": "phase-code-review",
+      "display_name": "Mission Control \u2014 Phase Code Review",
+      "path": "mission-control/variants/phase-code-review",
+      "carousel": false,
+      "ide_counterpart": "/use-master",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "mission-control",
+      "variant": "phase-context",
+      "display_name": "Mission Control \u2014 Phase Context",
+      "path": "mission-control/variants/phase-context",
+      "carousel": false,
+      "ide_counterpart": "/use-master",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "mission-control",
+      "variant": "phase-doc-review",
+      "display_name": "Mission Control \u2014 Phase Doc Review",
+      "path": "mission-control/variants/phase-doc-review",
+      "carousel": false,
+      "ide_counterpart": "/use-master",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "mission-control",
+      "variant": "phase-fix-review",
+      "display_name": "Mission Control \u2014 Phase Fix Review",
+      "path": "mission-control/variants/phase-fix-review",
+      "carousel": false,
+      "ide_counterpart": "/use-master",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "mission-control",
+      "variant": "phase-implement",
+      "display_name": "Mission Control \u2014 Phase Implement",
+      "path": "mission-control/variants/phase-implement",
+      "carousel": false,
+      "ide_counterpart": "/use-master",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "mission-control",
+      "variant": "phase-plan",
+      "display_name": "Mission Control \u2014 Phase Plan",
+      "path": "mission-control/variants/phase-plan",
+      "carousel": false,
+      "ide_counterpart": "/use-master",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "mission-control",
+      "variant": "phase-plan-review",
+      "display_name": "Mission Control \u2014 Phase Plan Review",
+      "path": "mission-control/variants/phase-plan-review",
+      "carousel": false,
+      "ide_counterpart": "/use-master",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "mission-control",
+      "variant": "phase-research",
+      "display_name": "Mission Control \u2014 Phase Research",
+      "path": "mission-control/variants/phase-research",
+      "carousel": false,
+      "ide_counterpart": "/use-master",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "thinking-lab",
+      "variant": null,
+      "display_name": "Thinking Lab",
+      "path": "thinking-lab",
+      "carousel": true,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "thinking-lab",
+      "variant": "cascade-risk",
+      "display_name": "Thinking Lab \u2014 Cascade Risk",
+      "path": "thinking-lab/variants/cascade-risk",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "thinking-lab",
+      "variant": "decision-reversibility",
+      "display_name": "Thinking Lab \u2014 Decision Reversibility",
+      "path": "thinking-lab/variants/decision-reversibility",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "thinking-lab",
+      "variant": "idea-stress-test",
+      "display_name": "Thinking Lab \u2014 Idea Stress Test",
+      "path": "thinking-lab/variants/idea-stress-test",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    },
+    {
+      "family": "thinking-lab",
+      "variant": "pre-mortem",
+      "display_name": "Thinking Lab \u2014 Pre Mortem",
+      "path": "thinking-lab/variants/pre-mortem",
+      "carousel": false,
+      "ide_counterpart": null,
+      "deprecated_aliases": []
+    }
+  ],
+  "manifest_index": "shared/browser/MANIFEST.index.json"
+}

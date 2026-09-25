@@ -1,0 +1,155 @@
+{
+  "package": "browser-agent-pack",
+  "version": "3.0.0-federated",
+  "families": [
+    "plans-and-places",
+    "kitchen-cooking",
+    "learning-coach",
+    "writing-studio",
+    "research-desk",
+    "code-crafter",
+    "code-reviewer",
+    "document-reviewer",
+    "mission-control",
+    "thinking-lab"
+  ],
+  "agent_count": 13,
+  "default_paste": [
+    "AGENT_MESSAGE.md",
+    "TASK_PACKET",
+    "evidence"
+  ],
+  "agents": [
+    {
+      "family": "research-desk",
+      "variant": null,
+      "display_name": "Research Desk",
+      "path": "research-desk",
+      "carousel": true,
+      "ide_counterpart": "/deep-research",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "research-desk",
+      "variant": "assemble-given",
+      "display_name": "Research Desk \u2014 Assemble Given",
+      "path": "research-desk/variants/assemble-given",
+      "carousel": false,
+      "ide_counterpart": "/deep-research",
+      "deprecated_aliases": [
+        "doc-reader",
+        "browser_idea:doc-reader"
+      ]
+    },
+    {
+      "family": "research-desk",
+      "variant": "compare-options",
+      "display_name": "Research Desk \u2014 Compare Options",
+      "path": "research-desk/variants/compare-options",
+      "carousel": false,
+      "ide_counterpart": "/deep-research",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "research-desk",
+      "variant": "contradiction-audit",
+      "display_name": "Research Desk \u2014 Contradiction Audit",
+      "path": "research-desk/variants/contradiction-audit",
+      "carousel": false,
+      "ide_counterpart": "/deep-research",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "research-desk",
+      "variant": "deep",
+      "display_name": "Research Desk \u2014 Deep",
+      "path": "research-desk/variants/deep",
+      "carousel": false,
+      "ide_counterpart": "/deep-research",
+      "deprecated_aliases": [
+        "deep-research",
+        "browser_idea:deep-research"
+      ]
+    },
+    {
+      "family": "research-desk",
+      "variant": "field-extract",
+      "display_name": "Research Desk \u2014 Field Extract",
+      "path": "research-desk/variants/field-extract",
+      "carousel": false,
+      "ide_counterpart": "/deep-research",
+      "deprecated_aliases": [
+        "information-condenser"
+      ]
+    },
+    {
+      "family": "research-desk",
+      "variant": "gap-finder",
+      "display_name": "Research Desk \u2014 Gap Finder",
+      "path": "research-desk/variants/gap-finder",
+      "carousel": false,
+      "ide_counterpart": "/deep-research",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "research-desk",
+      "variant": "medium",
+      "display_name": "Research Desk \u2014 Medium",
+      "path": "research-desk/variants/medium",
+      "carousel": false,
+      "ide_counterpart": "/deep-research",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "research-desk",
+      "variant": "obligation-register",
+      "display_name": "Research Desk \u2014 Obligation Register",
+      "path": "research-desk/variants/obligation-register",
+      "carousel": false,
+      "ide_counterpart": "/deep-research",
+      "deprecated_aliases": [
+        "bureaucracy-translator"
+      ]
+    },
+    {
+      "family": "research-desk",
+      "variant": "phd",
+      "display_name": "Research Desk \u2014 Phd",
+      "path": "research-desk/variants/phd",
+      "carousel": false,
+      "ide_counterpart": "/deep-research",
+      "deprecated_aliases": [
+        "deep-research",
+        "browser_idea:deep-research"
+      ]
+    },
+    {
+      "family": "research-desk",
+      "variant": "quick",
+      "display_name": "Research Desk \u2014 Quick",
+      "path": "research-desk/variants/quick",
+      "carousel": false,
+      "ide_counterpart": "/deep-research",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "research-desk",
+      "variant": "source-check",
+      "display_name": "Research Desk \u2014 Source Check",
+      "path": "research-desk/variants/source-check",
+      "carousel": false,
+      "ide_counterpart": "/deep-research",
+      "deprecated_aliases": []
+    },
+    {
+      "family": "research-desk",
+      "variant": "table-capture",
+      "display_name": "Research Desk \u2014 Table Capture",
+      "path": "research-desk/variants/table-capture",
+      "carousel": false,
+      "ide_counterpart": "/deep-research",
+      "deprecated_aliases": []
+    }
+  ],
+  "manifest_index": "shared/browser/MANIFEST.index.json"
+}

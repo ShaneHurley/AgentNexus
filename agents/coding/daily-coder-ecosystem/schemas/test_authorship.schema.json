@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "changed_test_files",
+    "criterion_mapping",
+    "negative_control"
+  ],
+  "properties": {
+    "changed_test_files": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "criterion_mapping": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "negative_control": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": true
+}

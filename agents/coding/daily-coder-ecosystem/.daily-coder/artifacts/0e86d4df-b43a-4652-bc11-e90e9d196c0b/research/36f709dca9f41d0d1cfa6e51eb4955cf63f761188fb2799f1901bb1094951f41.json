@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "run_id": "0e86d4df-b43a-4652-bc11-e90e9d196c0b",
+  "kind": "research",
+  "producer_role": "researcher",
+  "created_at": 1790094241.9059336,
+  "payload": {
+    "cards": [
+      {
+        "question": "bounded repository reconnaissance",
+        "scope": "read-only mock",
+        "observations": [
+          {
+            "label": "UNKNOWN",
+            "claim": "No real repository evidence was collected by the mock provider.",
+            "source": "mock"
+          }
+        ],
+        "unknowns": [
+          "implementation ground truth"
+        ],
+        "recommended_followup": "Use a configured provider/tool adapter."
+      }
+    ]
+  }
+}

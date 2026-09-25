@@ -1,0 +1,35 @@
+# Browser RCC v3 — logical routing (F2b). Daily Task domain owns the driver entrypoint.
+schema_version: 1
+
+authority_banner: |
+  BROWSER RCC v3 — paste harness only. Not IDE PolicyGateway, not automated /use-master execution.
+  mission-control sequences one chat per phase; audited repo mutations require ide-bridge + /daily-coder in IDE.
+  Browser hosts: paste AGENT_MESSAGE → task packet → evidence; label STATUS honestly (COMPLETE | PARTIAL | BLOCKED).
+
+manifest_index: agents/shared/browser/MANIFEST.index.json
+
+domains:
+  daily-task:
+    root: agents/daily-task/browser/families
+    families:
+      - plans-and-places
+      - kitchen-cooking
+      - learning-coach
+      - writing-studio
+      - thinking-lab
+      - mission-control
+  coder:
+    root: agents/coding/browser
+    families:
+      - code-crafter
+      - code-reviewer
+      - document-reviewer
+    stubs:
+      - planner
+      - plan-reviewer
+      - plan-prep-researcher
+      - daily-coder
+  deep-research:
+    root: agents/research/browser
+    families:
+      - research-desk

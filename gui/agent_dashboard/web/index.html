@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agent Orchestration</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1>Agent Orchestration</h1>
+      <p class="muted">Shared control surface for local agents — modular, replaceable UI.</p>
+    </div>
+    <div class="top-actions">
+      <span id="health" class="pill muted">connecting…</span>
+      <input id="token" type="password" placeholder="API token (if required)" size="22" />
+      <button type="button" id="saveToken">Use token</button>
+      <button type="button" id="refreshBtn">Refresh</button>
+    </div>
+  </header>
+
+  <nav id="appTablist" class="app-tabs" role="tablist" aria-label="Dashboard sections">
+    <button type="button" class="app-tab" role="tab" id="tab-home" data-tab="home" aria-controls="viewport" aria-selected="false" tabindex="-1">Home</button>
+    <button type="button" class="app-tab" role="tab" id="tab-agent" data-tab="agent" aria-controls="viewport" aria-selected="false" tabindex="-1">Agent</button>
+    <button type="button" class="app-tab" role="tab" id="tab-docs" data-tab="docs" aria-controls="viewport" aria-selected="false" tabindex="-1">Documentation</button>
+    <button type="button" class="app-tab" role="tab" id="tab-apis" data-tab="apis" aria-controls="viewport" aria-selected="false" tabindex="-1">APIs &amp; abilities</button>
+    <button type="button" class="app-tab" role="tab" id="tab-usage" data-tab="usage" aria-controls="viewport" aria-selected="false" tabindex="-1">Usage</button>
+    <button type="button" class="app-tab" role="tab" id="tab-ide" data-tab="ide" aria-controls="viewport" aria-selected="false" tabindex="-1">IDE</button>
+  </nav>
+
+  <div id="viewport" class="viewport" role="tabpanel" aria-labelledby="tab-home"></div>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

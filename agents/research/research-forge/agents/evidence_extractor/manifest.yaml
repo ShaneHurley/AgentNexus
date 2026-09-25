@@ -1,0 +1,4 @@
+role_id: evidence_extractor
+interface_version: "1.0.0"
+output_schema: evidence_card
+forbidden_fields: [recommendation]

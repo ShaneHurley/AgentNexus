@@ -1,0 +1,91 @@
+{
+  "run_id": "run-w5-exit",
+  "profile": "M",
+  "synthesis_need": "standard",
+  "charter": {
+    "charter_id": "ch-w5",
+    "objective": "Decide safe widget reliability strategy",
+    "charter_hash": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+  },
+  "leading_conclusions": ["Canary rollout reduced incidents (EVD-A1)"],
+  "method_summary": "Multi-lane discovery, verification, scrutiny, and portfolio ideation.",
+  "sources": {
+    "SRC-A": {
+      "source_id": "SRC-A",
+      "locator": "https://example.org/canary-report",
+      "access_level": "public"
+    },
+    "SRC-B": {
+      "source_id": "SRC-B",
+      "locator": "internal://observational/study-7",
+      "access_level": "internal"
+    }
+  },
+  "evidence": {
+    "EVD-A1": {
+      "evidence_id": "EVD-A1",
+      "source_id": "SRC-A",
+      "claim": "Canary rollout reduced incidents 12%",
+      "verifier_status": "passed",
+      "claim_status": "FACT"
+    },
+    "EVD-B1": {
+      "evidence_id": "EVD-B1",
+      "source_id": "SRC-B",
+      "claim": "Observational cohort shows mixed results",
+      "verifier_status": "passed",
+      "claim_status": "INFERENCE"
+    }
+  },
+  "scrutiny_result": {
+    "acceptance_blocked": false,
+    "methods_flags": ["observational_bias"],
+    "contradictions": [
+      {
+        "contradiction_id": "CTR-001",
+        "proposition": "Incident rate effect",
+        "positions": [
+          {
+            "source_id": "SRC-A",
+            "evidence_id": "EVD-A1",
+            "stance": "supports",
+            "summary": "12% reduction"
+          },
+          {
+            "source_id": "SRC-B",
+            "evidence_id": "EVD-B1",
+            "stance": "contradicts",
+            "summary": "Mixed observational signal"
+          }
+        ],
+        "contradiction_type": "methodological",
+        "severity": "medium",
+        "decision_relevance": "high",
+        "resolution_status": "open",
+        "follow_up_query": "Align definitions of incident rate"
+      }
+    ],
+    "gaps": [{ "gap_id": "GAP-1", "status": "open", "decision_relevance": "high" }],
+    "evidence_matrix": { "matrix_id": "MAT-w5" },
+    "skeptic": { "cases": [{ "case_id": "ADV-1", "summary": "Retry storm risk" }] }
+  },
+  "portfolio": {
+    "ideas": [
+      {
+        "idea_id": "IDEA-A",
+        "status": "recommended",
+        "evidence_ids": ["EVD-A1"]
+      }
+    ],
+    "experiments": [{ "experiment_id": "EXP-A", "title": "Weekly incident budget gate" }],
+    "abstentions": [{ "outcome": "NO DEFENSIBLE IDEA", "reason": "GAP-1 open for combine lever" }]
+  },
+  "budget_snapshot": { "profile": "M", "spent_usd": 4.0 },
+  "unknowns": ["GAP-1"],
+  "director_fixture_task": "director_valid",
+  "pre_director_synthesis": {
+    "format": "doctoral_synthesis",
+    "conclusions": [{ "conclusion_id": "PRE-1", "text": "Pre-director draft", "evidence_ids": ["EVD-A1"] }],
+    "unknowns": ["GAP-1"]
+  }
+}

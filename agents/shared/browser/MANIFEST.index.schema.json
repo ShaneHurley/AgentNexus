@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-agents.local/schemas/browser-manifest-index-v1.json",
+  "title": "Browser RCC federated MANIFEST index",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "package",
+    "version",
+    "families",
+    "shards",
+    "shared"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "package": { "type": "string" },
+    "version": { "type": "string" },
+    "families": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 10,
+      "items": { "type": "string" }
+    },
+    "shards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "root", "family_ids"],
+        "properties": {
+          "id": { "type": "string" },
+          "root": { "type": "string" },
+          "manifest": { "type": "string" },
+          "family_ids": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "shared": {
+      "type": "object",
+      "required": ["root"],
+      "properties": {
+        "root": { "type": "string" },
+        "_shared": { "type": "string" },
+        "profiles": { "type": "string" },
+        "scripts": { "type": "string" }
+      }
+    },
+    "router": { "type": "string" }
+  }
+}

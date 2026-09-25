@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "run_id": "6d97caee-c366-4d07-afaf-4b316cbb41d7",
+  "kind": "test_design",
+  "producer_role": "test_designer",
+  "created_at": 1790094220.4834855,
+  "payload": {
+    "criteria": [
+      {
+        "id": "AC-1",
+        "behavior": "Configured provider is required for real edits",
+        "proof": "provider conformance test"
+      }
+    ],
+    "test_required": false,
+    "reason": "Mock run performs no code change."
+  }
+}

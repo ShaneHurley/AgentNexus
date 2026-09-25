@@ -1,0 +1,7 @@
+role_id: research_auditor
+interface_version: "1.0.0"
+input_schema: research_packet
+output_schema: audit_report
+budget_profile: M
+tools:
+  - audit_checklist

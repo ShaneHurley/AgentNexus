@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "no_better_angle_found",
+    "options"
+  ],
+  "properties": {
+    "options": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "no_better_angle_found": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": true
+}

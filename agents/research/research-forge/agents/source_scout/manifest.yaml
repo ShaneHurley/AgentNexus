@@ -1,0 +1,7 @@
+role_id: source_scout
+interface_version: "1.0.0"
+input_schema: scout_lane_contract
+output_schema: scout_result
+budget_profile: S
+tools:
+  - mock_search_v1

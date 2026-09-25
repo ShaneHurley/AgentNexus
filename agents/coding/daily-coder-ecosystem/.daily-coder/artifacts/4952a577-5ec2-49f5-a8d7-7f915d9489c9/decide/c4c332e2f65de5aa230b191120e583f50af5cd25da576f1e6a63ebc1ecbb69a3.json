@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "run_id": "4952a577-5ec2-49f5-a8d7-7f915d9489c9",
+  "kind": "decide",
+  "producer_role": "master",
+  "created_at": 1790100706.5157602,
+  "payload": {
+    "intent": "Fix typo",
+    "non_goals": [
+      "Unrequested refactors"
+    ],
+    "invariants": [
+      "Preserve user intent"
+    ],
+    "chosen_approach": "Mock dry-run only",
+    "rejected_alternatives": [],
+    "scope": [],
+    "risk": "unknown",
+    "acceptance_criteria": [
+      "Replace mock provider before modifying code"
+    ],
+    "unresolved_questions": []
+  }
+}

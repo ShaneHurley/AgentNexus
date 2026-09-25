@@ -1,0 +1,11 @@
+role_id: experiment_architect
+
+interface_version: "1.0.0"
+
+input_schema: candidate_idea
+
+output_schema: experiment
+
+budget_profile: M
+
+tools: []

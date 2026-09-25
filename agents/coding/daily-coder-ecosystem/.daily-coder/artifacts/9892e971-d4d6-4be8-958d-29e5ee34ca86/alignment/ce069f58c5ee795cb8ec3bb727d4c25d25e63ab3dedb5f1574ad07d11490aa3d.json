@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "run_id": "9892e971-d4d6-4be8-958d-29e5ee34ca86",
+  "kind": "alignment",
+  "producer_role": "alignment_checker",
+  "created_at": 1790102163.2179134,
+  "payload": {
+    "verdict": "pass",
+    "checks": {
+      "intent_to_decision": true,
+      "decision_to_plan": true,
+      "plan_to_diff": true,
+      "diff_to_tests": true,
+      "diff_to_docs": true
+    },
+    "findings": []
+  }
+}

@@ -1,0 +1,150 @@
+{
+  "run_id": "run-w3-exit",
+  "high_risk_domain": false,
+  "charter": {
+    "charter_id": "ch-w3",
+    "objective": "Widget reliability decision",
+    "charter_hash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "sources": {
+    "SRC-A": {
+      "source_id": "SRC-A",
+      "title": "Benchmark study A",
+      "load_bearing": true,
+      "triage_status": "DEEP_READ",
+      "study_types": ["benchmark"],
+      "harness_version": "v1",
+      "dataset_version": "ds-2024"
+    },
+    "SRC-B": {
+      "source_id": "SRC-B",
+      "title": "Observational cohort B",
+      "load_bearing": true,
+      "triage_status": "DEEP_READ",
+      "study_types": ["observational"]
+    },
+    "SRC-DOC": {
+      "source_id": "SRC-DOC",
+      "title": "Product readme",
+      "source_class": "documentation",
+      "triage_status": "REFERENCE_ONLY"
+    }
+  },
+  "evidence": {
+    "EVD-A1": {
+      "evidence_id": "EVD-A1",
+      "source_id": "SRC-A",
+      "claim": "Method M improves reliability to 95 percent on dataset ds-2024",
+      "is_material_numerical": true,
+      "units_and_denominator": "95/100 trials",
+      "uncertainty": "95% CI 92-97",
+      "verifier_status": "passed",
+      "claim_status": "FACT"
+    },
+    "EVD-B1": {
+      "evidence_id": "EVD-B1",
+      "source_id": "SRC-B",
+      "claim": "Method M improves reliability to 95 percent on dataset ds-2024",
+      "is_material_numerical": true,
+      "units_and_denominator": "95/100 trials",
+      "uncertainty": "wide",
+      "verifier_status": "passed",
+      "claim_status": "FACT",
+      "methods_fixture_kind": "causal_overclaim",
+      "causal_overclaim": true
+    },
+    "EVD-B2": {
+      "evidence_id": "EVD-B2",
+      "source_id": "SRC-B",
+      "claim": "Method M does not improve reliability versus baseline",
+      "verifier_status": "passed",
+      "claim_status": "FACT",
+      "decision_critical": true
+    },
+    "EVD-FIX": {
+      "evidence_id": "EVD-FIX",
+      "source_id": "SRC-A",
+      "claim": "Average latency improved",
+      "is_material_numerical": true,
+      "methods_fixture_kind": "misleading_average",
+      "verifier_status": "passed",
+      "claim_status": "INFERENCE"
+    }
+  },
+  "matrix_cells": [
+    {
+      "source_id": "SRC-A",
+      "evidence_id": "EVD-A1",
+      "proposition_id": "PROP-M-reliability",
+      "stance": "supports",
+      "decision_critical": true
+    },
+    {
+      "source_id": "SRC-B",
+      "evidence_id": "EVD-B2",
+      "proposition_id": "PROP-M-reliability",
+      "stance": "contradicts",
+      "conflict_cause": "method",
+      "decision_critical": true
+    }
+  ],
+  "leading_conclusions": [
+    { "conclusion_id": "CONC-1", "text": "Adopt method M" }
+  ],
+  "objections": [
+    {
+      "category": "simpler_baseline",
+      "evidence_ids": ["EVD-B2"],
+      "conclusion_id": "CONC-1",
+      "severity_rank": 2
+    },
+    {
+      "category": "wrong_framing",
+      "summary": "noise without evidence"
+    }
+  ],
+  "propositions": [
+    {
+      "proposition_id": "PROP-1",
+      "disconfirming_observation": "Baseline matches M on held-out production traces"
+    }
+  ],
+  "hypotheses": [
+    { "hypothesis_id": "H1", "status": "live" },
+    { "hypothesis_id": "H2", "status": "live" }
+  ],
+  "proposed_tests": [
+    {
+      "test_id": "T-good",
+      "predictions": { "H1": "outcome_a", "H2": "outcome_b" },
+      "information_value": 0.9,
+      "cost_usd": 0.2,
+      "time_days": 2,
+      "feasibility": 0.8,
+      "safety_ok": true
+    },
+    {
+      "test_id": "T-bad-tautology",
+      "tautology": true,
+      "predicted_outcome": "always_true"
+    }
+  ],
+  "claims": [
+    {
+      "claim_id": "CL-1",
+      "text": "Adopt M",
+      "evidence_ids": ["EVD-A1"]
+    },
+    {
+      "claim_id": "CL-2",
+      "text": "Unsupported leap",
+      "evidence_ids": []
+    }
+  ],
+  "load_bearing_claim_ids": ["CL-1"],
+  "adversarial_signals": [
+    { "kind": "fake_doi", "present": true },
+    { "kind": "prompt_injection", "present": true },
+    { "kind": "omitted_negative_result", "present": true }
+  ]
+}

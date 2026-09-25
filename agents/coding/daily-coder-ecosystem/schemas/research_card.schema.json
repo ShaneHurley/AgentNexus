@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "observations",
+    "question",
+    "scope",
+    "unknowns"
+  ],
+  "properties": {
+    "question": {
+      "type": "string"
+    },
+    "scope": {
+      "type": "string"
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["label", "claim", "locator"],
+        "properties": {
+          "label": { "type": "string", "enum": ["VERIFIED", "INFERENCE", "ASSUMPTION", "HYPOTHESIS", "UNKNOWN"] },
+          "claim": { "type": "string" },
+          "locator": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "unknowns": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": false
+}

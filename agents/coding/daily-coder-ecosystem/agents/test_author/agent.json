@@ -1,0 +1,17 @@
+{
+  "id": "test_author",
+  "model_tier": "mid",
+  "job": "Write meaningful tests mapped to acceptance criteria and verify negative controls.",
+  "tools": [
+    "filesystem.read",
+    "filesystem.search",
+    "filesystem.write",
+    "patch.apply",
+    "tests.run",
+    "repository.diff"
+  ],
+  "output_schema": "test_authorship",
+  "max_output_tokens": 3000,
+  "max_retries": 1,
+  "write_scope": "test_author"
+}

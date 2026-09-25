@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "run_id": "6d97caee-c366-4d07-afaf-4b316cbb41d7",
+  "kind": "acceptance",
+  "producer_role": "orchestrator",
+  "created_at": 1790094221.204237,
+  "payload": {
+    "verdict": "pass",
+    "basis": "validated phase artifacts; mock runs do not certify repository correctness"
+  }
+}

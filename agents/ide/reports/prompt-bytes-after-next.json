@@ -1,0 +1,1596 @@
+{
+  "generated_at": "2026-09-23T15:51:47.670416+00:00",
+  "repo_root": "C:\\Users\\WZ69B7\\Downloads\\ai_agents",
+  "agent_count": 82,
+  "total_bytes_all_agents": 508935,
+  "median_bytes": 6031,
+  "p90_bytes": 12526,
+  "median_deferred_invoke_bytes": 0,
+  "missing_file_refs": [],
+  "agents": [
+    {
+      "agent": "deep-research",
+      "path": ".cursor/agents/deep-research.md",
+      "body_bytes": 3947,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/deep-research-phase-index.md",
+          "resolved": "ide-pack/ide-agents/contracts/deep-research-phase-index.md",
+          "bytes": 1550,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/research-draft-1.0.schema.json",
+          "resolved": "ide-pack/ide-agents/contracts/research-draft-1.0.schema.json",
+          "bytes": 5776,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/research-intelligence-packet-1.0.schema.json",
+          "resolved": "ide-pack/ide-agents/contracts/research-intelligence-packet-1.0.schema.json",
+          "bytes": 10523,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/recommendation-scoring.md",
+          "resolved": "ide-pack/ide-agents/contracts/recommendation-scoring.md",
+          "bytes": 2806,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 24602,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "deep-research",
+      "path": "ide-pack/ide-agents/canonical/deep-research.md",
+      "body_bytes": 3747,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/deep-research-phase-index.md",
+          "resolved": "ide-pack/ide-agents/contracts/deep-research-phase-index.md",
+          "bytes": 1550,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/research-draft-1.0.schema.json",
+          "resolved": "ide-pack/ide-agents/contracts/research-draft-1.0.schema.json",
+          "bytes": 5776,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/research-intelligence-packet-1.0.schema.json",
+          "resolved": "ide-pack/ide-agents/contracts/research-intelligence-packet-1.0.schema.json",
+          "bytes": 10523,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/recommendation-scoring.md",
+          "resolved": "ide-pack/ide-agents/contracts/recommendation-scoring.md",
+          "bytes": 2806,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 24402,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "evidence-integrator",
+      "path": ".cursor/agents/evidence-integrator.md",
+      "body_bytes": 1483,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/research-draft-1.0.schema.json",
+          "resolved": "ide-pack/ide-agents/contracts/research-draft-1.0.schema.json",
+          "bytes": 5776,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/evidence-and-source-rubric.md",
+          "resolved": "ide-pack/ide-agents/contracts/evidence-and-source-rubric.md",
+          "bytes": 3482,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 15579,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "evidence-integrator",
+      "path": "ide-pack/ide-agents/canonical/evidence-integrator.md",
+      "body_bytes": 1271,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/research-draft-1.0.schema.json",
+          "resolved": "ide-pack/ide-agents/contracts/research-draft-1.0.schema.json",
+          "bytes": 5776,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/evidence-and-source-rubric.md",
+          "resolved": "ide-pack/ide-agents/contracts/evidence-and-source-rubric.md",
+          "bytes": 3482,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 15367,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "recommendation-scorer",
+      "path": ".cursor/agents/recommendation-scorer.md",
+      "body_bytes": 1388,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/recommendation-scoring.md",
+          "resolved": "ide-pack/ide-agents/contracts/recommendation-scoring.md",
+          "bytes": 2806,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/research-intelligence-packet-1.0.schema.json",
+          "resolved": "ide-pack/ide-agents/contracts/research-intelligence-packet-1.0.schema.json",
+          "bytes": 10523,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 14717,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "recommendation-scorer",
+      "path": "ide-pack/ide-agents/canonical/recommendation-scorer.md",
+      "body_bytes": 1174,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/recommendation-scoring.md",
+          "resolved": "ide-pack/ide-agents/contracts/recommendation-scoring.md",
+          "bytes": 2806,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/research-intelligence-packet-1.0.schema.json",
+          "resolved": "ide-pack/ide-agents/contracts/research-intelligence-packet-1.0.schema.json",
+          "bytes": 10523,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 14503,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "internal-authority-scout",
+      "path": ".cursor/agents/internal-authority-scout.md",
+      "body_bytes": 2034,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/evidence-and-source-rubric.md",
+          "resolved": "ide-pack/ide-agents/contracts/evidence-and-source-rubric.md",
+          "bytes": 3482,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 13606,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "internal-authority-scout",
+      "path": "ide-pack/ide-agents/canonical/internal-authority-scout.md",
+      "body_bytes": 1817,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/evidence-and-source-rubric.md",
+          "resolved": "ide-pack/ide-agents/contracts/evidence-and-source-rubric.md",
+          "bytes": 3482,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 13389,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "plan-prep",
+      "path": ".cursor/agents/plan-prep.md",
+      "body_bytes": 5293,
+      "file_refs": [
+        {
+          "ref": "docs/README.md",
+          "resolved": "docs/README.md",
+          "bytes": 7233,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 12526,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "plan-prep",
+      "path": "ide-pack/ide-agents/canonical/plan-prep.md",
+      "body_bytes": 5097,
+      "file_refs": [
+        {
+          "ref": "docs/README.md",
+          "resolved": "docs/README.md",
+          "bytes": 7233,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 12330,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "academic-evidence-scout",
+      "path": ".cursor/agents/academic-evidence-scout.md",
+      "body_bytes": 1460,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/evidence-and-source-rubric.md",
+          "resolved": "ide-pack/ide-agents/contracts/evidence-and-source-rubric.md",
+          "bytes": 3482,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 9780,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "academic-evidence-scout",
+      "path": "ide-pack/ide-agents/canonical/academic-evidence-scout.md",
+      "body_bytes": 1242,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        },
+        {
+          "ref": "ide-agents/contracts/evidence-and-source-rubric.md",
+          "resolved": "ide-pack/ide-agents/contracts/evidence-and-source-rubric.md",
+          "bytes": 3482,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 9562,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "use-master",
+      "path": ".cursor/agents/use-master.md",
+      "body_bytes": 5556,
+      "file_refs": [
+        {
+          "ref": "ide-agents/canonical/master-orchestrator.md",
+          "resolved": "ide-pack/ide-agents/canonical/master-orchestrator.md",
+          "bytes": 3548,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 9104,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "use-master",
+      "path": "ide-pack/ide-agents/canonical/use-master.md",
+      "body_bytes": 5447,
+      "file_refs": [
+        {
+          "ref": "ide-agents/canonical/master-orchestrator.md",
+          "resolved": "ide-pack/ide-agents/canonical/master-orchestrator.md",
+          "bytes": 3548,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 8995,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "principal-director",
+      "path": ".cursor/agents/principal-director.md",
+      "body_bytes": 3461,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 6713,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "adversarial-skeptic",
+      "path": ".cursor/agents/adversarial-skeptic.md",
+      "body_bytes": 3409,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 6661,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "intake-clarifier",
+      "path": ".cursor/agents/intake-clarifier.md",
+      "body_bytes": 3396,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 6648,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "source-scout",
+      "path": ".cursor/agents/source-scout.md",
+      "body_bytes": 3366,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 6618,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "evidence-extractor",
+      "path": ".cursor/agents/evidence-extractor.md",
+      "body_bytes": 3363,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 6615,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "charter-planner",
+      "path": ".cursor/agents/charter-planner.md",
+      "body_bytes": 3332,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 6584,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "report-composer",
+      "path": ".cursor/agents/report-composer.md",
+      "body_bytes": 3299,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 6551,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "citation-verifier",
+      "path": ".cursor/agents/citation-verifier.md",
+      "body_bytes": 3272,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 6524,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "principal-director",
+      "path": "ide-pack/ide-agents/canonical/principal-director.md",
+      "body_bytes": 3246,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 6498,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "research-planner",
+      "path": ".cursor/agents/research-planner.md",
+      "body_bytes": 1610,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 6448,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "adversarial-skeptic",
+      "path": "ide-pack/ide-agents/canonical/adversarial-skeptic.md",
+      "body_bytes": 3193,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 6445,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "intake-clarifier",
+      "path": "ide-pack/ide-agents/canonical/intake-clarifier.md",
+      "body_bytes": 3183,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 6435,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "source-scout",
+      "path": "ide-pack/ide-agents/canonical/source-scout.md",
+      "body_bytes": 3157,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 6409,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "evidence-extractor",
+      "path": "ide-pack/ide-agents/canonical/evidence-extractor.md",
+      "body_bytes": 3148,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 6400,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "charter-planner",
+      "path": "ide-pack/ide-agents/canonical/charter-planner.md",
+      "body_bytes": 3120,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 6372,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "report-composer",
+      "path": "ide-pack/ide-agents/canonical/report-composer.md",
+      "body_bytes": 3087,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 6339,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "official-standards-scout",
+      "path": ".cursor/agents/official-standards-scout.md",
+      "body_bytes": 1501,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 6339,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "citation-verifier",
+      "path": "ide-pack/ide-agents/canonical/citation-verifier.md",
+      "body_bytes": 3058,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 6310,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "adversarial-evidence-reviewer",
+      "path": ".cursor/agents/adversarial-evidence-reviewer.md",
+      "body_bytes": 1436,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 6274,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "targeted-gap-researcher",
+      "path": ".cursor/agents/targeted-gap-researcher.md",
+      "body_bytes": 1411,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 6249,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "research-planner",
+      "path": "ide-pack/ide-agents/canonical/research-planner.md",
+      "body_bytes": 1397,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 6235,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "practitioner-implementation-scout",
+      "path": ".cursor/agents/practitioner-implementation-scout.md",
+      "body_bytes": 1365,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 6203,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "failure-unfavorable-scout",
+      "path": ".cursor/agents/failure-unfavorable-scout.md",
+      "body_bytes": 1353,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 6191,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "alternatives-analogy-scout",
+      "path": ".cursor/agents/alternatives-analogy-scout.md",
+      "body_bytes": 1285,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 6123,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "official-standards-scout",
+      "path": "ide-pack/ide-agents/canonical/official-standards-scout.md",
+      "body_bytes": 1282,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 6120,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "adversarial-evidence-reviewer",
+      "path": "ide-pack/ide-agents/canonical/adversarial-evidence-reviewer.md",
+      "body_bytes": 1212,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 6050,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "targeted-gap-researcher",
+      "path": "ide-pack/ide-agents/canonical/targeted-gap-researcher.md",
+      "body_bytes": 1193,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 6031,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "practitioner-implementation-scout",
+      "path": "ide-pack/ide-agents/canonical/practitioner-implementation-scout.md",
+      "body_bytes": 1137,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 5975,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "failure-unfavorable-scout",
+      "path": "ide-pack/ide-agents/canonical/failure-unfavorable-scout.md",
+      "body_bytes": 1133,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 5971,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "alternatives-analogy-scout",
+      "path": "ide-pack/ide-agents/canonical/alternatives-analogy-scout.md",
+      "body_bytes": 1064,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/subagent-contracts.md",
+          "resolved": "ide-pack/ide-agents/contracts/subagent-contracts.md",
+          "bytes": 4838,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 5902,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "master-orchestrator",
+      "path": ".cursor/agents/master-orchestrator.md",
+      "body_bytes": 3764,
+      "file_refs": [],
+      "load_on_invoke_refs": [],
+      "total_bytes": 3764,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "master-orchestrator",
+      "path": "ide-pack/ide-agents/canonical/master-orchestrator.md",
+      "body_bytes": 3548,
+      "file_refs": [],
+      "load_on_invoke_refs": [],
+      "total_bytes": 3548,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "daily-coder",
+      "path": ".cursor/agents/daily-coder.md",
+      "body_bytes": 3424,
+      "file_refs": [],
+      "load_on_invoke_refs": [],
+      "total_bytes": 3424,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "failure-diagnostician",
+      "path": ".cursor/agents/failure-diagnostician.md",
+      "body_bytes": 3390,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/failure_diagnostician/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/failure_diagnostician/prompt.md",
+          "bytes": 1694,
+          "missing": false
+        }
+      ],
+      "total_bytes": 3390,
+      "deferred_invoke_bytes": 4946
+    },
+    {
+      "agent": "implementer",
+      "path": ".cursor/agents/implementer.md",
+      "body_bytes": 3387,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/implementer/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/implementer/prompt.md",
+          "bytes": 1648,
+          "missing": false
+        }
+      ],
+      "total_bytes": 3387,
+      "deferred_invoke_bytes": 4900
+    },
+    {
+      "agent": "test-author",
+      "path": ".cursor/agents/test-author.md",
+      "body_bytes": 3363,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/test_author/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/test_author/prompt.md",
+          "bytes": 1330,
+          "missing": false
+        }
+      ],
+      "total_bytes": 3363,
+      "deferred_invoke_bytes": 4582
+    },
+    {
+      "agent": "researcher",
+      "path": ".cursor/agents/researcher.md",
+      "body_bytes": 3339,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/researcher/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/researcher/prompt.md",
+          "bytes": 1638,
+          "missing": false
+        }
+      ],
+      "total_bytes": 3339,
+      "deferred_invoke_bytes": 4890
+    },
+    {
+      "agent": "code-reviewer",
+      "path": ".cursor/agents/code-reviewer.md",
+      "body_bytes": 3318,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/code_reviewer/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/code_reviewer/prompt.md",
+          "bytes": 1754,
+          "missing": false
+        }
+      ],
+      "total_bytes": 3318,
+      "deferred_invoke_bytes": 5006
+    },
+    {
+      "agent": "master",
+      "path": ".cursor/agents/master.md",
+      "body_bytes": 3246,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/master/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/master/prompt.md",
+          "bytes": 1319,
+          "missing": false
+        }
+      ],
+      "total_bytes": 3246,
+      "deferred_invoke_bytes": 4571
+    },
+    {
+      "agent": "brainstormer",
+      "path": ".cursor/agents/brainstormer.md",
+      "body_bytes": 3242,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/brainstormer/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/brainstormer/prompt.md",
+          "bytes": 1356,
+          "missing": false
+        }
+      ],
+      "total_bytes": 3242,
+      "deferred_invoke_bytes": 4608
+    },
+    {
+      "agent": "test-executor",
+      "path": ".cursor/agents/test-executor.md",
+      "body_bytes": 3219,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/test_executor/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/test_executor/prompt.md",
+          "bytes": 1717,
+          "missing": false
+        }
+      ],
+      "total_bytes": 3219,
+      "deferred_invoke_bytes": 4969
+    },
+    {
+      "agent": "planner",
+      "path": ".cursor/agents/planner.md",
+      "body_bytes": 3218,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/planner/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/planner/prompt.md",
+          "bytes": 1662,
+          "missing": false
+        }
+      ],
+      "total_bytes": 3218,
+      "deferred_invoke_bytes": 4914
+    },
+    {
+      "agent": "daily-coder",
+      "path": "ide-pack/ide-agents/canonical/daily-coder.md",
+      "body_bytes": 3216,
+      "file_refs": [],
+      "load_on_invoke_refs": [],
+      "total_bytes": 3216,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "alignment-checker",
+      "path": ".cursor/agents/alignment-checker.md",
+      "body_bytes": 3215,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/alignment_checker/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/alignment_checker/prompt.md",
+          "bytes": 1467,
+          "missing": false
+        }
+      ],
+      "total_bytes": 3215,
+      "deferred_invoke_bytes": 4719
+    },
+    {
+      "agent": "plan-reviewer",
+      "path": ".cursor/agents/plan-reviewer.md",
+      "body_bytes": 3209,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/plan_reviewer/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/plan_reviewer/prompt.md",
+          "bytes": 1654,
+          "missing": false
+        }
+      ],
+      "total_bytes": 3209,
+      "deferred_invoke_bytes": 4906
+    },
+    {
+      "agent": "skill-curator",
+      "path": ".cursor/agents/skill-curator.md",
+      "body_bytes": 3206,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/skill_curator/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/skill_curator/prompt.md",
+          "bytes": 1700,
+          "missing": false
+        }
+      ],
+      "total_bytes": 3206,
+      "deferred_invoke_bytes": 4952
+    },
+    {
+      "agent": "test-designer",
+      "path": ".cursor/agents/test-designer.md",
+      "body_bytes": 3201,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/test_designer/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/test_designer/prompt.md",
+          "bytes": 1306,
+          "missing": false
+        }
+      ],
+      "total_bytes": 3201,
+      "deferred_invoke_bytes": 4558
+    },
+    {
+      "agent": "implementer",
+      "path": "ide-pack/ide-agents/canonical/implementer.md",
+      "body_bytes": 3179,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/implementer/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/implementer/prompt.md",
+          "bytes": 1648,
+          "missing": false
+        }
+      ],
+      "total_bytes": 3179,
+      "deferred_invoke_bytes": 4900
+    },
+    {
+      "agent": "failure-diagnostician",
+      "path": "ide-pack/ide-agents/canonical/failure-diagnostician.md",
+      "body_bytes": 3172,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/failure_diagnostician/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/failure_diagnostician/prompt.md",
+          "bytes": 1694,
+          "missing": false
+        }
+      ],
+      "total_bytes": 3172,
+      "deferred_invoke_bytes": 4946
+    },
+    {
+      "agent": "documenter",
+      "path": ".cursor/agents/documenter.md",
+      "body_bytes": 3163,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/documenter/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/documenter/prompt.md",
+          "bytes": 1286,
+          "missing": false
+        }
+      ],
+      "total_bytes": 3163,
+      "deferred_invoke_bytes": 4538
+    },
+    {
+      "agent": "frontier-advisor",
+      "path": ".cursor/agents/frontier-advisor.md",
+      "body_bytes": 3157,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/frontier_advisor/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/frontier_advisor/prompt.md",
+          "bytes": 714,
+          "missing": false
+        }
+      ],
+      "total_bytes": 3157,
+      "deferred_invoke_bytes": 3966
+    },
+    {
+      "agent": "test-author",
+      "path": "ide-pack/ide-agents/canonical/test-author.md",
+      "body_bytes": 3155,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/test_author/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/test_author/prompt.md",
+          "bytes": 1330,
+          "missing": false
+        }
+      ],
+      "total_bytes": 3155,
+      "deferred_invoke_bytes": 4582
+    },
+    {
+      "agent": "researcher",
+      "path": "ide-pack/ide-agents/canonical/researcher.md",
+      "body_bytes": 3132,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/researcher/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/researcher/prompt.md",
+          "bytes": 1638,
+          "missing": false
+        }
+      ],
+      "total_bytes": 3132,
+      "deferred_invoke_bytes": 4890
+    },
+    {
+      "agent": "code-reviewer",
+      "path": "ide-pack/ide-agents/canonical/code-reviewer.md",
+      "body_bytes": 3108,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/code_reviewer/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/code_reviewer/prompt.md",
+          "bytes": 1754,
+          "missing": false
+        }
+      ],
+      "total_bytes": 3108,
+      "deferred_invoke_bytes": 5006
+    },
+    {
+      "agent": "research-messenger",
+      "path": ".cursor/agents/research-messenger.md",
+      "body_bytes": 2066,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/research-messenger-contract-index.md",
+          "resolved": "ide-pack/ide-agents/contracts/research-messenger-contract-index.md",
+          "bytes": 1025,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 3091,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "master",
+      "path": "ide-pack/ide-agents/canonical/master.md",
+      "body_bytes": 3043,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/master/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/master/prompt.md",
+          "bytes": 1319,
+          "missing": false
+        }
+      ],
+      "total_bytes": 3043,
+      "deferred_invoke_bytes": 4571
+    },
+    {
+      "agent": "brainstormer",
+      "path": "ide-pack/ide-agents/canonical/brainstormer.md",
+      "body_bytes": 3033,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/brainstormer/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/brainstormer/prompt.md",
+          "bytes": 1356,
+          "missing": false
+        }
+      ],
+      "total_bytes": 3033,
+      "deferred_invoke_bytes": 4608
+    },
+    {
+      "agent": "planner",
+      "path": "ide-pack/ide-agents/canonical/planner.md",
+      "body_bytes": 3014,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/planner/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/planner/prompt.md",
+          "bytes": 1662,
+          "missing": false
+        }
+      ],
+      "total_bytes": 3014,
+      "deferred_invoke_bytes": 4914
+    },
+    {
+      "agent": "test-executor",
+      "path": "ide-pack/ide-agents/canonical/test-executor.md",
+      "body_bytes": 3009,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/test_executor/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/test_executor/prompt.md",
+          "bytes": 1717,
+          "missing": false
+        }
+      ],
+      "total_bytes": 3009,
+      "deferred_invoke_bytes": 4969
+    },
+    {
+      "agent": "alignment-checker",
+      "path": "ide-pack/ide-agents/canonical/alignment-checker.md",
+      "body_bytes": 3001,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/alignment_checker/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/alignment_checker/prompt.md",
+          "bytes": 1467,
+          "missing": false
+        }
+      ],
+      "total_bytes": 3001,
+      "deferred_invoke_bytes": 4719
+    },
+    {
+      "agent": "plan-reviewer",
+      "path": "ide-pack/ide-agents/canonical/plan-reviewer.md",
+      "body_bytes": 2999,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/plan_reviewer/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/plan_reviewer/prompt.md",
+          "bytes": 1654,
+          "missing": false
+        }
+      ],
+      "total_bytes": 2999,
+      "deferred_invoke_bytes": 4906
+    },
+    {
+      "agent": "skill-curator",
+      "path": "ide-pack/ide-agents/canonical/skill-curator.md",
+      "body_bytes": 2996,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/skill_curator/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/skill_curator/prompt.md",
+          "bytes": 1700,
+          "missing": false
+        }
+      ],
+      "total_bytes": 2996,
+      "deferred_invoke_bytes": 4952
+    },
+    {
+      "agent": "test-designer",
+      "path": "ide-pack/ide-agents/canonical/test-designer.md",
+      "body_bytes": 2991,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/test_designer/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/test_designer/prompt.md",
+          "bytes": 1306,
+          "missing": false
+        }
+      ],
+      "total_bytes": 2991,
+      "deferred_invoke_bytes": 4558
+    },
+    {
+      "agent": "sizer",
+      "path": ".cursor/agents/sizer.md",
+      "body_bytes": 2959,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/sizer/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/sizer/prompt.md",
+          "bytes": 1275,
+          "missing": false
+        }
+      ],
+      "total_bytes": 2959,
+      "deferred_invoke_bytes": 4527
+    },
+    {
+      "agent": "documenter",
+      "path": "ide-pack/ide-agents/canonical/documenter.md",
+      "body_bytes": 2956,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/documenter/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/documenter/prompt.md",
+          "bytes": 1286,
+          "missing": false
+        }
+      ],
+      "total_bytes": 2956,
+      "deferred_invoke_bytes": 4538
+    },
+    {
+      "agent": "frontier-advisor",
+      "path": "ide-pack/ide-agents/canonical/frontier-advisor.md",
+      "body_bytes": 2944,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/frontier_advisor/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/frontier_advisor/prompt.md",
+          "bytes": 714,
+          "missing": false
+        }
+      ],
+      "total_bytes": 2944,
+      "deferred_invoke_bytes": 3966
+    },
+    {
+      "agent": "research-messenger",
+      "path": "ide-pack/ide-agents/canonical/research-messenger.md",
+      "body_bytes": 1851,
+      "file_refs": [
+        {
+          "ref": "ide-agents/contracts/research-messenger-contract-index.md",
+          "resolved": "ide-pack/ide-agents/contracts/research-messenger-contract-index.md",
+          "bytes": 1025,
+          "missing": false
+        }
+      ],
+      "load_on_invoke_refs": [],
+      "total_bytes": 2876,
+      "deferred_invoke_bytes": 0
+    },
+    {
+      "agent": "sizer",
+      "path": "ide-pack/ide-agents/canonical/sizer.md",
+      "body_bytes": 2757,
+      "file_refs": [],
+      "load_on_invoke_refs": [
+        {
+          "ref": "ide-agents/contracts/claim-enum-map.md",
+          "resolved": "ide-pack/ide-agents/contracts/claim-enum-map.md",
+          "bytes": 3252,
+          "missing": false
+        },
+        {
+          "ref": "daily-coder-ecosystem/agents/sizer/prompt.md",
+          "resolved": "daily-coder-ecosystem/agents/sizer/prompt.md",
+          "bytes": 1275,
+          "missing": false
+        }
+      ],
+      "total_bytes": 2757,
+      "deferred_invoke_bytes": 4527
+    }
+  ]
+}

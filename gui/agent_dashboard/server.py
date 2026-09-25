@@ -14,6 +14,7 @@ from .registry import Registry, load_config
 from .routes import dispatch_get, dispatch_post, dispatch_put
 from .routes.common import authorized, read_body, send
 from .routes.home import SnapshotCache
+from .routes.workshop import WorkshopSnapshotCache
 from .routes import common as route_common
 from .terminal_registry import TerminalRegistry
 from .usage_store import UsageStore
@@ -140,6 +141,7 @@ def serve(
         "docs_dir": docs_path,
         "usage_store": UsageStore(data_dir / "usage.jsonl"),
         "home_snapshot": SnapshotCache(ttl_seconds=5.0),
+        "workshop_snapshot": WorkshopSnapshotCache(ttl_seconds=5.0),
         "terminal_registry": TerminalRegistry(data_dir, profiles_path),
     }
     try:

@@ -22,6 +22,7 @@ REGISTERED_GET = [
     "/api/agents",
     "/api/usage",
     "/api/home/snapshot",
+    "/api/workshop/snapshot",
     "/api/docs",
     "/api/config/overlay",
     "/api/setup/runtimes",
@@ -75,7 +76,8 @@ class OpenApiParityTests(unittest.TestCase):
     def test_dispatch_modules_cover_registered_routes(self):
         """Sanity: static registry paths are declared in OpenAPI."""
         for p in REGISTERED_GET:
-            self.assertIn(p, HUB_OPENAPI_PATHS)
+            spec = HUB_OPENAPI_PATHS[p]
+            self.assertIn("get", spec)
         for p in REGISTERED_POST:
             spec = HUB_OPENAPI_PATHS[p]
             self.assertIn("post", spec)

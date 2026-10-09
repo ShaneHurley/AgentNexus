@@ -7,6 +7,7 @@ def test_digest_required(tmp_path):
     with pytest.raises(ValueError): DockerRunner('python:latest',tmp_path)
 
 def test_sandbox_flags_no_secrets_and_cleanup(tmp_path,monkeypatch):
+    monkeypatch.setattr("agent_core.isolation.shutil.which", lambda name: "/mock/docker")
     workspace=tmp_path/'repo'; workspace.mkdir()
     (workspace/'code.py').write_text('print(1)')
     (workspace/'.env').write_text('KEY=secret')
@@ -41,6 +42,7 @@ def test_sandbox_flags_no_secrets_and_cleanup(tmp_path,monkeypatch):
     assert all('OPENROUTER_API_KEY' not in kwargs['env'] for _,kwargs in seen)
 
 def test_timeout_cleans_container(tmp_path,monkeypatch):
+    monkeypatch.setattr("agent_core.isolation.shutil.which", lambda name: "/mock/docker")
     calls=[]
     def run(argv,**kw):
         calls.append(argv)

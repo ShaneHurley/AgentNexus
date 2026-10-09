@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import json
+import os
 import re
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -42,7 +44,28 @@ class ExperimentStore:
 
     def write_json(self, experiment_id: str, name: str, payload: dict[str, Any]) -> Path:
         p = self.path(experiment_id, name, create_dir=True)
-        p.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        content = json.dumps(payload, indent=2, sort_keys=True) + "\n"
+        temporary = None
+        try:
+            # Unique temporary files in the destination directory preserve atomic
+            # rename semantics even when the workspace is on another filesystem.
+            with tempfile.NamedTemporaryFile(
+                mode="w", encoding="utf-8", dir=p.parent,
+                prefix=f".{p.name}.", suffix=".tmp", delete=False,
+            ) as stream:
+                temporary = Path(stream.name)
+                stream.write(content)
+                stream.flush()
+                os.fsync(stream.fileno())
+            os.replace(temporary, p)
+            directory_fd = os.open(p.parent, os.O_RDONLY)
+            try:
+                os.fsync(directory_fd)
+            finally:
+                os.close(directory_fd)
+        finally:
+            if temporary is not None:
+                temporary.unlink(missing_ok=True)
         return p
 
     def read_json(self, experiment_id: str, name: str) -> dict[str, Any] | None:

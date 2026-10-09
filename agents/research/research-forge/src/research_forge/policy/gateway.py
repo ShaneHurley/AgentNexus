@@ -7,21 +7,38 @@ from typing import Any
 from urllib.parse import unquote, urlparse
 
 import yaml
+from agent_core.contracts import ContractDenied
+from agent_core.runtime_authority import RuntimeAuthority
 
 from research_forge.errors import ErrorCode, ForgeError, forge_error, raise_forge
 from research_forge.policy.manifest import ToolManifest
 
 
 class PolicyGateway:
-    def __init__(self, policy_path: Path, *, mode: str = "mock") -> None:
+    def __init__(
+        self,
+        policy_path: Path,
+        *,
+        mode: str = "mock",
+        workspace_root: Path | None = None,
+        task_layers=None,
+    ) -> None:
         with policy_path.open(encoding="utf-8") as f:
             self.policy = yaml.safe_load(f) or {}
         self.mode = mode
+        self.workspace_root = (workspace_root or policy_path.parent.parent).expanduser().resolve()
+        self.authority = RuntimeAuthority("rf",self.workspace_root,task_layers=task_layers)
         self._tools: dict[str, ToolManifest] = {}
         self.audit_log: list[dict[str, Any]] = []
 
     def register_tool(self, manifest: ToolManifest) -> ForgeError | None:
         errs = manifest.validate()
+        if manifest.capabilities.get("credential") or (manifest.capabilities.get("write") and manifest.tool_id not in {"experiment.create", "experiment.pre_review", "experiment.run"}):
+            errs.append("RF tools cannot acquire writes or raw credentials")
+        if manifest.tool_id in self._tools:
+            errs.append("registered tools cannot be replaced")
+        if manifest.tool_id not in self.authority.snapshot.data["tools"]:
+            errs.append("tool is not in compiled registry")
         if errs:
             return forge_error(ErrorCode.POLICY_DENIED, "Invalid tool manifest", errors=errs)
         self._tools[manifest.tool_id] = manifest
@@ -81,6 +98,12 @@ class PolicyGateway:
             self.audit_log.append(decision)
             return False, decision
 
+        role_tools = self.policy.get("role_tool_allowlist") or {}
+        if tool_id not in role_tools.get(role, []):
+            decision["reason"] = "role_not_allowed"
+            self.audit_log.append(decision)
+            return False, decision
+
         if self.policy.get("default_deny") and not self._explicit_allow(
             role, phase, tool_id, operation, confidentiality, live
         ):
@@ -88,6 +111,18 @@ class PolicyGateway:
             self.audit_log.append(decision)
             return False, decision
 
+        try:
+            resource = Path(unquote(urlparse(target).path)) if target.startswith("file://") else None
+            self.authority.tool(role,tool_id,target=resource)
+            caps = self._tools[tool_id].capabilities
+            if operation in {"read", "search", "read_document"} and not caps["read"]:
+                raise ContractDenied("tool does not declare reads")
+            if target.startswith(("http://", "https://")) and not caps["network"]:
+                raise ContractDenied("tool does not declare network")
+        except ContractDenied as exc:
+            decision["reason"] = "compiled_grant_denied"
+            self.audit_log.append(decision)
+            return False, decision
         decision["allowed"] = True
         decision["rule"] = "mock_read_only_allowlist"
         self.audit_log.append(decision)
@@ -110,7 +145,7 @@ class PolicyGateway:
         if operation in ("read", "search", "read_document", "model_call") and not live:
             return allowed_mock and not tool_id.startswith("public_")
         if operation in ("search", "read_document") and live:
-            return tool_id.startswith("public_") or tool_id.startswith("web_")
+            return tool_id.startswith("public_") or tool_id.startswith("web_") or tool_id.startswith("live_")
         if operation == "ledger_append" and tool_id == "ledger":
             return True
         if tool_id.startswith("experiment.") and phase == "local_experiment":
@@ -138,11 +173,16 @@ class PolicyGateway:
             return True
         if target.startswith("file://"):
             parsed = urlparse(target)
-            path = unquote(parsed.path if parsed.path else target[7:])
-            norm = Path(path).as_posix()
-            if ".." in norm.split("/"):
+            if parsed.netloc not in ("", "localhost"):
                 return False
-            return True
+            raw_path = unquote(parsed.path)
+            if not raw_path or ".." in Path(raw_path).as_posix().split("/"):
+                return False
+            try:
+                Path(raw_path).expanduser().resolve().relative_to(self.workspace_root)
+                return True
+            except (OSError, ValueError):
+                return False
         decoded = unquote(target)
         if ".." in decoded.replace("\\", "/"):
             return False

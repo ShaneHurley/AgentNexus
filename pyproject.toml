@@ -1,0 +1,33 @@
+[project]
+name = "agent-nexus"
+version = "0.1.0"
+description = "AgentNexus local orchestration workspace"
+requires-python = ">=3.10"
+dependencies = []
+
+[dependency-groups]
+dev = ["pytest>=8", "pytest-cov>=5", "ruff>=0.6", "mypy>=1.11", "hypothesis>=6", "pytest-xdist>=3", "hatchling>=1.27", "wheel", "setuptools>=68", "pip>=24"]
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = ["agents/shared/ai_agents_repo", "agents/shared/agent-core", "agents/ide/bridge", "agents/coding/daily-coder-ecosystem", "agents/research/research-forge", "gui"]
+
+[tool.uv.sources]
+agent-core = { workspace = true }
+ai-agents-repo = { workspace = true }
+ide-bridge = { workspace = true }
+daily-coder-ecosystem = { workspace = true }
+research-forge = { workspace = true }
+agent-dashboard = { workspace = true }
+
+[tool.pytest.ini_options]
+addopts = "--import-mode=importlib"
+testpaths = ["agents/shared/ai_agents_repo/tests", "agents/shared/agent-core/tests", "agents/coding/daily-coder-ecosystem/tests", "agents/research/research-forge/tests", "agents/ide/tests", "gui/tests", "tests"]
+pythonpath = ["gui", "agents/shared/agent-core", "agents/shared/ai_agents_repo/src", "agents/coding/daily-coder-ecosystem", "agents/research/research-forge/src", "agents/research/research-forge", "agents/ide/bridge"]
+
+[tool.ruff]
+target-version = "py310"
+[tool.ruff.lint]
+select = ["F821", "F822", "F823", "E9"]

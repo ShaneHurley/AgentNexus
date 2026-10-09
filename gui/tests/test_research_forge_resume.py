@@ -12,6 +12,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from agent_dashboard.adapters.research_forge import ResearchForgeAdapter
+from agent_dashboard.adapters.daily_task import DailyTaskAdapter
 from agent_dashboard.registry import Registry, load_config
 from agent_dashboard.server import _Handler, _resume_http_status
 
@@ -41,7 +42,7 @@ class ResearchForgeResumeAdapterTests(unittest.TestCase):
             "research-forge",
             "RF",
             "test",
-            {"package_root": str(package_root), "workspace_root": str(package_root)},
+            {"package_root": str(package_root), "workspace_root": str(package_root), "supervised": False},
             Path(tmp) / "data",
         )
 
@@ -54,6 +55,35 @@ class ResearchForgeResumeAdapterTests(unittest.TestCase):
             out = adapter.resume("no-such-run")
             self.assertFalse(out["accepted"])
             self.assertEqual(out["error"]["code"], "NOT_FOUND")
+
+    def test_cancel_reports_request_without_claiming_termination(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            pkg = Path(tmp) / "pkg"
+            pkg.mkdir()
+            (pkg / "pyproject.toml").write_text("[project]\nname='rf-test'\n", encoding="utf-8")
+            adapter = self._adapter(tmp, pkg)
+            queued = adapter.start_run("bounded research")
+            self.assertTrue(queued["queued"])
+            self.assertFalse(queued["execution_started"])
+            run_id = queued['run_id']
+            out = adapter.cancel(run_id)
+            self.assertTrue(out["cancellation_requested"])
+            self.assertFalse(out["cancelled"])
+            self.assertFalse(out["acknowledged"])
+            self.assertEqual(adapter.get_run(run_id)["status"], "CANCEL_REQUESTED")
+
+    def test_daily_task_cancel_reports_request_without_claiming_termination(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            adapter = DailyTaskAdapter("daily-task", "Daily Task", "test", {}, Path(tmp) / "data")
+            queued = adapter.start_run("prepare a plan")
+            self.assertTrue(queued["queued"])
+            self.assertFalse(queued["execution_started"])
+            run_id = queued["run_id"]
+            out = adapter.cancel(run_id)
+            self.assertTrue(out["cancellation_requested"])
+            self.assertFalse(out["cancelled"])
+            self.assertFalse(out["acknowledged"])
+            self.assertEqual(adapter.get_run(run_id)["status"], "CANCEL_REQUESTED")
 
     def test_persisted_state_mock_resume(self):
         from research_forge.wave1.orchestrator import RunState
@@ -99,7 +129,7 @@ class ResumeApiTests(unittest.TestCase):
         cls._tmpdir = tempfile.TemporaryDirectory()
         reg = Registry(cfg, ROOT / "config", Path(cls._tmpdir.name))
         cls.httpd = ThreadingHTTPServer(("127.0.0.1", 0), _Handler)
-        cls.httpd.ctx = make_server_ctx(reg, auth_required=False, token="")
+        cls.httpd.ctx = make_server_ctx(reg, auth_required=True, token="test-token")
         cls.thread = threading.Thread(target=cls.httpd.serve_forever, daemon=True)
         cls.thread.start()
         host, port = cls.httpd.server_address
@@ -115,7 +145,7 @@ class ResumeApiTests(unittest.TestCase):
         req = urllib.request.Request(
             self.base + "/api/agents/research-forge/runs/RF-missing-persist/resume",
             data=b"{}",
-            headers={"Content-Type": "application/json"},
+            headers={"Content-Type": "application/json", "Authorization": "Bearer test-token"},
             method="POST",
         )
         with self.assertRaises(urllib.error.HTTPError) as ctx:
@@ -128,3 +158,14 @@ class ResumeApiTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class DailyResumeQueueTests(unittest.TestCase):
+    def test_resume_does_not_claim_worker_started(self):
+        with tempfile.TemporaryDirectory() as temp:
+            adapter=DailyTaskAdapter("daily-task","Daily","test",{},Path(temp))
+            run_id=adapter.start_run("prepare plan")["run_id"]
+            result=adapter.resume(run_id)
+            self.assertEqual(adapter.get_run(run_id)["status"],"RESUME_REQUESTED")
+            self.assertFalse(result["acknowledged"])
+            self.assertFalse(result["execution_started"])

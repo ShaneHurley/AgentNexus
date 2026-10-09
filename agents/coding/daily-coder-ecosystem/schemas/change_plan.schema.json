@@ -4,7 +4,6 @@
   "required": [
     "change_units",
     "file_allowlist",
-    "rollback",
     "unresolved_questions",
     "verification_commands"
   ],
@@ -44,9 +43,7 @@
         }
       }
     },
-    "rollback": {
-      "type": "string"
-    },
+    "rollback": {"type": ["string", "null"], "default": ""},
     "unresolved_questions": {
       "type": "array",
       "items": {

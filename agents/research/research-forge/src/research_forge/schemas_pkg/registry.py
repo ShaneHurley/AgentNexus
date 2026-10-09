@@ -7,13 +7,39 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-from jsonschema import Draft202012Validator
-from jsonschema.exceptions import ValidationError
-from referencing import Registry, Resource
+_SCHEMA_IMPORT_ERROR: ImportError | None = None
+try:
+    from jsonschema import Draft202012Validator
+    from jsonschema.exceptions import ValidationError
+    from referencing import Registry, Resource
+except ImportError as exc:
+    _SCHEMA_IMPORT_ERROR = exc
+    Draft202012Validator = None  # type: ignore[assignment, misc]
+
+    class ValidationError(Exception):  # type: ignore[no-redef]
+        pass
+
+    Registry = None  # type: ignore[assignment, misc]
+    Resource = None  # type: ignore[assignment, misc]
 
 from research_forge.settings import find_package_root
 
 SCHEMA_VERSION = "1.0.0"
+
+
+class SchemaValidationUnavailableError(RuntimeError):
+    """Raised when schema validation dependencies are unavailable."""
+
+
+class SchemaVersionError(ValueError):
+    """Raised when stored schema data requires a version migration."""
+
+
+def _require_schema_dependencies() -> None:
+    if Draft202012Validator is None or Registry is None or Resource is None:
+        raise SchemaValidationUnavailableError(
+            "Research Forge schema validation requires jsonschema and referencing"
+        ) from _SCHEMA_IMPORT_ERROR
 
 CANONICAL: dict[str, str] = {
     "research_request": "research_request.schema.json",
@@ -88,6 +114,7 @@ class SchemaRegistry:
         return self._registry
 
     def _ensure_built(self, needed: frozenset[str]) -> None:
+        _require_schema_dependencies()
         missing = needed - self._validators.keys()
         if not missing:
             return
@@ -102,12 +129,13 @@ class SchemaRegistry:
     def validate(self, canonical_name: str, instance: dict[str, Any]) -> None:
         if canonical_name not in self._names:
             raise KeyError(f"Unknown schema: {canonical_name}")
+        _require_schema_dependencies()
         self._ensure_built(frozenset({canonical_name}))
         self._validators[canonical_name].validate(instance)
 
     def validate_version(self, requested: str) -> None:
         if requested != self.version:
-            raise ValidationError(
+            raise SchemaVersionError(
                 f"Schema version {requested} requires migration; current={self.version}"
             )
 

@@ -9,7 +9,11 @@ from typing import Any
 import yaml
 from pydantic import BaseModel, Field, ValidationError
 
-ALLOWED_ENV = frozenset({"RF_MODE", "RF_RUN_DIR", "RF_WORKSPACE", "RF_PACKAGE_ROOT"})
+ALLOWED_ENV = frozenset({
+    "RF_MODE", "RF_RUN_DIR", "RF_WORKSPACE", "RF_PACKAGE_ROOT",
+    "RF_RATE_LIMIT_CALLS", "RF_RATE_LIMIT_WINDOW",
+    "RF_RATE_LIMIT_MAX_WAIT", "RF_RATE_LIMIT_ENABLED",
+})
 
 
 class Settings(BaseModel):

@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import json
+import os
+import re
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -25,17 +28,44 @@ class ExperimentStore:
         )
 
     def exp_dir(self, experiment_id: str, *, create: bool = True) -> Path:
-        d = self.root / experiment_id
+        if not re.fullmatch(r"EXP-[A-Za-z0-9_-]+",experiment_id): raise PermissionError("invalid experiment ID")
+        d = (self.root / experiment_id).resolve()
+        if not d.is_relative_to(self.workspace_root) or not d.is_relative_to(self.root.resolve()): raise PermissionError("experiment path escapes workspace")
         if create:
             d.mkdir(parents=True, exist_ok=True)
         return d
 
     def path(self, experiment_id: str, name: str, *, create_dir: bool = True) -> Path:
-        return self.exp_dir(experiment_id, create=create_dir) / name
+        if not re.fullmatch(r"[A-Za-z0-9_.-]+",name) or name in {".",".."}: raise PermissionError("invalid artifact name")
+        base = self.exp_dir(experiment_id, create=create_dir)
+        target = (base / name).resolve()
+        if not target.is_relative_to(base): raise PermissionError("artifact path escapes experiment")
+        return target
 
     def write_json(self, experiment_id: str, name: str, payload: dict[str, Any]) -> Path:
         p = self.path(experiment_id, name, create_dir=True)
-        p.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        content = json.dumps(payload, indent=2, sort_keys=True) + "\n"
+        temporary = None
+        try:
+            # Unique temporary files in the destination directory preserve atomic
+            # rename semantics even when the workspace is on another filesystem.
+            with tempfile.NamedTemporaryFile(
+                mode="w", encoding="utf-8", dir=p.parent,
+                prefix=f".{p.name}.", suffix=".tmp", delete=False,
+            ) as stream:
+                temporary = Path(stream.name)
+                stream.write(content)
+                stream.flush()
+                os.fsync(stream.fileno())
+            os.replace(temporary, p)
+            directory_fd = os.open(p.parent, os.O_RDONLY)
+            try:
+                os.fsync(directory_fd)
+            finally:
+                os.close(directory_fd)
+        finally:
+            if temporary is not None:
+                temporary.unlink(missing_ok=True)
         return p
 
     def read_json(self, experiment_id: str, name: str) -> dict[str, Any] | None:

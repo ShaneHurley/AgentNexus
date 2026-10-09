@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -9,6 +10,7 @@ from typing import Any
 import yaml
 
 from research_forge.errors import ErrorCode, ForgeError, forge_error
+from agent_core.rate_limiter import RateLimiter, RateLimiterConfig
 
 
 @dataclass
@@ -36,8 +38,10 @@ class BudgetManager:
             cfg = yaml.safe_load(f) or {}
         self.profiles = cfg["profiles"]
         self.thresholds = cfg["thresholds"]
+        self.resource_limits: dict[str, Any] | None = None
         self.state: BudgetState | None = None
         self.events: list[dict[str, Any]] = []
+        self.rate_limiter: RateLimiter = RateLimiter(RateLimiterConfig.disabled())
 
     def start(self, profile: str) -> BudgetState:
         if profile not in self.profiles:
@@ -45,14 +49,20 @@ class BudgetManager:
         p = self.profiles[profile]
         self.state = BudgetState(
             profile=profile,
-            limit_usd=float(p["cost_usd"]),
+            limit_usd=min(float(p["cost_usd"]),float(self.resource_limits["usd"])) if self.resource_limits else float(p["cost_usd"]),
             audit_fraction=float(p.get("reserve_audit_fraction", 0.10)),
         )
+        rl_cfg = RateLimiterConfig.from_profile(p)
+        self.rate_limiter = RateLimiter(rl_cfg)
         return self.state
 
     def reserve(self, amount_usd: float, *, role: str = "host", lane: str = "default") -> ForgeError | None:
+        if self.resource_limits and self.resource_limits.get("deadline") is not None and time.time() >= self.resource_limits["deadline"]:
+            return forge_error(ErrorCode.BUDGET_EXCEEDED, "Run deadline exhausted")
         if not self.state or self.state.hard_stopped:
             return forge_error(ErrorCode.BUDGET_EXCEEDED, "Budget hard stopped")
+        if self.state.limit_usd <= 0:
+            return forge_error(ErrorCode.BUDGET_EXCEEDED, "Run cost limit exhausted")
         if amount_usd > self.state.available:
             return forge_error(ErrorCode.BUDGET_EXCEEDED, "Insufficient reserve")
         self.state.reserved_usd += amount_usd
@@ -75,7 +85,7 @@ class BudgetManager:
         self.state.role_spent[role] = self.state.role_spent.get(role, 0.0) + amount_usd
         self.state.lane_spent[lane] = self.state.lane_spent.get(lane, 0.0) + amount_usd
         self.events.append({"type": "debit", "amount_usd": amount_usd, "role": role, "lane": lane})
-        frac = self.state.spent_usd / self.state.limit_usd
+        frac = self.state.spent_usd / self.state.limit_usd if self.state.limit_usd > 0 else 1.0
         if frac >= self.thresholds["hard_stop_fraction"]:
             self.state.hard_stopped = True
         return None
@@ -83,7 +93,7 @@ class BudgetManager:
     def threshold_status(self) -> str:
         if not self.state:
             return "none"
-        frac = self.state.spent_usd / self.state.limit_usd
+        frac = self.state.spent_usd / self.state.limit_usd if self.state.limit_usd > 0 else 1.0
         if frac >= self.thresholds["hard_stop_fraction"]:
             return "hard_stop"
         if frac >= self.thresholds["checkpoint_fraction"]:
@@ -117,7 +127,7 @@ class BudgetManager:
     def report(self) -> dict[str, Any]:
         if not self.state:
             return {}
-        return {
+        base = {
             "profile": self.state.profile,
             "limit_usd": self.state.limit_usd,
             "spent_usd": self.state.spent_usd,
@@ -128,3 +138,5 @@ class BudgetManager:
             "threshold": self.threshold_status(),
             "hard_stopped": self.state.hard_stopped,
         }
+        base["rate_limiter"] = self.rate_limiter.report()
+        return base

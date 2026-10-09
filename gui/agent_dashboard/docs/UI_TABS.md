@@ -1,35 +1,22 @@
-# UI tabs — hash routes, session keys, polling
+# Workspace shell, sessions, and polling
 
-The dashboard shell is a **six-tab** app (`REC-DASH-TABS-SHELL`). Navigation uses the URL hash only (no History API paths in v1). Modules live under `agent_dashboard/web/`.
+The dashboard uses a workspace shell rather than the retired six-app-tab/hash-router layout. The shell is defined in `agent_dashboard/web/index.html`; `app.js` restores the compatibility API token and boots `workspace.js`.
 
-## App tabs and hash routes
+## Shell regions
 
-| Tab (UI label) | `data-tab` | Default hash | Optional segments |
-|----------------|------------|--------------|-------------------|
-| Home | `home` | `#/home` | — |
-| Agent | `agent` | `#/agent` | `#/agent/{agentId}` · `#/agent/{agentId}/{runId}` |
-| Documentation | `docs` | `#/docs` | `#/docs/{docName}` (e.g. `#/docs/ARCHITECTURE.md`) |
-| APIs & abilities | `apis` | `#/apis` | — |
-| Usage | `usage` | `#/usage` | — |
-| IDE | `ide` | `#/ide` | — |
+| Region | Stable element | Behavior |
+|--------|----------------|----------|
+| Top bar | `wsTopbar` | Branding, agent launch controls, health, refresh, settings |
+| Workspace body | `wsBody` | Sidebar, chat area, and optional panel dock |
+| Sidebar | `wsSidebar` | Session rail and daily tasks |
+| Chat area | `wsChatArea` | Active session tab strip and chat panel |
+| Session tabs | `wsSessionTabs` | One tab per active agent run; not URL hash routes |
+| Panel dock | `wsPanelDock` | Optional browser, code, and plan panels |
+| Status bar | `wsStatusbar` | Agent, session, panel, and clock status |
 
-**Router:** `router.js` exports `APP_TABS`, `parseHash()`, `hashFor()`, and `initRouter()`.
+`workspace.js` initializes these regions, loads agents, restores session metadata, wires resize handles and shortcuts, and manages chat/dock/sidebar rendering. `index.html` loads `/app.js` as an ES module. UI tests should assert stable shell IDs, accessible roles, and that referenced modules exist; they should not assert retired `data-tab` values or `#viewport`.
 
-- Unknown first segment → redirect to `#/home` (`redirect: true`).
-- Empty hash on load → `#/home`.
-- Docs path: segments after `docs/` are joined and decoded (supports nested-looking names in the hash; server docs API still serves flat `docs/*.md` names).
-
-**Boot:** `app.js` mounts one tab module into `#viewport` on hash change. Agent tab receives `agentId`, `runId`, and a `navigate()` helper that updates the hash.
-
-**Hash sync:** When the app tab is already active, `app.js` calls `syncRoute(route)` on Agent and Docs modules so `#/agent/…` and `#/docs/…` deep links update without remounting.
-
-**Agent UX:** Horizontal **peer agent switcher** (Daily Coder | Research Forge | Daily Task) plus collapsible session groups (5 newest, Show all, client archive). **Start work** calls `ensureBackend()` before `POST …/runs`. Composer chips: Agent / Model (from Setup runtimes) / Context / Thinking / Subagents. Type `/` in the prompt for skills & subagents. Configure providers and API keys under **APIs & abilities → Setup**.
-
-After changing adapters or `agents.json`, **restart** the hub (`python start.py` from `gui/`). A stale process loads only the agents it started with.
-
-
-
-**Mobile (G4):** At viewport width ≤768px, the IDE tab button is hidden (`styles.css`). Mobile clients should use the routes in [MOBILE_API.md](./MOBILE_API.md) only.
+After changing adapters or `agents.json`, restart the hub (`python start.py` from `gui/`) so the registry is reloaded.
 
 ## Session storage keys
 
@@ -39,6 +26,7 @@ All keys are in `state.js` (`SESSION_KEYS`). Values are **metadata only** — ne
 |-----|---------|
 | `ad_agent` | Last selected agent id (Agent tab). |
 | `ad_run` | Last selected run id (Agent tab). |
+| `ad_run_by_agent` | Per-agent active run IDs, with `ad_run` retained as a legacy fallback. |
 | `ad_token` | API bearer token for `Authorization` (header field). |
 | `ad_provider` | Daily Coder provider preference (`mock` default). |
 | `ad_ide_layout` | IDE workbench layout v1 JSON (metadata-only). |
@@ -51,21 +39,17 @@ All keys are in `state.js` (`SESSION_KEYS`). Values are **metadata only** — ne
 | `ad_forced_subagents` | Per-agent forced subagent id list (JSON). |
 | `ad_agent_sections` | Agent tab disclose open/closed map. |
 
-**Quota:** `setItem()` catches `QuotaExceededError`, drops `ad_ide_layout`, and retries once. IDE layout writes also reject payloads >200KB.
+**Quota:** `setItem()` catches `QuotaExceededError`, drops `ad_ide_layout`, and retries once. IDE layout writes also reject payloads >200KB. These keys store metadata only; archived-run flags use `localStorage`, other session state uses `sessionStorage`.
 
 ## Polling and refresh rules
 
-Polling must avoid request storms when the document is hidden or the wrong tab is active (**G8**). The locked design uses a central **`poll.js` registry** (T28): register/unregister tick handlers per feature; run ticks only when `document.visibilityState === "visible"` and the handler’s app tab is active.
+Polling is coordinated by `poll.js`. A poller runs only when the document is visible, the browser is online, its declared app area is active, and that poller has no request in flight. The registry ticks every six seconds and requests an immediate tick when visibility returns. `workspace.js` registers the `workspace-tick` poller for the `workspace` area.
 
 | Source | When it runs | Interval / trigger | Endpoints (typical) |
 |--------|----------------|----------------------|---------------------|
-| Header health | App boot; manual **Refresh** | One-shot | `GET /api/health` |
-| Home snapshot | Active tab `home`; visible document | ~5s (align with server TTL) | `GET /api/home/snapshot` |
-| Agent tab | Active tab `agent`; mounted; visible | 6s + immediate tick on `visibilitychange` → visible | `GET /api/agents`, run/activity/approvals/thread as needed |
-| Usage tab | Active tab `usage`; visible | On mount + manual refresh (charts may poll sparingly) | `GET /api/usage` |
-| Docs / APIs | Those tabs active | On mount / navigation only | `GET /api/docs`, `GET /api/openapi.json` |
-| IDE log shells | Active tab `ide`; **visible log-shell tab** in a pane | ~2–4s per session (budget when multiple shells) | `GET /api/terminal/sessions/{id}/log` |
-| IDE file editor | No poll | Load/save only | `GET`/`PUT /api/workspace/file` |
+| Workspace refresh | `workspace` active; page visible and online | 6s + visibility restoration | `GET /api/agents`, agent activity, session/sidebar data |
+| User actions | On demand | Click or submit | Relevant `/api/*` endpoint |
+| Workspace edits | On demand | Load/save only | Workspace file endpoints |
 
 **Guards (all pollers):**
 
@@ -73,7 +57,7 @@ Polling must avoid request storms when the document is hidden or the wrong tab i
 - Skip if the poller’s app tab is not the active shell tab.
 - Use an in-flight guard so overlapping requests do not stack.
 
-**Current implementation notes:** The Agent tab already uses a 6s interval with visibility and in-flight guards while mounted. Home snapshot polling and the shared `poll.js` registry are scheduled in the tabbed-shell plan; until the registry lands, do not assume Home or IDE pollers are wired from a single coordinator.
+**Current implementation notes:** `poll.js` provides the shared visibility/online/active-area/in-flight guards. `workspace.js` registers the workspace refresh callback; individual user actions remain on-demand.
 
 ## Related docs
 

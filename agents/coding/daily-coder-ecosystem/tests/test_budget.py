@@ -33,6 +33,19 @@ def _profile_config(total_tokens: int = 100, max_calls: int = 20) -> dict:
 
 
 class TestBudgetThresholds(unittest.TestCase):
+    def test_unlisted_model_is_not_assumed_free(self):
+        cfg = _profile_config()
+        pricing = {"default": {"input_per_1k": 0.0, "output_per_1k": 0.0}}
+        budget = BudgetManager(cfg, _StaticUsageStore(), pricing=pricing)
+        with self.assertRaises(BudgetExceeded):
+            budget.price("unlisted-provider/model", 1000, 1000)
+
+    def test_explicit_zero_rate_model_is_free(self):
+        cfg = _profile_config()
+        pricing = {"free/provider-model": {"input_per_1k": 0.0, "output_per_1k": 0.0}}
+        budget = BudgetManager(cfg, _StaticUsageStore(), pricing=pricing)
+        self.assertEqual(budget.price("free/provider-model", 1000, 1000), 0.0)
+
     def test_usable_tokens_matches_ninety_percent_hard_stop(self):
         cfg = _profile_config(100)
         budget = BudgetManager(cfg, _StaticUsageStore())
@@ -119,7 +132,74 @@ class TestBudgetParallelReserve(unittest.TestCase):
         self.assertNotIn("r", budget._reserved)
 
 
+class TestPersistentBudgetReservations(unittest.TestCase):
+    def test_separate_managers_share_per_run_reservations(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "state.sqlite"
+            first_store = StateStore(path)
+            first_store.create("r", "task", temp, "cfg", "create", live=True)
+            first_store.set_profile("r", "S")
+            second_store = StateStore(path)
+            first = BudgetManager(_profile_config(100), first_store)
+            second = BudgetManager(_profile_config(100), second_store)
+
+            first.reserve("r", "S", 60, reservation_id="first-call")
+            with self.assertRaises(BudgetExceeded):
+                second.reserve("r", "S", 31, reservation_id="second-call")
+
+    def test_separate_managers_share_daily_usd_reservations(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "state.sqlite"
+            first_store = StateStore(path)
+            first_store.create("r1", "task", temp, "cfg", "create-1", live=True)
+            first_store.set_profile("r1", "S")
+            first_store.create("r2", "task", temp, "cfg", "create-2", live=True)
+            first_store.set_profile("r2", "S")
+            second_store = StateStore(path)
+            config = _profile_config(100)
+            limits = {"max_tokens_per_day": 1000, "max_spend_usd": 1.0}
+            pricing = {"priced/model": {"input_per_1k": 1.0, "output_per_1k": 1.0}}
+            first = BudgetManager(config, first_store, pricing=pricing, limits=limits)
+            second = BudgetManager(config, second_store, pricing=pricing, limits=limits)
+
+            first.reserve("r1", "S", 10, model="priced/model", estimated_usd=0.6,
+                          reservation_id="first-call")
+            with self.assertRaises(BudgetExceeded):
+                second.reserve("r2", "S", 10, model="priced/model", estimated_usd=0.6,
+                               reservation_id="second-call")
+
+
 class TestOrchestratorBudgetPath(unittest.TestCase):
+    def test_unpriced_selected_model_is_rejected_before_provider_call(self):
+        source = Path(__file__).resolve().parents[1]
+        with tempfile.TemporaryDirectory() as d:
+            package = Path(d) / "package"
+            package.mkdir()
+            for name in ("agents", "schemas", "skills", "config"):
+                shutil.copytree(source / name, package / name)
+            (package / "config" / "pricing.json").write_text(
+                '{"default":{"input_per_1k":0,"output_per_1k":0}}', encoding="utf-8")
+
+            class ProviderSpy:
+                name = "mock"
+
+                def __init__(self):
+                    self.calls = 0
+
+                def invoke(self, request):
+                    self.calls += 1
+                    return MockProvider().invoke(request)
+
+            provider = ProviderSpy()
+            store = StateStore(Path(d) / "state.sqlite")
+            orch = Orchestrator(package, store, provider, live=False)
+            run_id = "r"
+            store.create(run_id, "research", str(package), "cfg", "create")
+            store.set_profile(run_id, "S")
+            with self.assertRaises(BudgetExceeded):
+                orch._invoke(run_id, "researcher", "RESEARCH", {"request": "inspect"}, 0, "S", None)
+            self.assertEqual(provider.calls, 0)
+
     def test_invoke_reserves_before_provider(self):
         source = Path(__file__).resolve().parents[1]
         order: list[str] = []
@@ -140,9 +220,9 @@ class TestOrchestratorBudgetPath(unittest.TestCase):
             orch = Orchestrator(package, store, OrderProvider(), live=False)
             original_reserve = orch.budget.reserve
 
-            def tracking_reserve(run_id, profile, estimated_tokens):
+            def tracking_reserve(run_id, profile, estimated_tokens, **kwargs):
                 order.append("reserve")
-                return original_reserve(run_id, profile, estimated_tokens)
+                return original_reserve(run_id, profile, estimated_tokens, **kwargs)
 
             orch.budget.reserve = tracking_reserve  # type: ignore[method-assign]
             orch.start("Fix typo", package)

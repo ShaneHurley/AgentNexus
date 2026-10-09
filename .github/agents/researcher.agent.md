@@ -43,14 +43,14 @@ Summary: Investigate one bounded angle using read-only evidence only.
 
 When **this agent** is invoked, read the full runtime instructions from SSOT (not at picker/resident load):
 
-`load-on-invoke:daily-coder-ecosystem/agents/researcher/prompt.md` (sha256 `727c40745543ebdd2ef3c5d6d598aeed20093aa4879766d0900da1dc34f35acc`)
+`load-on-invoke:daily-coder-ecosystem/agents/researcher/prompt.md` (sha256 `5970b33aac3f682298351415a3e01aa355832011363579e36b75d882d4af914b`)
 
 ## Projection SSOT
 
 | Field | Value |
 |-------|-------|
 | Agent directory | `daily-coder-ecosystem/agents/researcher` |
-| `prompt.md` sha256 | `727c40745543ebdd2ef3c5d6d598aeed20093aa4879766d0900da1dc34f35acc` |
+| `prompt.md` sha256 | `5970b33aac3f682298351415a3e01aa355832011363579e36b75d882d4af914b` |
 | `agent.json` sha256 | `c8c2f85e3da122b2bd76bac5b18c01a48b62b09a94d13d586404f2def3ea2e08` |
 | Regenerate | `python ide-agents/scripts/import_daily_coder_agents.py` |
 

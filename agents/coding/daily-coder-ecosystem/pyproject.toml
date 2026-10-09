@@ -7,7 +7,7 @@ name = "daily-coder-ecosystem"
 version = "0.1.0"
 description = "Token-frugal artifact-driven coding agent orchestration"
 requires-python = ">=3.10"
-dependencies = ["keyring>=25"]
+dependencies = ["keyring>=25", "agent-core>=0.1.0"]
 
 [project.scripts]
 daily-coder = "daily_coder.cli:main"

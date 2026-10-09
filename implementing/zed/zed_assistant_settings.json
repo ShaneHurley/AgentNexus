@@ -1,0 +1,56 @@
+{
+  "assistant": {
+    "default_model": {
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-5-20251001"
+    },
+    "version": "2",
+    "enabled": true,
+    "button": true
+  },
+  "language_models": {
+    "anthropic": {
+      "api_url": "https://api.anthropic.com"
+    },
+    "openai": {
+      "api_url": "https://api.openai.com/v1"
+    }
+  },
+  "custom_slash_commands": [
+    {
+      "name": "researcher",
+      "description": "AgentNexus researcher role — read-only, evidence-tagged findings",
+      "prompt_path": "~/.config/zed/prompts/researcher.md"
+    },
+    {
+      "name": "daily-coder",
+      "description": "AgentNexus daily-coder orchestrator — bounded code changes",
+      "prompt_path": "~/.config/zed/prompts/daily-coder.md"
+    },
+    {
+      "name": "plan-prep",
+      "description": "AgentNexus plan-prep specialist — structured implementation plans",
+      "prompt_path": "~/.config/zed/prompts/plan-prep.md"
+    },
+    {
+      "name": "code-reviewer",
+      "description": "AgentNexus code-reviewer — adversarial findings report, no rewrites",
+      "prompt_path": "~/.config/zed/prompts/code-reviewer.md"
+    },
+    {
+      "name": "browser-handoff",
+      "description": "Generate a filled TASK_PACKET for browser agent handoff",
+      "prompt": "Produce a filled browser agent TASK_PACKET in the format below for the current context:\n\n```yaml\ntask_id: \"\"\nbrowser_family: \"research-desk | code-crafter | writing-studio | code-reviewer | document-reviewer | thinking-lab | plans-and-places | learning-coach | kitchen-cooking | mission-control\"\nbrowser_variant: \"<slug or omit for main>\"\nhost: \"claude | chatgpt | gemini | kimi | deepseek\"\nmode: \"RESEARCH | CODING | WRITING | REVIEW | PLANNING\"\nobjective: \"\"\nin_scope: []\nout_of_scope: []\nacceptance_criteria: []\n```\n\nExplain which AGENT_MESSAGE.md to prepend before pasting into the browser chat."
+    }
+  ],
+  "context_servers": {
+    "agentNexusContext": {
+      "source_files": [
+        "agents/ide/contracts/keep6-delegation-contract.md",
+        "agents/shared/browser/_shared/CORE_AGENT_CONTRACT.md",
+        "agents/shared/browser/_shared/TASK_PACKET_TEMPLATE.md"
+      ],
+      "auto_include": false
+    }
+  }
+}

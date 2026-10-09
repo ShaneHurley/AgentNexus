@@ -2,9 +2,12 @@ from __future__ import annotations
 
 import tempfile
 import unittest
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+from ai_agents_repo.discovery import repo_root
+from ai_agents_repo.paths import agent_core_root
+
+ROOT = repo_root()
+AGENT_CORE = agent_core_root(root=ROOT)
 
 
 class WritingLintTests(unittest.TestCase):
@@ -12,7 +15,7 @@ class WritingLintTests(unittest.TestCase):
     def setUpClass(cls) -> None:
         import sys
 
-        sys.path.insert(0, str(ROOT / "agent-core"))
+        sys.path.insert(0, str(AGENT_CORE))
 
     def test_rejects_em_dash(self) -> None:
         from agent_core.writing_lint import check_punctuation, may_complete
@@ -59,8 +62,7 @@ class WritingLintTests(unittest.TestCase):
             encoding="utf-8"
         )
         contract = (
-            ROOT
-            / "agent-core"
+            AGENT_CORE
             / "shared-agents"
             / "artifact-style-enforcer"
             / "contract.yaml"

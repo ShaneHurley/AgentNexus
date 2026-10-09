@@ -72,10 +72,13 @@ export async function renderRuns(agentId, onSelectRun, selectedRunId, capabiliti
           onSelectRun(runId);
         }
         if (act === "cancel") {
-          await api(`/api/agents/${encodeURIComponent(agentId)}/runs/${encodeURIComponent(runId)}/cancel`, {
+          const result = await api(`/api/agents/${encodeURIComponent(agentId)}/runs/${encodeURIComponent(runId)}/cancel`, {
             method: "POST",
             body: "{}",
           });
+          if (result.cancellation_requested && !result.acknowledged) {
+            el.insertAdjacentHTML("afterbegin", `<p class="warn">Cancellation requested; the worker has not acknowledged or stopped.</p>`);
+          }
           onSelectRun(runId);
         }
       } catch (err) {

@@ -183,7 +183,16 @@ class DailyTaskAdapter:
             ),
             encoding="utf-8",
         )
-        return {"accepted": True, "run_id": run_id, "artifact": str(artifact), "family": family, "forced_subagents": forced}
+        return {
+            "accepted": True,
+            "queued": True,
+            "acknowledged": False,
+            "execution_started": False,
+            "run_id": run_id,
+            "artifact": str(artifact),
+            "family": family,
+            "forced_subagents": forced,
+        }
 
     def approve(self, run_id: str, *, reject: bool = False, note: str | None = None, kind: str = "plan") -> dict[str, Any]:
         decision = "rejected" if reject else "approved"
@@ -211,17 +220,32 @@ class DailyTaskAdapter:
             json.dumps({"run_id": run_id, "action": "resume", "at": _now()}, indent=2),
             encoding="utf-8",
         )
-        self._patch_pending(run_id, status="ACTIVE", phase="resume_requested")
+        self._patch_pending(run_id, status="RESUME_REQUESTED", phase="resume_requested")
         return {
             "accepted": True,
             "run_id": run_id,
             "inbox_note": str(note),
+            "acknowledged": False,
+            "execution_started": False,
             "hint": "No HTTP runtime — resume is an inbox signal for the paste harness.",
         }
 
     def cancel(self, run_id: str) -> dict[str, Any]:
-        self._patch_pending(run_id, status="CANCELLED", phase="cancelled")
-        return {"cancelled": True, "run_id": run_id}
+        try:
+            self.get_run(run_id)
+        except KeyError:
+            return {"accepted": False, "run_id": run_id, "error": {"code": "NOT_FOUND", "message": "run not found"}}
+        note = self.inbox / f"{run_id}.cancel.json"
+        note.write_text(json.dumps({"run_id": run_id, "action": "cancel", "at": _now()}, indent=2), encoding="utf-8")
+        self._patch_pending(run_id, status="CANCEL_REQUESTED", phase="cancel_requested")
+        return {
+            "accepted": True,
+            "cancelled": False,
+            "cancellation_requested": True,
+            "acknowledged": False,
+            "run_id": run_id,
+            "inbox_note": str(note),
+        }
 
     def pending_approvals(self) -> list[dict[str, Any]]:
         out = []

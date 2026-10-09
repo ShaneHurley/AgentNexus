@@ -74,7 +74,7 @@ class ExperimentService:
         self.ledger = experiment_ledger(self.workspace_root)
         self.prefix = str(self.cfg.get("ledger_run_prefix", "exp-"))
         policy_path = self.package_root / "config" / "policies.yaml"
-        self.gateway = PolicyGateway(policy_path, mode="mock")
+        self.gateway = PolicyGateway(policy_path, mode="mock",workspace_root=self.workspace_root)
         _register_experiment_tools(self.gateway)
         self.creator = ExperimentCreator(
             self.package_root, self.workspace_root, self.store

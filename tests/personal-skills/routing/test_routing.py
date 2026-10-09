@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import json
 import unittest
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[3]
-SCHEMAS = ROOT / "schemas" / "personal"
-CATALOG = ROOT / "skills" / "personal-catalog.yaml"
+from ai_agents_repo.discovery import repo_root
+from ai_agents_repo.paths import schemas_personal_root, skills_root
+
+ROOT = repo_root()
+SCHEMAS = schemas_personal_root(root=ROOT)
+CATALOG = skills_root(root=ROOT) / "personal-catalog.yaml"
 
 
 class RoutingTests(unittest.TestCase):

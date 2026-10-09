@@ -24,6 +24,12 @@ def build_provider(name, *, config=None, secrets=None, command=None, endpoint=No
     def key(env_name):
         return secrets.get(env_name) if secrets else None
 
+    def required_key(env_name):
+        value = key(env_name)
+        if not value:
+            raise ValueError(f"{name} provider requires credential {env_name}")
+        return value
+
     if name == "mock":
         return MockProvider()
     if name == "command":
@@ -35,26 +41,28 @@ def build_provider(name, *, config=None, secrets=None, command=None, endpoint=No
             raise ValueError("--provider-endpoint is required for the http bridge provider")
         return HttpBridgeProvider(endpoint, token=key("BRIDGE_TOKEN"), timeout=timeout)
     if name == "openai":
-        return OpenAICompatibleProvider(api_key=key("OPENAI_API_KEY"),
+        return OpenAICompatibleProvider(api_key=required_key("OPENAI_API_KEY"),
                                         base_url=entry.get("base_url", "https://api.openai.com/v1"),
-                                        default_model=entry.get("default_model", "gpt-4o-mini"), timeout=timeout)
+                                        default_model=entry.get("default_model", "gpt-4o-mini"), timeout=timeout,
+                                        name=name)
     if name == "openrouter":
-        return OpenAICompatibleProvider(api_key=key("OPENROUTER_API_KEY"),
+        return OpenAICompatibleProvider(api_key=required_key("OPENROUTER_API_KEY"),
                                         base_url=entry.get("base_url", "https://openrouter.ai/api/v1"),
                                         default_model=entry.get("default_model", "openai/gpt-4o-mini"),
                                         timeout=timeout,
-                                        extra_headers={"HTTP-Referer": "https://localhost", "X-Title": "daily-coder"})
+                                        extra_headers={"HTTP-Referer": "https://localhost", "X-Title": "daily-coder"},
+                                        name=name)
     if name == "local":
         return OpenAICompatibleProvider(api_key=key("LOCAL_API_KEY") or "local",
                                         base_url=entry.get("base_url", "http://127.0.0.1:11434/v1"),
                                         default_model=entry.get("default_model", "qwen2.5-coder"), timeout=timeout,
-                                        supports_json_response_format=False)
+                                        supports_json_response_format=False, name=name)
     if name == "anthropic":
-        return AnthropicProvider(api_key=key("ANTHROPIC_API_KEY"),
+        return AnthropicProvider(api_key=required_key("ANTHROPIC_API_KEY"),
                                  base_url=entry.get("base_url", "https://api.anthropic.com/v1"),
                                  default_model=entry.get("default_model", "claude-sonnet-4-5"), timeout=timeout)
     if name == "gemini":
-        return GeminiProvider(api_key=key("GEMINI_API_KEY"),
+        return GeminiProvider(api_key=required_key("GEMINI_API_KEY"),
                               base_url=entry.get("base_url", "https://generativelanguage.googleapis.com/v1beta"),
-                              default_model=entry.get("default_model", "gemini-2.5-flash"), timeout=timeout)
+                              default_model=entry.get("default_model", "gemini-3.8-flash"), timeout=timeout)
     raise ValueError(f"unknown provider: {name}")

@@ -7,7 +7,8 @@ from __future__ import annotations
 
 REQUIRED_ARTIFACTS = ("decide", "plan", "plan_review")
 
-def evaluate(*, run, packet, artifacts, approvals_ok, live, config):
+def evaluate(*, run, packet, artifacts, approvals_ok, live, config,
+             verification_results=(), job_results=()):
     """Return a verdict dict. `pass` only when every required condition holds."""
     acc = config.get("acceptance", {})
     failures: list[str] = []
@@ -32,7 +33,12 @@ def evaluate(*, run, packet, artifacts, approvals_ok, live, config):
     test_design = packet.get("test_design") or {}
 
     record("decision_has_criteria", bool(decide.get("acceptance_criteria")), "decision has no acceptance criteria")
-    record("plan_resolved", not plan.get("unresolved_questions"), "plan still contains unresolved questions")
+    mode = str(packet.get("task_mode") or config.get("task_mode", "coding")).strip().lower()
+    gate_unresolved = acc.get("gate_unresolved_questions", True)
+    if gate_unresolved and mode != "research":
+        record("plan_resolved", not plan.get("unresolved_questions"), "plan still contains unresolved questions")
+    else:
+        checks["plan_resolved"] = True
     record("plan_review_pass", plan_review.get("verdict") == "pass", "plan review did not pass")
     record("plan_approved", approvals_ok, "plan approval was not granted")
 
@@ -46,7 +52,29 @@ def evaluate(*, run, packet, artifacts, approvals_ok, live, config):
     tests_required = bool(test_design.get("test_required", True)) and bool(changed)
     if acc.get("require_test_evidence_for_nontrivial", True) and tests_required:
         record("tests_pass", test_exec.get("verdict") == "pass", "test evidence is missing or not passing")
-        record("tests_have_commands", bool(test_exec.get("commands")), "test evidence has no executed commands")
+        reported_commands = test_exec.get("commands") or []
+        record("tests_have_commands", bool(reported_commands), "test evidence has no executed commands")
+        reported_pass = bool(reported_commands) and all(
+            isinstance(command, dict) and type(command.get("returncode")) is int
+            and command["returncode"] == 0 for command in reported_commands)
+        record("tests_reported_commands_pass", reported_pass, "test evidence reports a failed or invalid command result")
+
+        recorded_jobs = [job for job in job_results if job.get("kind") == "tests"]
+        has_recorded_results = bool(verification_results or recorded_jobs)
+        record("tests_have_recorded_results", has_recorded_results,
+               "test results are not backed by recorded command or job evidence")
+        recorded_pass = all(
+            result.get("decision") == "allow"
+            and type(result.get("returncode")) is int
+            and result["returncode"] == 0
+            and not result.get("timeout", False)
+            for result in verification_results
+        ) and all(
+            job.get("state") == "succeeded" and job.get("exit_code") == 0
+            for job in recorded_jobs
+        )
+        record("tests_recorded_results_pass", has_recorded_results and recorded_pass,
+               "recorded test command or detached job did not succeed")
     else:
         checks["tests_pass"] = True
 

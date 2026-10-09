@@ -27,6 +27,11 @@ def _request_path(request: str) -> Path:
 
 
 def cmd_run(args: argparse.Namespace) -> int:
+    if getattr(args, "supervisor_dir", None):
+        from ide_bridge.supervised import execute
+        if args.dry_run:
+            raise ValueError("Supervised dry-run is not supported; use the native Research Forge planning command")
+        return execute(args, "research-forge")
     rf = which("research-forge")
     if not rf:
         print(
@@ -58,6 +63,9 @@ def cmd_run(args: argparse.Namespace) -> int:
 
 
 def cmd_resume(args: argparse.Namespace) -> int:
+    if getattr(args, "supervisor_dir", None):
+        from ide_bridge.supervised import execute
+        return execute(args, "research-forge", resume=True)
     rf = which("research-forge")
     if not rf:
         print(json.dumps({"ok": False, "error": "research-forge not on PATH"}), file=sys.stderr)
@@ -68,7 +76,10 @@ def cmd_resume(args: argparse.Namespace) -> int:
         argv.extend(["--answer", ans])
     if args.live:
         argv.append("--live")
-    return run_command(argv, cwd=args.cwd)
+    code = run_command(argv, cwd=args.cwd)
+    if not args.live and code == 0 and getattr(args, "mark_simulated", True):
+        return 1
+    return code
 
 
 def register(sub: argparse._SubParsersAction) -> None:
@@ -93,6 +104,8 @@ def register(sub: argparse._SubParsersAction) -> None:
         help="Return RF raw exit 0 on mock success (default: exit 1 = SIMULATED)",
     )
     run_p.set_defaults(mark_simulated=True)
+    from ide_bridge.supervised import add_options
+    add_options(run_p)
     run_p.set_defaults(handler=cmd_run)
 
     resume_p = rf_sub.add_parser("resume", help="Resume paused Wave 1 run")
@@ -100,4 +113,7 @@ def register(sub: argparse._SubParsersAction) -> None:
     resume_p.add_argument("--answer", "-a", action="append", default=[], help="CLQ-ID=value")
     resume_p.add_argument("--live", action="store_true")
     resume_p.add_argument("--cwd", default=".")
-    resume_p.set_defaults(handler=cmd_resume)
+    resume_p.add_argument("--no-mark-simulated", dest="mark_simulated", action="store_false",
+                          help="Return raw exit 0 for successful mock resume")
+    add_options(resume_p)
+    resume_p.set_defaults(handler=cmd_resume, mark_simulated=True)

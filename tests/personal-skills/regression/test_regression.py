@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import unittest
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[3]
+from ai_agents_repo.discovery import repo_root
+from ai_agents_repo.paths import ide_pack_root
+
+ROOT = repo_root()
 
 
 class RegressionTests(unittest.TestCase):
@@ -20,7 +22,7 @@ class RegressionTests(unittest.TestCase):
             self.assertIn(name, text)
 
     def test_ide_pack_exists(self) -> None:
-        self.assertTrue((ROOT / "ide-pack" / "ide-agents").is_dir())
+        self.assertTrue(ide_pack_root(root=ROOT).is_dir())
 
     def test_no_personal_orchestrator_package(self) -> None:
         self.assertFalse((ROOT / "personal-orchestrator").exists())

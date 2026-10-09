@@ -74,7 +74,7 @@ def test_wrapped_call(repo_root: Path) -> None:
         bm,
         cost_usd=0.01,
         auth_kwargs={
-            "role": "host",
+            "role": "orchestrator",
             "phase": "wave0",
             "tool_id": "mock_model",
             "operation": "model_call",

@@ -13,3 +13,22 @@ gui/agent_dashboard_data/
 *.log
 *.jsonl
 .DS_Store
+
+# Generated capability pins and execution state (not source configuration)
+.agentnexus/
+agents/coding/daily-coder-ecosystem/.daily-coder/
+agents/research/research-forge/runs/workspace/
+
+# UUID-based RF runtime journals; tracked historical evidence is retained
+agents/research/research-forge/runs/wave1/run-????????-????-????-????-????????????/
+
+# Machine environments and private operator state
+.venv*/
+venv/
+.superpowers/
+.agents/teamwork/
+.codex/
+ORIGINAL_REQUEST.md
+scratch/
+**/.daily-coder/
+**/runs/

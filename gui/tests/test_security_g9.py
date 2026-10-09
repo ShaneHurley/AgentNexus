@@ -92,22 +92,27 @@ class WorkspaceApiSecurityTests(unittest.TestCase):
             urllib.request.urlopen(req, timeout=10)
         self.assertEqual(ctx.exception.code, 401)
 
-        spawn = urllib.request.Request(
-            self.base + "/api/terminal/sessions",
-            data=json.dumps({"profile_id": "echo"}).encode("utf-8"),
-            headers={**self._auth_headers(), "Content-Type": "application/json"},
-            method="POST",
-        )
-        with urllib.request.urlopen(spawn, timeout=15) as resp:
-            session = json.loads(resp.read().decode("utf-8"))
-        sid = session["id"]
+        sid = None
+        try:
+            spawn = urllib.request.Request(
+                self.base + "/api/terminal/sessions",
+                data=json.dumps({"profile_id": "sleep"}).encode("utf-8"),
+                headers={**self._auth_headers(), "Content-Type": "application/json"},
+                method="POST",
+            )
+            with urllib.request.urlopen(spawn, timeout=15) as resp:
+                session = json.loads(resp.read().decode("utf-8"))
+            sid = session["id"]
 
-        stop = urllib.request.Request(
-            self.base + f"/api/terminal/sessions/{sid}/stop",
-            data=b"{}",
-            headers={**self._auth_headers(), "Content-Type": "application/json"},
-            method="POST",
-        )
-        with urllib.request.urlopen(stop, timeout=10) as resp:
-            stopped = json.loads(resp.read().decode("utf-8"))
-        self.assertEqual(stopped["state"], "stopped")
+            stop = urllib.request.Request(
+                self.base + f"/api/terminal/sessions/{sid}/stop",
+                data=b"{}",
+                headers={**self._auth_headers(), "Content-Type": "application/json"},
+                method="POST",
+            )
+            with urllib.request.urlopen(stop, timeout=10) as resp:
+                stopped = json.loads(resp.read().decode("utf-8"))
+            self.assertEqual(stopped["state"], "stopped")
+        finally:
+            if sid:
+                self.httpd.ctx["terminal_registry"].stop(sid)

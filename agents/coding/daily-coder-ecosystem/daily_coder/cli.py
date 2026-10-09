@@ -41,6 +41,7 @@ def main(argv=None):
     run=sub.add_parser('run'); run.add_argument('--request',required=True); run.add_argument('--repo',default='.'); _provider_args(run)
     resume=sub.add_parser('resume'); resume.add_argument('run_id'); _provider_args(resume)
     status=sub.add_parser('status'); status.add_argument('run_id')
+    cancel=sub.add_parser('cancel'); cancel.add_argument('run_id')
     runs=sub.add_parser('runs'); runs.add_argument('--limit',type=int,default=20)
     sub.add_parser('validate'); sub.add_parser('doctor')
 
@@ -115,6 +116,8 @@ def main(argv=None):
     if a.cmd=='doctor':
         print(json.dumps({'python':'ok','tree_errors':validate_tree(root()),'runtime':str(runtime()),
                           'providers':list(PROVIDERS),'secrets':SecretStore(runtime()/'secrets.json').list()},indent=2)); return
+    if a.cmd=='cancel':
+        print(json.dumps(store.request_cancel(a.run_id),indent=2)); return 0
     if a.cmd=='status':
         row=store.get(a.run_id)
         row['pending_approvals']=[x for x in store.pending_approvals() if x['run_id']==a.run_id]

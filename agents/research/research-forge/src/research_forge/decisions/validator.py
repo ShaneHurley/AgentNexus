@@ -6,7 +6,10 @@ import json
 from pathlib import Path
 from typing import Any, Literal
 
-import jsonschema
+try:
+    import jsonschema
+except ImportError:
+    jsonschema = None
 import yaml
 
 from research_forge.errors import ErrorCode, forge_error
@@ -37,9 +40,10 @@ def load_registry(repo_root: Path) -> dict[str, Any]:
     schema_path = repo_root / "docs" / "decisions" / "decision-registry.schema.json"
     with reg_path.open(encoding="utf-8") as f:
         data = yaml.safe_load(f)
-    with schema_path.open(encoding="utf-8") as f:
-        schema = json.load(f)
-    jsonschema.validate(instance=data, schema=schema)
+    if jsonschema is not None and schema_path.is_file():
+        with schema_path.open(encoding="utf-8") as f:
+            schema = json.load(f)
+        jsonschema.validate(instance=data, schema=schema)
     return data
 
 

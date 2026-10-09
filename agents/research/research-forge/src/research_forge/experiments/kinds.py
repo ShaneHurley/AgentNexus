@@ -128,76 +128,17 @@ def run_group_comparison(
     }
 
 
-def run_python_unittest_benchmark(
-    start_dir: Path,
-    *,
-    repetitions: int = 1,
-    raw_tail: int = 4000,
-) -> dict[str, Any]:
-    """Run unittest discovery via argv list (no shell).
-
-    Set ``RF_EXPERIMENT_SANDBOX=docker`` to wrap discovery in
-    ``docker run --rm --network=none`` (REC-04 experiment). Default remains
-    in-process subprocess and is **not** a secure sandbox.
-    """
-    import os
-
-    durations: list[float] = []
-    last_out = ""
-    last_err = ""
-    exit_code = 0
-    sandbox = (os.environ.get("RF_EXPERIMENT_SANDBOX") or "").strip().lower()
-    start_dir = start_dir.resolve()
+def run_python_unittest_benchmark(start_dir: Path, *, repetitions: int = 1, raw_tail: int = 4000, image: str | None = None) -> dict[str, Any]:
+    """Arbitrary Python executes only inside a reviewed, digest-pinned worker."""
+    from agent_core.isolation import DockerRunner, IsolationUnavailable
+    if not image: raise IsolationUnavailable("code experiments require a reviewed isolated_image")
+    if not 1 <= repetitions <= 10: raise ValueError("experiment repetitions exceed ceiling")
+    runner = DockerRunner(image,start_dir)
+    durations=[]; last={"returncode":None,"stdout":"","stderr":""}
     for _ in range(repetitions):
-        t0 = time.perf_counter()
-        if sandbox == "docker":
-            cmd = [
-                "docker",
-                "run",
-                "--rm",
-                "--network=none",
-                "-v",
-                f"{start_dir}:/work:ro",
-                "-w",
-                "/work",
-                "python:3.11-slim",
-                "python",
-                "-m",
-                "unittest",
-                "discover",
-                "-s",
-                "/work",
-                "-q",
-            ]
-        else:
-            cmd = [sys.executable, "-m", "unittest", "discover", "-s", str(start_dir), "-q"]
-        proc = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        durations.append(time.perf_counter() - t0)
-        last_out = proc.stdout or ""
-        last_err = proc.stderr or ""
-        exit_code = proc.returncode
-        if exit_code != 0:
-            break
-
-    metrics = {
-        "repetitions_run": len(durations),
-        "durations_seconds": durations,
-        "mean_duration_seconds": statistics.fmean(durations) if durations else 0.0,
-        "start_dir": str(start_dir),
-        "sandbox_mode": sandbox or "in_process",
-        "sandbox_warning": (
-            "docker_network_none" if sandbox == "docker" else "not_a_secure_sandbox"
-        ),
-    }
-    return {
-        "exit_code": exit_code,
-        "duration_seconds": sum(durations),
-        "metrics": metrics,
-        "raw_stdout_tail": _tail(last_out, raw_tail),
-        "raw_stderr_tail": _tail(last_err, raw_tail),
-    }
+        last=runner.run(["python","-m","unittest","discover","-s","/workspace","-q"])
+        durations.append(last["duration_s"])
+        if last["returncode"] != 0: break
+    return {"exit_code":last["returncode"] if last["returncode"] is not None else 1,
+            "duration_seconds":sum(durations),"metrics":{"repetitions_run":len(durations),"durations_seconds":durations,"mean_duration_seconds":statistics.fmean(durations),"sandbox_mode":"docker","sandbox_warning":"digest_pinned_isolated_worker"},
+            "raw_stdout_tail":_tail(last["stdout"],raw_tail),"raw_stderr_tail":_tail(last["stderr"],raw_tail)}

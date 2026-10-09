@@ -1,0 +1,33 @@
+## Aider configuration for AgentNexus
+## Architect mode: plan-prep designs, daily-coder editor applies
+
+# Two-model architect/editor pattern (maps to KEEP-6 plan-prep → daily-coder)
+architect: true
+model: anthropic/claude-sonnet-4-5-20251001
+editor-model: anthropic/claude-haiku-4-5-20251001
+
+# Repository
+git: true
+gitignore: true
+auto-commits: false          # always explicit commit — matches AgentNexus audit requirement
+commit-prompt: "feat|fix|refactor|docs|test: <concise description>\n\nAgent: daily-coder (aider architect mode)\nScope: <files changed>"
+
+# Context management
+map-tokens: 4096             # repo map token budget (increase for large codebases)
+map-refresh: auto
+cache-prompts: true          # enable prompt caching — saves ~30% on repeated sessions
+
+# Conventions file — aider reads this before every edit
+conventions: CONVENTIONS.md
+
+# Output
+show-diffs: true             # always show unified diff after edits
+pretty: true
+stream: true
+
+# Cost control
+max-chat-history-tokens: 8192    # cap context history to control costs
+reasoning-effort: medium         # medium reasoning for sonnet; set 'high' for opus
+
+# Voice (disable in CI/headless environments)
+voice: false

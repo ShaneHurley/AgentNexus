@@ -1,11 +1,24 @@
 {
   "profiles": {
+    "XS": {
+      "total_tokens": 20000,
+      "max_calls": 10,
+      "research_lanes": 1,
+      "brainstorm_lanes": 0,
+      "frontier_calls": 0,
+      "rate_limit_calls": 10,
+      "rate_limit_window": 300,
+      "rate_limit_enabled": true
+    },
     "S": {
       "total_tokens": 40000,
       "max_calls": 12,
       "research_lanes": 1,
       "brainstorm_lanes": 0,
-      "frontier_calls": 0
+      "frontier_calls": 0,
+      "rate_limit_calls": 12,
+      "rate_limit_window": 300,
+      "rate_limit_enabled": true
     },
     "M": {
       "total_tokens": 80000,
@@ -13,21 +26,30 @@
       "research_lanes": 3,
       "brainstorm_lanes": 0,
       "frontier_calls": 1,
-      "early_stop_min_cards": 2
+      "early_stop_min_cards": 2,
+      "rate_limit_calls": 24,
+      "rate_limit_window": 300,
+      "rate_limit_enabled": false
     },
     "L": {
       "total_tokens": 140000,
       "max_calls": 40,
       "research_lanes": 5,
       "brainstorm_lanes": 1,
-      "frontier_calls": 1
+      "frontier_calls": 1,
+      "rate_limit_calls": 40,
+      "rate_limit_window": 300,
+      "rate_limit_enabled": false
     },
     "XL": {
       "total_tokens": 220000,
       "max_calls": 50,
       "research_lanes": 6,
       "brainstorm_lanes": 3,
-      "frontier_calls": 1
+      "frontier_calls": 1,
+      "rate_limit_calls": 50,
+      "rate_limit_window": 300,
+      "rate_limit_enabled": false
     }
   },
   "thresholds": {

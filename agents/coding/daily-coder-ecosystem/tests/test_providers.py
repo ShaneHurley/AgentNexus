@@ -7,6 +7,7 @@ from daily_coder.models import Invocation
 from daily_coder.providers.anthropic import AnthropicProvider
 from daily_coder.providers.gemini import GeminiProvider
 from daily_coder.providers.openai_compat import OpenAICompatibleProvider
+from daily_coder.providers.registry import build_provider
 
 
 class _FakeHandler(BaseHTTPRequestHandler):
@@ -33,20 +34,62 @@ class _FakeHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(data))); self.end_headers(); self.wfile.write(data)
 
 
+import io
+import urllib.parse
+from unittest.mock import patch
+
+
+class _FakeResponse:
+    def __init__(self, data):
+        self._fp = io.BytesIO(data)
+
+    def read(self, *args):
+        return self._fp.read(*args)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        pass
+
+
+def _mock_urlopen(req, timeout=None):
+    url = req.full_url
+    path = urllib.parse.urlparse(url).path
+    body = json.loads(req.data.decode("utf-8")) if req.data else {}
+    _FakeHandler.requests.append((path, body, dict(req.headers)))
+    if path.endswith("/chat/completions"):
+        payload = {"model": body["model"], "choices": [{"message": {"content": '{"verdict":"pass"}'}}],
+                   "usage": {"prompt_tokens": 11, "completion_tokens": 3}}
+    elif path.endswith("/messages"):
+        payload = {"model": body["model"], "content": [{"type": "text", "text": '{"verdict":"pass"}'}],
+                   "usage": {"input_tokens": 12, "output_tokens": 4}}
+    else:
+        payload = {"candidates": [{"content": {"parts": [{"text": '{"verdict":"pass"}'}]}}],
+                   "usageMetadata": {"promptTokenCount": 13, "candidatesTokenCount": 5}}
+    data = json.dumps(payload).encode()
+    return _FakeResponse(data)
+
+
 class TestProviderContracts(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.server = ThreadingHTTPServer(("127.0.0.1", 0), _FakeHandler)
-        cls.thread = threading.Thread(target=cls.server.serve_forever, daemon=True); cls.thread.start()
-        cls.base = f"http://127.0.0.1:{cls.server.server_address[1]}"
+        cls.patcher = patch("urllib.request.urlopen", side_effect=_mock_urlopen)
+        cls.patcher.start()
+        cls.base = "http://fake-provider.local"
 
     @classmethod
     def tearDownClass(cls):
-        cls.server.shutdown(); cls.server.server_close(); cls.thread.join(timeout=2)
+        cls.patcher.stop()
 
     def request(self, model="test-model"):
         return Invocation("run", "reviewer", "Return JSON", {"x": 1}, "mid", 123, "idem",
                           model=model, output_schema={"type": "object"})
+
+    def test_hosted_providers_require_credentials_before_invocation(self):
+        for name in ("openai", "openrouter", "anthropic", "gemini"):
+            with self.subTest(provider=name), self.assertRaisesRegex(ValueError, "credential"):
+                build_provider(name, config={}, secrets={})
 
     def test_openai_compatible_contract(self):
         provider = OpenAICompatibleProvider("key", self.base + "/v1")

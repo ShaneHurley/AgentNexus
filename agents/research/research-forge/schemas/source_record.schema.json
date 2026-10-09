@@ -69,6 +69,14 @@
       "type": "string",
       "enum": ["screen", "deep_read", "reference_only", "reject", "follow_citations"]
     },
+    "source_authenticity": {
+      "type": "string",
+      "enum": ["unverified", "synthetic_fixture"]
+    },
+    "content_availability": {
+      "type": "string",
+      "enum": ["not_read", "available", "empty", "unavailable", "failed"]
+    },
     "rejection_reason": { "type": ["string", "null"] }
   }
 }

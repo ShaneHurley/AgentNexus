@@ -1,0 +1,45 @@
+# Kiro Crew Workspace Configuration for AgentNexus
+version: "1.0"
+
+project:
+  name: "AgentNexus"
+  root: "."
+  description: "Evidence-first research and artifact-driven coding monorepo"
+
+memory:
+  backend: "local_sqlite"
+  storage_path: ".kirocrew/memory.db"
+  retention_days: 90
+  shared_context:
+    - "docs/architecture/AGENT_ECOSYSTEM_OVERVIEW.md"
+    - "AGENTS.md"
+    - "agents/ide/MANIFEST.yml"
+
+agents:
+  - id: "deep-researcher"
+    role: "Evidence Research Specialist"
+    goal: "Conduct comprehensive, read-only evidence research on codebase components and report citations"
+    tools: ["file_reader", "code_search", "web_search"]
+    allow_delegation: false
+    can_mutate_files: false
+
+  - id: "plan-reviewer"
+    role: "Adversarial Plan Skeptic"
+    goal: "Rigorously audit implementation plans for security flaws, regressions, and test gaps"
+    tools: ["file_reader"]
+    allow_delegation: false
+    can_mutate_files: false
+
+  - id: "daily-coder"
+    role: "Audited Codebase Implementer"
+    goal: "Apply minimal, test-backed code changes and run verification suites through ide-bridge"
+    tools: ["file_reader", "file_writer", "terminal_runner"]
+    allow_delegation: true
+    can_mutate_files: true
+    bridge_command: "python -m ide_bridge"
+
+schedules:
+  - id: "nightly_audit"
+    cron: "0 2 * * *"
+    task: "Verify that all IDE agent projections are synchronized and run unit test suites"
+    agent: "daily-coder"

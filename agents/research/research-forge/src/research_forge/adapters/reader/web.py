@@ -70,6 +70,12 @@ class WebDocumentReader:
         return ReaderResponse(
             access_level=level,
             chunks=chunks,
-            metadata={"mime": mime, "content_hash": hash_bytes(body), "url": url},
+                metadata={
+                    "mime": mime,
+                    "content_hash": hash_bytes(body),
+                    "url": url,
+                    "retrieval_status": "fixture",
+                    "synthetic": True,
+                },
             raw_byte_ref=f"ref://{hash_bytes(body)}",
         ).to_dict()

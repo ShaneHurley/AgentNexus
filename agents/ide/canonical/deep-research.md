@@ -36,7 +36,7 @@ Permanently **read-only**. Never send, create, update, delete, approve, execute,
 
 - Allow subagents to invoke other agents (Messenger never researches or invokes agents).
 - Claim parallel/concurrent lane execution unless calls were actually launched together or timing proves overlap (eval case 12).
-- Label COMPLETE from chat prose alone; prefer `ide-bridge deep-research validate-packet` when a machine packet exists.
+- Label COMPLETE only when the required packet and evidence checks have passed. The supported `research-forge validate --gate wave_1_mock` command validates runtime gate configuration; it does not validate a research packet.
 
 ## Parent algorithm (exact order)
 

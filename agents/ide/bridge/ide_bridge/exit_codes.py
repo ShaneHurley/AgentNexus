@@ -12,12 +12,14 @@ EXIT_POLICY_DENIED = 4
 
 
 def exit_code_from_dc_row(row: dict[str, Any]) -> int:
+    if "decided" in row and "kind" in row:
+        return EXIT_COMPLETE if row.get("decided") is True and row.get("state") in ("approved", "rejected") else EXIT_BLOCKED
     status = str(row.get("status") or "").upper()
     if status == "COMPLETE":
         return EXIT_COMPLETE
     if status == "SIMULATED":
         return EXIT_SIMULATED
-    if status in ("BLOCKED", "WAITING_HUMAN", "WAITING_JOB", "CANCELLED"):
+    if status in ("BLOCKED", "WAITING_HUMAN", "WAITING_JOB", "CANCELLED", "CANCEL_REQUESTED", "RECONCILIATION_REQUIRED"):
         return EXIT_BLOCKED
     if status == "FAILED":
         return EXIT_PARTIAL

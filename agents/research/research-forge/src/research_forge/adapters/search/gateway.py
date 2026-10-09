@@ -45,5 +45,6 @@ def gated_search(
             "target": target,
             "live": live,
         },
+        request={"query":query,"options":search_kwargs},
         fn=_run,
     )

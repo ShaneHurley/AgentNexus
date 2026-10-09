@@ -65,14 +65,14 @@ class UsageApiTests(unittest.TestCase):
         req = urllib.request.Request(
             self.base + "/api/agents/research-forge/runs",
             data=json.dumps({"request": "usage hook test"}).encode("utf-8"),
-            headers={"Content-Type": "application/json"},
+            headers={"Content-Type": "application/json", "Authorization": "Bearer test-token"},
             method="POST",
         )
         with urllib.request.urlopen(req, timeout=10) as resp:
             body = json.loads(resp.read().decode("utf-8"))
         run_id = body["run_id"]
 
-        with urllib.request.urlopen(self.base + "/api/usage", timeout=10) as resp:
+        with urllib.request.urlopen(urllib.request.Request(self.base + "/api/usage", headers={"Authorization": "Bearer test-token"}), timeout=10) as resp:
             usage = json.loads(resp.read().decode("utf-8"))
         events = [e for e in usage["events"] if e.get("run_id") == run_id]
         self.assertTrue(any(e.get("event") == "run_start" for e in events))
@@ -80,7 +80,7 @@ class UsageApiTests(unittest.TestCase):
     def test_usage_bucket_day(self):
         store = self.httpd.ctx["usage_store"]
         store.append("approve", "research-forge", run_id="R1", meta={})
-        with urllib.request.urlopen(self.base + "/api/usage?bucket=day", timeout=10) as resp:
+        with urllib.request.urlopen(urllib.request.Request(self.base + "/api/usage?bucket=day", headers={"Authorization": "Bearer test-token"}), timeout=10) as resp:
             data = json.loads(resp.read().decode("utf-8"))
         self.assertTrue(data["buckets"])
         self.assertIn("metrics", data)

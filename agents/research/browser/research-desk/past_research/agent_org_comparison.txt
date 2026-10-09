@@ -1,0 +1,53 @@
+{
+  "run_id": "cd9c01e0-8f58-48df-b766-f25036ab81cc",
+  "request": "task_id: 'agent-org-eval-01'\nbrowser_family: 'research-desk'\nbrowser_variant: 'phd'\nhost: 'openrouter'\nmode: 'RESEARCH'\nobjective: 'Research and evaluate how my current coding agent and research agent organizations compare to the best state-of-the-art agent organizations available.'\nin_scope: ['coding agent ecosystem', 'research agent ecosystem', 'industry best practices']\nconstraints: ['Provide an actual broken-out grade in each category', 'Provide specific recommendations on how to improve']\nacceptance_criteria: ['VERDICT_OR_FRAME included', 'CLAIMS_TABLE included with epistemic tags', 'BIBLIOGRAPHY provided', 'GAPS identified']\nrequired_output: {format: 'markdown', length: 'comprehensive', destination_or_paths: ['agents/research/browser/research-desk/past_research/agent_org_comparison.txt']}",
+  "repo": "/Users/shurley/Documents/AgentNexus",
+  "phase": "FAILED",
+  "profile": "S",
+  "config_hash": "856217470923c373063017a507ccfd6e5961858bf439dca702c0d4b40598b328",
+  "created": 1790798199.744422,
+  "updated": 1790798229.332484,
+  "status": "FAILED",
+  "revision": "fed0b0f87e43901fe5b2d32bc26faf906bbf8f51",
+  "tree_fingerprint": "9f9ccfea040e3c733f976494681b97dc9873b08557dba68c5b71f8745672595c",
+  "prompt_hash": "945bedb8e21442eabbd13c469c18b33b001532ddd56daf59646a0dcb2345e077",
+  "workflow_version": "2.1",
+  "live": 1,
+  "plan_hash": null,
+  "repair_cycles": 3,
+  "frontier_calls": 0,
+  "est_usd": 0.002853,
+  "cost": {
+    "run_id": "cd9c01e0-8f58-48df-b766-f25036ab81cc",
+    "profile": "S",
+    "tokens": 18344,
+    "calls": 12,
+    "est_usd": 0.002853,
+    "cap": {
+      "total_tokens": 40000,
+      "max_calls": 12,
+      "research_lanes": 1,
+      "brainstorm_lanes": 0,
+      "frontier_calls": 0,
+      "rate_limit_calls": 12,
+      "rate_limit_window": 300,
+      "rate_limit_enabled": true
+    },
+    "level": "ok",
+    "cost_per_verified_pass": null,
+    "today": {
+      "tokens": 153540,
+      "est_usd": 0.015301999999999994
+    },
+    "rate_limiter": {
+      "enabled": true,
+      "max_calls": 12,
+      "window_seconds": 300.0,
+      "calls_in_window": 3,
+      "remaining": 9,
+      "total_calls": 3,
+      "total_waits": 0,
+      "total_wait_seconds": 0.0
+    }
+  }
+}

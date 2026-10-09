@@ -66,7 +66,10 @@ class MockSearchAdapterV1:
         next_cursor = end if end < len(self._fixtures) else None
         return {
             "query": query,
-            "results": normalize_page(page),
+            "results": [
+                {**item, "source_authenticity": "synthetic_fixture"}
+                for item in normalize_page(page)
+            ],
             "cursor": start,
             "next_cursor": next_cursor,
             "adapter_id": self.adapter_id,

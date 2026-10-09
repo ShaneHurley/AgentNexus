@@ -62,7 +62,9 @@ class JobManager:
                 self.cancel(job_id, state="timeout")
                 return self.state.get_job(job_id)
             return self.state.get_job(job_id)
-        # The wrapper is gone but no result marker exists: treat this as an interrupted job.
+        # A dead wrapper does not prove its descendants stopped.
+        if pid and _group_alive(pid): return self.state.get_job(job_id)
+        # The group is gone but no result marker exists: interrupted job.
         tail = _tail(job["log_path"])
         self.state.finish_job(job_id, "failed", -1, sha256_text(tail))
         return self.state.get_job(job_id)
@@ -77,6 +79,12 @@ class JobManager:
                     os.killpg(job["pid"], signal.SIGTERM)
             except (ProcessLookupError, PermissionError, OSError):
                 pass
+        deadline=time.monotonic()+2
+        while job["pid"] and _group_alive(job["pid"]) and time.monotonic()<deadline:
+            time.sleep(.05)
+        if job["pid"] and _group_alive(job["pid"]):
+            # A request is not proof that the child or its descendants stopped.
+            return self.state.get_job(job_id)
         self.state.finish_job(job_id, state, None, None)
         return self.state.get_job(job_id)
 
@@ -86,6 +94,13 @@ class JobManager:
                 "argv": json.loads(job["argv"]), "duration_s": (job["finished"] or time.time()) - (job["started"] or time.time()),
                 "output_tail": _tail(job["log_path"])}
 
+
+def _group_alive(pid):
+    if os.name=="nt": return _alive(pid)
+    try: os.killpg(pid,0)
+    except ProcessLookupError: return False
+    except PermissionError: return True
+    return True
 
 def _alive(pid) -> bool:
     if os.name == "nt":

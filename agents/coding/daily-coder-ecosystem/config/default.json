@@ -1,6 +1,6 @@
 {
   "runtime_dir": ".daily-coder",
-  "provider": "mock",
+  "provider": "openrouter",
   "max_parallel_agents": 4,
   "max_tool_turns": 6,
   "role_tool_turns": {
@@ -53,7 +53,8 @@
     "require_clean_scope": true,
     "require_test_evidence_for_nontrivial": true,
     "require_alignment_pass": true,
-    "max_repair_cycles": 2
+    "max_repair_cycles": 2,
+    "gate_unresolved_questions": false
   },
   "evolution": {
     "enabled": true,
@@ -68,9 +69,9 @@
   },
   "providers": {
     "openai": { "base_url": "https://api.openai.com/v1", "default_model": "gpt-4o-mini", "tier_models": {"lowest":"gpt-4o-mini","mid":"gpt-4o-mini","high":"gpt-4o","frontier":"gpt-4o"} },
-    "anthropic": { "base_url": "https://api.anthropic.com/v1", "default_model": "claude-sonnet-4-5", "tier_models": {"lowest":"claude-haiku-4-5","mid":"claude-haiku-4-5","high":"claude-sonnet-4-5","frontier":"claude-opus-4-5"} },
-    "gemini": { "base_url": "https://generativelanguage.googleapis.com/v1beta", "default_model": "gemini-2.5-flash", "tier_models": {"lowest":"gemini-2.5-flash","mid":"gemini-2.5-flash","high":"gemini-2.5-pro","frontier":"gemini-2.5-pro"} },
-    "openrouter": { "base_url": "https://openrouter.ai/api/v1", "default_model": "openai/gpt-4o-mini", "tier_models": {"lowest":"openai/gpt-4o-mini","mid":"anthropic/claude-haiku-4.5","high":"anthropic/claude-sonnet-4.5","frontier":"anthropic/claude-opus-4.5"} },
+    "anthropic": { "base_url": "https://api.anthropic.com/v1", "default_model": "claude-3-5-sonnet-latest", "tier_models": {"lowest":"claude-3-5-haiku-latest","mid":"claude-3-5-haiku-latest","high":"claude-3-5-sonnet-latest","frontier":"claude-3-5-sonnet-latest"} },
+    "gemini": { "base_url": "https://generativelanguage.googleapis.com/v1beta", "default_model": "gemini-1.5-flash", "tier_models": {"lowest":"gemini-1.5-flash","mid":"gemini-1.5-flash","high":"gemini-1.5-pro","frontier":"gemini-1.5-pro"} },
+    "openrouter": { "base_url": "https://openrouter.ai/api/v1", "default_model": "anthropic/claude-3.5-sonnet", "tier_models": {"lowest":"anthropic/claude-3.5-haiku","mid":"anthropic/claude-3.5-haiku","high":"anthropic/claude-3.5-sonnet","frontier":"anthropic/claude-3.5-sonnet"} },
     "local": { "base_url": "http://127.0.0.1:11434/v1", "default_model": "qwen2.5-coder", "tier_models": {"lowest":"qwen2.5-coder","mid":"qwen2.5-coder","high":"qwen2.5-coder","frontier":"qwen2.5-coder"} }
   }
 }

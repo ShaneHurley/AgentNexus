@@ -8,12 +8,17 @@ version = "0.1.0"
 description = "Shared contracts, style profiles, and deterministic helpers for personal skills"
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = ["PyYAML>=6.0"]
+dependencies = [
+    "PyYAML>=6.0",
+    "jsonschema>=4.23.0",
+    "referencing>=0.35.0",
+]
 
 [project.scripts]
 personal-store = "agent_core.personal_store:main"
 writing-lint = "agent_core.writing_lint:main"
 agent-core = "agent_core.cli:main"
+agent-nexus = "agent_core.nexus_cli:main"
 
 [tool.setuptools.packages.find]
 where = ["."]

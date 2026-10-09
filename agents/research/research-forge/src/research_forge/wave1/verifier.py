@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import hashlib
 from typing import Any
 
 from research_forge.schemas_pkg.claim_status import legal_claim_transitions
@@ -14,9 +15,10 @@ class CitationVerifier:
     role_id = "citation_verifier"
     interface_version = WAVE1_INTERFACE_VERSION
 
-    def __init__(self, registry: SchemaRegistry) -> None:
+    def __init__(self, registry: SchemaRegistry, *, entailment_checker=None) -> None:
         assert_conforms(self, WAVE1_ROLE_CONTRACTS["citation_verifier"])
         self._registry = registry
+        self._entailment_checker = entailment_checker
 
     def verify(
         self,
@@ -25,11 +27,31 @@ class CitationVerifier:
         source: dict[str, Any],
         read_response: dict[str, Any],
         provenance_graph: dict[str, list[str]] | None = None,
+        live: bool = False,
     ) -> dict[str, Any]:
         verified = dict(card)
         notes: list[str] = []
         passed = True
 
+        retrieval = read_response.get("metadata") or {}
+        if live and (
+            source.get("source_authenticity") == "synthetic_fixture"
+            or retrieval.get("synthetic")
+            or retrieval.get("retrieval_status") == "fixture"
+        ):
+            passed = False
+            notes.append("synthetic_source")
+        elif retrieval.get("retrieval_status") in ("unavailable", "failed", "empty"):
+            passed = False
+            notes.append("source_unavailable")
+
+        if live:
+            corpus = read_response.get("content")
+            if corpus is None: corpus = " ".join(c.get("text", "") for c in read_response.get("chunks") or [])
+            expected = "sha256:" + hashlib.sha256(corpus.encode()).hexdigest()
+            if retrieval.get("retrieval_status") != "retrieved" or retrieval.get("synthetic") is not False or retrieval.get("content_hash") != expected or not read_response.get("canonical_url"):
+                passed = False
+                notes.append("missing_or_invalid_provenance")
         if source.get("publication_state") == "retracted":
             passed = False
             notes.append("retracted_source")
@@ -46,8 +68,9 @@ class CitationVerifier:
             passed = False
             notes.append("locator_not_retrievable")
 
-        entail = self._entailment(card, read_response)
-        if entail == "not_supported":
+        entail = (self._entailment_checker(card, source, read_response) if self._entailment_checker else
+                  ("not_supported" if live else self._entailment(card, read_response)))
+        if entail != "supports":
             passed = False
             notes.append("entailment_fail")
 
@@ -79,7 +102,11 @@ class CitationVerifier:
         meta = read_response.get("metadata") or {}
         if meta.get("error") == "inaccessible":
             return False
-        return bool(source.get("canonical_title"))
+        source_url = source.get("canonical_url") or source.get("url")
+        read_url = read_response.get("canonical_url")
+        if source_url and read_url and source_url != read_url:
+            return False
+        return bool(source_url or source.get("canonical_title"))
 
     def _locator_retrievable(self, card: dict[str, Any], read_response: dict[str, Any]) -> bool:
         loc = card.get("locator")
@@ -96,8 +123,13 @@ class CitationVerifier:
         if not corpus.strip():
             return "not_supported"
         tokens = [t for t in re.findall(r"[a-z0-9%]+", claim) if len(t) > 3][:5]
-        if tokens and sum(1 for t in tokens if t in corpus) >= max(1, len(tokens) // 2):
+        # Offline fixtures can verify exact paragraph attribution only. A substring
+        # inside a negation is never entailment; live acceptance requires a reviewed checker.
+        if claim.strip() and any(claim.strip() == c.get("text", "").strip().lower() for c in read_response.get("chunks") or []):
             return "supports"
+        # Similar wording is a lead for human review, not evidence of entailment.
+        if tokens and sum(1 for t in tokens if t in corpus) >= max(1, len(tokens) // 2):
+            return "inference"
         if "contradict" in claim and "contradict" in corpus:
             return "contradicts"
         return "not_supported"

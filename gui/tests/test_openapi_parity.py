@@ -66,7 +66,7 @@ class OpenApiParityTests(unittest.TestCase):
         cls._tmpdir.cleanup()
 
     def test_openapi_lists_all_static_hub_paths(self):
-        with urllib.request.urlopen(self.base + "/api/openapi.json", timeout=10) as resp:
+        with urllib.request.urlopen(urllib.request.Request(self.base + "/api/openapi.json", headers={"Authorization": "Bearer test-token"}), timeout=10) as resp:
             doc = json.loads(resp.read().decode("utf-8"))
         paths = set(doc.get("paths", {}))
         for p in HUB_OPENAPI_PATHS:

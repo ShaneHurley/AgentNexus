@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import unittest
+
 from research_forge.providers.mock_model import MockModel
 from research_forge.providers.mock_reader import MockReaderAdapter
 from research_forge.providers.mock_search import MockSearchAdapter
@@ -26,3 +28,18 @@ def test_mock_reader_access_levels() -> None:
     abstract = r.read("https://example.org/b")
     assert full["access_level"] == "full"
     assert abstract["access_level"] == "abstract"
+
+
+class TestMockProviders(unittest.TestCase):
+    def test_mock_model(self) -> None:
+        test_mock_model_deterministic()
+
+    def test_mock_search(self) -> None:
+        test_mock_search_pagination()
+
+    def test_mock_reader(self) -> None:
+        test_mock_reader_access_levels()
+
+
+if __name__ == "__main__":
+    unittest.main()

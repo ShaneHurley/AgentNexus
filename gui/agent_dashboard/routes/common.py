@@ -35,11 +35,10 @@ def ctx(handler: BaseHTTPRequestHandler) -> dict[str, Any]:
 
 def authorized(handler: BaseHTTPRequestHandler) -> bool:
     c = ctx(handler)
-    if not c["auth_required"]:
-        return True
     header = handler.headers.get("Authorization", "")
     token = header[7:] if header.startswith("Bearer ") else handler.headers.get("X-Api-Token", "")
-    return secrets.compare_digest(token or "", c["token"])
+    expected = c.get("token", "")
+    return bool(expected) and secrets.compare_digest((token or "").encode("utf-8"), expected.encode("utf-8"))
 
 
 def send(handler: BaseHTTPRequestHandler, code: int, payload: Any, content_type: str = "application/json"):

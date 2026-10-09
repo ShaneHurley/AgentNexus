@@ -43,9 +43,10 @@ class ExperimentRunner:
 
     def _resolve(self, rel: str) -> Path:
         p = Path(rel)
-        if not p.is_absolute():
-            return (self.workspace_root / p).resolve()
-        return p.resolve()
+        resolved = (self.workspace_root / p).resolve() if not p.is_absolute() else p.resolve()
+        if not resolved.is_relative_to(self.workspace_root):
+            raise ExperimentRunnerError("experiment input escapes workspace")
+        return resolved
 
     def _check_gates(
         self,
@@ -95,6 +96,7 @@ class ExperimentRunner:
                 self._resolve(start),
                 repetitions=int(proposal.get("repetitions", 1)),
                 raw_tail=raw_tail,
+                image=self.cfg.get("isolated_image"),
             )
         raise ExperimentRunnerError(f"unsupported kind: {kind}")
 
@@ -192,11 +194,11 @@ class ExperimentRunner:
         exp_dir = self.store.exp_dir(experiment_id)
         log_path = exp_dir / "job.log"
         # Spawn worker: python -m research_forge.experiments.worker EXP-ID
-        env = os.environ.copy()
+        env = {k:os.environ[k] for k in ("PATH",) if k in os.environ}
         env["RF_WORKSPACE"] = str(self.workspace_root)
         env["RF_PACKAGE_ROOT"] = str(self.package_root)
         proc = subprocess.Popen(
-            [sys.executable, "-m", "research_forge.experiments.worker", experiment_id],
+            [sys.executable, "-I", "-m", "research_forge.experiments.worker", experiment_id],
             cwd=str(self.workspace_root),
             env=env,
             stdout=log_path.open("w", encoding="utf-8"),

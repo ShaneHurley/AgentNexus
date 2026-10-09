@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "fixtures": [
+    {
+      "path": "agents/shared/agent-core/tests/test_skills.py",
+      "sha256": "cfb716058fdc101814e1f0bb5bcc08c2f67b765a238c632622d63fc85eafc4ec",
+      "spans": [
+        {
+          "start": 6219,
+          "end": 6275
+        },
+        {
+          "start": 6291,
+          "end": 6331
+        },
+        {
+          "start": 6344,
+          "end": 6364
+        }
+      ]
+    },
+    {
+      "path": "agents/shared/agent-core/tests/test_adversarial_skills.py",
+      "sha256": "dbe94f73b0846a58938caa74325dc510d2728fbbd2d853f9f543651f59ab92f7",
+      "spans": [
+        {
+          "start": 7773,
+          "end": 7793
+        },
+        {
+          "start": 8231,
+          "end": 8271
+        },
+        {
+          "start": 8289,
+          "end": 8329
+        },
+        {
+          "start": 8728,
+          "end": 8773
+        }
+      ]
+    },
+    {
+      "path": "agents/research/research-forge/tests/test_live_providers.py",
+      "sha256": "74e1f06457cecdeacad19844ecdf04f28f11ebf8b743124c13c6b9e8a3433682",
+      "spans": [
+        {
+          "start": 4473,
+          "end": 4499
+        }
+      ]
+    },
+    {
+      "path": "implementing/deepseek/README.md",
+      "sha256": "a3b53be6d8aa3a07ce0d7efd306845a496ed18dd46affbd043bc2c033182c33e",
+      "spans": [
+        {
+          "start": 2051,
+          "end": 2082
+        }
+      ]
+    },
+    {
+      "path": "implementing/glm/api_setup.md",
+      "sha256": "33252d959cbd9f86d0a850ca7061887e95b7ab21a58e8f323c1642d5ec3ddb8e",
+      "spans": [
+        {
+          "start": 289,
+          "end": 317
+        }
+      ]
+    },
+    {
+      "path": "implementing/kimi/README.md",
+      "sha256": "143bee7c2291689869487347375e1ee0104b75045332605913532abe969df29e",
+      "spans": [
+        {
+          "start": 1934,
+          "end": 1965
+        }
+      ]
+    }
+  ]
+}

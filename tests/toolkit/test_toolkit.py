@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import unittest
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+from ai_agents_repo.discovery import repo_root
+from ai_agents_repo.paths import skills_root
+
+ROOT = repo_root()
+SKILLS = skills_root(root=ROOT)
 
 
 class ToolkitTests(unittest.TestCase):
@@ -21,12 +24,12 @@ class ToolkitTests(unittest.TestCase):
             "claim-auditor",
             "visualization-specifier",
         ):
-            path = ROOT / "skills" / "shared" / name / "SKILL.md"
+            path = SKILLS / "shared" / name / "SKILL.md"
             self.assertTrue(path.is_file(), name)
 
     def test_structured_data_forbids_mental_math(self) -> None:
         text = (
-            ROOT / "skills" / "shared" / "structured-data-evaluator" / "SKILL.md"
+            SKILLS / "shared" / "structured-data-evaluator" / "SKILL.md"
         ).read_text(encoding="utf-8")
         self.assertIn("mental math", text.lower())
 

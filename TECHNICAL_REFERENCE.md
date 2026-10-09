@@ -1,0 +1,92 @@
+# AgentNexus technical reference
+
+This document describes the current local architecture and the Phase 1–3 trust-boundary and lifecycle changes. It is an implementation reference, not a claim that all planned runtime consolidation is complete.
+
+The GitHub Actions workflow at `.github/workflows/agentnexus.yml` runs the shared-contract, isolated-runner, runtime-grant, retrieval, policy, execution-boundary, adapter-status, and generated-agent checks.
+
+## Current authorities
+
+- IDE roster and generated projections: `agents/ide/MANIFEST.yml`, canonical agents, and the import/synchronization scripts. Edit canonical or source-of-truth files, then regenerate projections.
+- Daily Coder execution: `agents/coding/daily-coder-ecosystem/config`, role metadata, `ToolBroker`, and `PolicyGateway`.
+- Research Forge Wave 1: `agents/research/research-forge/config`, the Wave 1 orchestrator, policy gateway, and its persisted run artifacts.
+- Shared capability metadata: `agents/shared/agent-core/registry.yaml`.
+- Dashboard adapters: `gui/config/agents.json` and `gui/agent_dashboard/adapters`.
+
+The six user-facing orchestrators remain `deep-research`, `research-messenger`, `plan-prep`, `use-master`, `daily-coder`, and `researcher`. Daily is a personal profile and capability set, not another orchestrator.
+
+## Research evidence and retrieval
+
+Live search returns provider-retrieved results or an empty result with `metadata.retrieval_status` set to `unavailable`, `failed`, `empty`, or `retrieved`. It does not use a language model or deterministic text to invent sources. Live reads use the same status vocabulary; configured test fixtures carry `synthetic: true` and status `fixture`. The Wave 1 verifier rejects fixture content in live runs. A retrieval status describes availability, while `verifier_status` and `claim_status` describe claim review; none substitutes for the others.
+
+Source authenticity, content availability, and claim review are separate fields in the research record. Provider results remain `unverified` until authenticated; mock/test fixtures are labeled `synthetic_fixture`. Reads record whether content is available, empty, unavailable, or failed, and update the source content hash and access level. Lexical overlap is a review hint. It does not establish verified entailment. Live evidence acceptance requires explicit non-synthetic retrieval provenance, matching source identity and content hash, and a runtime-injected reviewed entailment checker. The default live verifier rejects claims without that checker. Similar wording, and quoted text embedded in a negation, cannot produce accepted findings. Offline exact-paragraph attribution remains a fixture check, not proof of real-world claim truth.
+
+## Permission boundaries
+
+Daily Coder routes `tests.run` and `shell.readonly` exclusively through `agent_core.isolation.DockerRunner`. A policy label or arbitrary registered callback cannot enable either operation. Configure `execution_policy.image` with a reviewed image digest; without it, execution is denied. Planned verification commands execute synchronously through PolicyGateway in this backend; detached host jobs remain disabled. Typed filesystem inspection and constrained Git inspection work without Docker.
+
+The worker uses a disposable filtered workspace copy, mounted read-only, with no network, capabilities, elevated user, inherited credentials, privileged mode, or host socket mount. Hidden stores, secret/credential paths, symlinks and files matching the existing credential scanner are omitted. Pattern scanning is supplementary and is not a completeness claim. Resource limits constrain CPU, memory, processes and scratch space. Images are never pulled implicitly. Timeouts force removal; unconfirmed removal is an error. Results do not apply worker filesystem changes to the host. Engineering edits still pass through the approved write gateway. The local Docker daemon was stopped during implementation; transport/control tests ran offline, but real container behavior remains unverified on this machine.
+
+RF code experiments use the same worker and require `isolated_image` in experiment configuration. Typed dataset computations and runtime-owned artifact recording retain their existing service, approval and ledger paths. Input and artifact paths must remain in the workspace. Background runtime workers receive a small explicit environment rather than the full host environment.
+
+Research Forge uses `config/policies.yaml` role-to-tool allowlists in addition to registered tool manifests, operation restrictions, workspace-contained file targets (including resolved symlinks), confidentiality rules, and live-mode gates. Unknown roles and undeclared role/tool pairs fail closed. Wave 1 runtime persistence remains controlled by the orchestrator; research agents do not gain arbitrary file-write authority.
+
+Research Forge defaults to shared supervision; Daily Coder enables it with `supervised: true`. Their execution and cancellation acknowledgment come from durable supervisor state. Daily Task and explicitly selected legacy inbox adapters return queue/intent acknowledgment only and never imply confirmed worker termination.
+
+The redacted response steps for the credential-like value found in historical request material are tracked in [the remediation checklist](docs/security/credential-exposure-remediation.md). The credential was not tested; owner verification and revocation remain pending.
+
+## Validation scope and known gaps
+
+Research Forge's supported CLI composes Wave 0 and Wave 1. Individual later-wave modules do not constitute a complete multi-wave pipeline. A mock run exercises fixtures and must not be described as live retrieval. `research-forge validate --gate wave_1_mock` validates the runtime gate, not a research packet. Supervised decision gates select the RF package explicitly. Native RF commands require the RF package as working directory; root invocation still reports missing decision configuration. Missing or invalid gates deny execution.
+
+Durable sessions and the shared supervisor are implemented for DC and RF Wave 1. ModelResolver, unified knowledge memory, and SecretBroker remain planned work. See the architecture roadmap and the relevant runtime docs before treating these contracts as implemented.
+
+
+## Shared contracts and source precedence
+
+`agent_core.contract_schema`, `contracts`, `registry_snapshot` and `runtime_authority` define the versioned authority interface. Compilation imports the IDE manifest/canonical prompts, DC tool configuration/role metadata/prompts/skills/schemas, RF policy/manifests/schemas, shared role registry/contracts, and personal skill catalog. Their content hashes form one snapshot. Contradictory DC tool declarations, duplicate IDs, invalid contracts, incompatible dependencies and unknown schema references fail closed. Existing RF roles with missing schemas are explicitly quarantined as inactive, with compilation warnings. Shared experimental services are installed but inactive; installation creates no execution grant. Prompt-only IDE specialists acquire no inferred tools.
+
+The six orchestrators are unchanged. DC workers are leaf roles, including its bounded Master specialist. RF's runtime dispatcher can invoke its declared specialists; workers cannot delegate. Messenger has no delegation or execution grants. Memory operations are denied until a memory service and explicit namespace grants are implemented.
+
+Effective grants intersect six named layers: user, role, profile, parent, runtime and approval, plus the immutable compiled role ceiling. Existing entry points explicitly translate legacy invocation into the existing role capabilities inside the selected workspace; this migration does not infer new authority from prompts or model output. Optional `task_grants` supplies all six layers and can only narrow them. Tool paths, skill selection and dispatch are checked before access. Existing PolicyGateway also checks the current plan hash and SQLite approval for engineering writes. Budget managers retain execution accounting; grant resource ceilings are available for deterministic narrowing, and the shared supervisor additionally enforces root/descendant reservations.
+
+`agent-core compile-registry` publishes a content-addressed candidate without activating it. `activate-registry` requires an explicit role grant ceiling file; it is also the rollback interface. Publication and pointer replacement are atomic. Later activation intersects the persisted current ceiling and retains revocations, so rollback cannot restore revoked access or increase resource limits. Runtime discovery reads `.agentnexus/registry`, or the explicit `AGENTNEXUS_REGISTRY_STORE` override. An active snapshot must match installed source hashes and cannot broaden source capabilities. With no activated snapshot, the compiled legacy configuration is the enforced baseline.
+
+DC stores `registry_hash` in SQLite schema version 6 and saves the complete snapshot. Migration preserves rows and creates a SQLite backup before upgrading; this runtime refuses newer schemas. RF serializes `registry_hash` with Wave 1 state and saves its snapshot. Both refuse unpinned legacy recovery or incompatible snapshot changes. Start a new run rather than replaying legacy work under changed authority. Recovery also checks engine configuration and durable receipts. Automatic migration of incompatible execution policy is unavailable.
+
+Unauthorized capabilities are absent from compact discovery results. Loading a skill requires an effective grant and a contained active skill path. Discovery or installation is not permission to execute it. Pinned snapshots and live revocations remain separate: current restrictions apply even to previously authorized runs.
+
+
+## Phase 3: durable supervision
+
+`agent_core.supervisor.Supervisor` links sessions and shared run UUIDs to retained DC/RF engines. `agent-nexus new`, `sessions`, `run` and `resume` call this service, with status, cancellation, run listing and SQLite backup utilities. Bridge supervised flags and dashboard adapters use the same service. DC's native PolicyGateway and approved plan remain authoritative for engineering writes; research gains no engineering write authority.
+
+Shared execution SQLite schema version 2 stores identity/project/profile sessions, immutable configuration/registry hashes, parent links, native aliases, reservations, call outcomes, accepted checkpoints, events and artifact manifests. Migrations use consistent backups and checksums and refuse unsupported newer schemas. Explicit legacy import retains provenance and partial-completeness labels, recorded usage and uncertain exposure. Incomplete legacy execution is blocked from automatic replay. Profiles are identifiers here; validated capability profiles are Phase 6 work.
+
+OS-owned process locks serialize each root's native execution across local processes and release on process death. Source configuration, public execution options, live authorization, registry and native provider/prompt/workflow pins are checked before resume. Child authority must match the parent's pins, workspace may narrow, deadlines and resource ceilings cannot expand. Duplicate task keys, excessive depth and child concurrency are denied. Automatic cross-workflow handoffs remain Phase 6 work.
+
+Reservations are persisted before native execution. Root accounting includes descendants. Admission conservatively requires the native run's whole remaining lifetime grant to fit available root headroom; native engines also enforce the supplied ceilings. Confirmed cumulative usage settles only the new segment delta. Estimates remain labeled estimates; unknown remote outcomes retain exposure instead of becoming zero. Supported RF Wave 1 search/read adapters make HTTP retrieval calls and no model invocations, so their known model token usage is zero. Future model-backed stages must supply durable token receipts rather than inherit that assumption. Native settled-but-unreceipted provider results block replay. Recovery after settlement but before a shared checkpoint reconstructs authoritative terminal/human state without another engine invocation.
+
+DC SQLite schema version 6 records tool receipts before side effects and accepted phase checkpoints. Approved file writes can reconcile against their final content hashes without replaying the write. Other uncertain tool operations remain blocked. RF Wave 1 records call IDs, reservations, cached results, budget updates and checkpoints in a workspace-local SQLite journal; journal state supersedes stale JSON. Native recovery continues accepted stages and never rewinds arbitrary work to charter. Supported integration remains Wave 1; individual later-wave modules are not a complete pipeline.
+
+STOP persists intent independently of executor locks, blocks new dispatch and signals descendants. Cancellation acknowledgment requires native safe-boundary confirmation, settled calls and stopped descendants. The isolated Docker runner terminates its client process group and requires successful container removal before reporting confirmation. Failed cleanup raises reconciliation rather than claiming termination. Providers without cancellation confirmation remain uncertain; socket closure does not establish stopped billing. Remote exactly-once execution and automatic provider reconciliation are not promised.
+
+Dashboard Research Forge runs execute through the supervisor. Daily Coder enables this with `supervised: true`; older HTTP configurations remain supported. Daily Task remains an explicitly labeled inbox workflow. GUI status comes from accepted checkpoints, and cancellation labels distinguish intent from acknowledgment. The supervisor is a local library/CLI service, not a newly exposed unauthenticated network API.
+
+
+## Adversarial review corrections
+
+The Phase 1–3 review added regression coverage for distinct RF search/page/locator identities, authorization on cached reads, monotonic budget recovery, native DC role/schema pins, stale-write denial, final RF deadlines, descriptor-bound worker snapshots, journal symlink refusal, blocked ancestor dispatch, terminal cancellation races, real v1 migration, invalid accounting categories and interrupted legacy import. Partial imports begin with uncertain exposure and never gain automatic replay authority. Shared-to-native DC creation uses the shared UUID so a crash before alias linkage cannot create another native execution.
+
+Supervised GUI starts carry explicit live authorization and a per-request provider. Automatic sessions are bound to individual workspaces and selected under a lock; explicit session boundaries remain enforced. Supervised mock status remains `SIMULATED` even with legacy `--no-mark-simulated`; that flag affects the legacy wrapper only.
+
+RF live text retrieval now uses a public-only transport: HTTP(S), standard web ports, no URL credentials or ambient proxy/cookies, all DNS answers checked, numeric endpoint pinning, original-host TLS authentication, redirect revalidation and a 400 KB body ceiling. A bounded DNS worker pool and owned-socket shutdown watchdog enforce the call deadline, including headers and TLS. Denied or failed retrieval remains empty/failed evidence. These controls have offline adversarial coverage; real provider cancellation/accounting and real Docker execution remain unverified.
+
+## ANX-0 locked development and publication
+
+`pyproject.toml` defines a virtual uv workspace retaining six editable packages. `uv sync --all-packages --locked` installs the reviewed lock; supported Python remains 3.10+. The macOS launcher fails visibly on installation errors and uses supported dependencies.
+
+The dashboard requires an explicitly supplied `AGENT_DASHBOARD_TOKEN`; browser requests use Authorization headers and the token stays in memory. Host and Origin must match the bound endpoint. Minimal health remains public. A missing private agents.json reads the adjacent example without creating files.
+
+`python -m agent_core.release_preflight --base origin/main --fixture-manifest config/publication-fixtures.json` inventories source and scans the index, working tree, untracked files and new history with bounded reads. It emits locations, never matched secret content. Exact synthetic fixture spans require file hashes; editing a fixture invalidates approval. Pattern scanning is supplementary, not proof that all private data is absent.
+
+Historical credential-owner revocation remains pending. Original history and backups are local recovery material, excluded from the publication branch. No paid provider calls or real isolated-runner smoke test were performed.

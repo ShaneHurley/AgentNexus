@@ -1,0 +1,56 @@
+{
+  "models": [
+    {
+      "title": "Gemini 2.0 Flash (Free Tier)",
+      "provider": "gemini",
+      "model": "gemini-2.0-flash",
+      "apiKey": "[GET_FREE_KEY_FROM_AISTUDIO.GOOGLE.COM]"
+    },
+    {
+      "title": "DeepSeek V3 (Low Cost / Free Trial)",
+      "provider": "deepseek",
+      "model": "deepseek-chat",
+      "apiKey": "[YOUR_DEEPSEEK_API_KEY]"
+    },
+    {
+      "title": "DeepSeek R1 Reasoning",
+      "provider": "deepseek",
+      "model": "deepseek-reasoner",
+      "apiKey": "[YOUR_DEEPSEEK_API_KEY]"
+    },
+    {
+      "title": "Local Ollama DeepSeek Coder",
+      "provider": "ollama",
+      "model": "deepseek-coder-v2:16b"
+    }
+  ],
+  "tabAutocompleteModel": {
+    "title": "Gemini Flash Autocomplete",
+    "provider": "gemini",
+    "model": "gemini-2.0-flash",
+    "apiKey": "[GET_FREE_KEY_FROM_AISTUDIO.GOOGLE.COM]"
+  },
+  "customCommands": [
+    {
+      "name": "deep-research",
+      "prompt": "Act as deep-research from AgentNexus. Conduct an evidence-first, read-only investigation into the selected code or problem. Cite file paths, line ranges, and factual evidence without modifying any code.",
+      "description": "Evidence-first deep research"
+    },
+    {
+      "name": "plan-prep",
+      "prompt": "Act as plan-prep from AgentNexus. Survey dependencies, symbols, and architectural patterns relevant to this request. Output a structured Planning Context Report.",
+      "description": "Pre-planning codebase reconnaissance"
+    },
+    {
+      "name": "plan-reviewer",
+      "prompt": "Act as plan-reviewer from AgentNexus. Review this plan adversarially. Look for security flaws, missing test cases, regression hazards, and wasteful token patterns. Return PASS or REVISE.",
+      "description": "Adversarial plan review"
+    }
+  ],
+  "contextProviders": [
+    { "name": "diff" },
+    { "name": "terminal" },
+    { "name": "code" },
+    { "name": "docs" }
+  ]
+}

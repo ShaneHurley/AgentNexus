@@ -47,7 +47,7 @@ def test_gateway_wraps_search(repo_root: Path) -> None:
         gw,
         budget,
         MockSearchAdapterV1(),
-        role="test",
+        role="orchestrator",
         phase="search",
         query="topic",
         live=False,

@@ -7,7 +7,7 @@ from __future__ import annotations
 import json
 from collections import defaultdict
 from .base import Provider
-from .http import (post_json, extract_json, json_instruction_compact, tool_result_text,
+from .http import (post_json, extract_json, json_instruction, tool_result_text,
                    ProviderError)
 from ..models import InvocationResult, ToolCall
 
@@ -15,7 +15,8 @@ class OpenAICompatibleProvider(Provider):
     name = "openai"
 
     def __init__(self, api_key=None, base_url="https://api.openai.com/v1", default_model="gpt-4o-mini",
-                 timeout=180, extra_headers=None, supports_json_response_format=True):
+                 timeout=180, extra_headers=None, supports_json_response_format=True, name="openai"):
+        self.name = name
         self.api_key = api_key
         self.base_url = base_url.rstrip("/")
         self.default_model = default_model
@@ -31,7 +32,7 @@ class OpenAICompatibleProvider(Provider):
 
     def _build_messages(self, request):
         messages = [
-            {"role": "system", "content": request.prompt + json_instruction_compact(request.output_schema)},
+            {"role": "system", "content": request.prompt + json_instruction(request.output_schema)},
             {"role": "user", "content": json.dumps(request.input_packet, sort_keys=True, default=str)},
         ]
         by_turn = defaultdict(list)
@@ -48,7 +49,7 @@ class OpenAICompatibleProvider(Provider):
                             "id": item["call_id"],
                             "type": "function",
                             "function": {
-                                "name": item.get("tool") or "",
+                                "name": (item.get("tool") or "").replace(".", "_"),
                                 "arguments": json.dumps(item.get("arguments") or {}, default=str),
                             },
                         }
@@ -71,7 +72,7 @@ class OpenAICompatibleProvider(Provider):
         messages = self._build_messages(request)
         payload = {"model": model, "messages": messages, "max_tokens": request.max_output_tokens, "temperature": 0}
         if request.tools:
-            payload["tools"] = [{"type": "function", "function": t} for t in request.tools]
+            payload["tools"] = [{"type": "function", "function": dict(t, name=t.get("name", "").replace(".", "_"))} for t in request.tools]
             payload["tool_choice"] = "auto"
         elif self.supports_json_response_format:
             payload["response_format"] = {"type": "json_object"}
@@ -85,10 +86,16 @@ class OpenAICompatibleProvider(Provider):
                 data = post_json(f"{self.base_url}/chat/completions", payload, headers, self.timeout)
             else:
                 raise
+        reverse_map = {}
+        if request.tools:
+            for t in request.tools:
+                name = t.get("name", "")
+                reverse_map[name.replace(".", "_")] = name
+                
         choice = (data.get("choices") or [{}])[0]
         message = choice.get("message") or {}
         usage = data.get("usage") or {}
-        calls = [ToolCall(name=c["function"]["name"], arguments=json.loads(c["function"].get("arguments") or "{}"),
+        calls = [ToolCall(name=reverse_map.get(c["function"]["name"], c["function"]["name"].replace("_", ".")), arguments=json.loads(c["function"].get("arguments") or "{}"),
                           call_id=c.get("id", ""))
                  for c in (message.get("tool_calls") or [])]
         output = None if calls else extract_json(message.get("content"))

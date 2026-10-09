@@ -36,7 +36,7 @@ class HomeSnapshotTests(unittest.TestCase):
         cls._tmpdir.cleanup()
 
     def test_snapshot_returns_agents(self):
-        with urllib.request.urlopen(self.base + "/api/home/snapshot", timeout=15) as resp:
+        with urllib.request.urlopen(urllib.request.Request(self.base + "/api/home/snapshot", headers={"Authorization": "Bearer test-token"}), timeout=15) as resp:
             data = json.loads(resp.read().decode("utf-8"))
         self.assertIn("agents", data)
         self.assertGreaterEqual(len(data["agents"]), 2)

@@ -1,0 +1,24 @@
+# Document Reviewer — example task packet (independent pass after Writing Studio)
+browser_family: document-reviewer
+browser_variant: ""  # omit for main; or docx-adversarial | pdf-adversarial | etc.
+task_id: doc-review-2025-001
+objective: >
+  Independent adversarial review of the attached product brief before external send.
+  Try to disprove readiness; do not rewrite the full document.
+acceptance_criteria:
+  - All material quantitative claims have visible in-doc source or are flagged UNKNOWN
+  - Target audience (PM + eng lead) can identify decision ask and next step within first two pages
+  - No contradictory scope statements between summary and requirements section
+  - Author writing-studio SELF_REVIEW claims cross-checked; overconfidence flagged if found
+audience: Product managers and engineering leads (internal)
+constraints:
+  - Review supplied export only; no web search unless user adds tabs to packet
+  - Adversarial review does not execute fixes
+prior_artifact_ref: "writing-studio/email variant output + SELF_REVIEW block (paste below)"
+inputs:
+  files:
+    - name: Product_Brief_v3.docx
+      locator_note: "attached in chat"
+  urls: []
+quality_claim: "Author marked READY_TO_SEND yes after SELF_REVIEW"
+compliance_hooks: []  # e.g. brand-legal, HIPAA — list if relevant

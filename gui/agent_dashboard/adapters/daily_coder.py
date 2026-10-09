@@ -46,6 +46,10 @@ class DailyCoderAdapter:
         self.port = parsed.port or 8765
         self._proc: subprocess.Popen | None = None
         self._managed_token: str | None = None
+        from .supervised import SupervisorAccess
+        self._supervised = options.get("supervised", False)
+        self._supervisor = SupervisorAccess("daily-coder", options,
+                                           Path(options.get("repository_root") or Path(__file__).resolve().parents[3]))
 
     def capabilities(self) -> list[str]:
         return [
@@ -74,6 +78,13 @@ class DailyCoderAdapter:
             raise RuntimeError(f"daily-coder unreachable at {self.base_url}: {exc.reason}") from exc
 
     def health(self) -> dict[str, Any]:
+        if self._supervised:
+            try:
+                supervisor = self._supervisor.supervisor()
+                supervisor.sessions()
+                return {"online": True, "detail": {"supervised": True, "directory": str(supervisor.directory)}}
+            except Exception as exc:
+                return {"online": False, "detail": str(exc)}
         try:
             payload = self._request("GET", "/api/health", auth=False)
             return {"online": True, "detail": payload}
@@ -90,6 +101,16 @@ class DailyCoderAdapter:
             return False
 
     def backend_status(self) -> dict[str, Any]:
+        if self._supervised:
+            health = self.health()
+            online = bool(health.get("online"))
+            return {"startable": False, "stoppable": False, "online": online,
+                    "auth_ok": online, "managed": False,
+                    "state": "ready" if online else "down",
+                    "message": "Runs and approvals use the local supervisor and native runtime.",
+                    "base_url": None, "has_token": False, "pid": None,
+                    "native_api_online": self._port_open(), "provider": self.provider,
+                    "bridges": self.bridge_availability()}
         health = self.health()
         online = bool(health.get("online"))
         managed = self._proc is not None and self._proc.poll() is None
@@ -399,10 +420,15 @@ class DailyCoderAdapter:
 
     # --- runs / approvals -------------------------------------------------
     def list_runs(self, limit: int = 50) -> list[dict[str, Any]]:
+        if self._supervised:
+            return [self._supervisor.normalize(row, self.id) for row in
+                    self._supervisor.supervisor().runs(engine="daily-coder", limit=limit)]
         runs = self._request("GET", f"/api/runs?limit={int(limit)}")
         return [self._normalize(r) for r in runs]
 
     def get_run(self, run_id: str) -> dict[str, Any]:
+        if self._supervised and self._supervisor.owns(run_id):
+            return self._supervisor.normalize(self._supervisor.supervisor().status(run_id), self.id)
         return self._normalize(self._request("GET", f"/api/runs/{run_id}"))
 
     def start_run(self, request: str, **kwargs: Any) -> dict[str, Any]:
@@ -413,6 +439,18 @@ class DailyCoderAdapter:
             repo = str((self.repo_root / str(repo)).resolve())
         else:
             repo = str(Path(str(repo)).resolve()) if repo else str(self.repo_root)
+        if self._supervised:
+            forced = kwargs.get("forced_subagents") or []
+            if forced:
+                names = forced if isinstance(forced, list) else [forced]
+                request += "\n\n[forced_subagents: " + ", ".join(str(name) for name in names) + "]"
+            live = kwargs.get("mode") == "live"
+            from daily_coder.providers.registry import PROVIDERS
+            provider=kwargs.get("model") or self.provider
+            if provider not in PROVIDERS: raise ValueError("Unknown provider selected for this request")
+            if provider in ("command", "http"):
+                raise ValueError("Configured command/HTTP providers require the native API adapter")
+            return self._supervisor.start(request, Path(repo), live=live, provider=provider)
         body = {"request": request, "repo": repo}
         forced = kwargs.get("forced_subagents")
         if forced:
@@ -432,17 +470,36 @@ class DailyCoderAdapter:
         return result
 
     def approve(self, run_id: str, *, reject: bool = False, note: str | None = None, kind: str = "plan") -> dict[str, Any]:
+        if self._supervised and self._supervisor.owns(run_id):
+            from daily_coder.state_store import StateStore
+            supervisor = self._supervisor.supervisor()
+            native_id = supervisor.status(run_id)["legacy_id"]
+            store = StateStore(supervisor.repository / "agents/coding/daily-coder-ecosystem/.daily-coder/state.sqlite")
+            native = store.get(native_id)
+            decided = store.decide_approval(native_id, kind, native.get("plan_hash"),
+                                            "rejected" if reject else "approved", "agent-dashboard", note)
+            return {"run_id": run_id, "legacy_id": native_id, "kind": kind, "decided": decided,
+                    "state": store.approval_state(native_id, kind, native.get("plan_hash"))}
         return self._request("POST", f"/api/runs/{run_id}/approve", {
             "reject": reject, "note": note, "kind": kind, "actor": "agent-dashboard",
         })
 
     def resume(self, run_id: str) -> dict[str, Any]:
+        if self._supervised and self._supervisor.owns(run_id):
+            return self._supervisor.resume(run_id)
         return self._request("POST", f"/api/runs/{run_id}/resume", {})
 
     def cancel(self, run_id: str) -> dict[str, Any]:
+        if self._supervised and self._supervisor.owns(run_id):
+            return self._supervisor.cancel(run_id)
         return self._request("POST", f"/api/runs/{run_id}/cancel", {})
 
     def pending_approvals(self) -> list[dict[str, Any]]:
+        if self._supervised:
+            return [{**approval, "run_id": row["run_id"], "agent_id": self.id,
+                     "summary": approval.get("kind", "plan")}
+                    for row in self._supervisor.supervisor().runs(engine="daily-coder", limit=100)
+                    for approval in row.get("pending_approvals", [])]
         items = self._request("GET", "/api/approvals")
         return [{
             "run_id": a.get("run_id"),
@@ -457,6 +514,8 @@ class DailyCoderAdapter:
             if not runs:
                 return []
             run_id = runs[0]["run_id"]
+        if self._supervised and self._supervisor.owns(run_id):
+            return self._supervisor.activity(run_id, self.id, limit)
         events = self._request("GET", f"/api/runs/{run_id}/events")
         out = []
         for ev in events[-limit:]:
@@ -471,6 +530,8 @@ class DailyCoderAdapter:
         return out
 
     def metrics(self) -> dict[str, Any]:
+        if self._supervised:
+            return self._supervisor.metrics()
         return self._request("GET", "/api/metrics")
 
     @staticmethod

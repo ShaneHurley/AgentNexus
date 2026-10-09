@@ -1,0 +1,44 @@
+name: AgentNexus checks
+on:
+  push:
+  pull_request:
+jobs:
+  offline:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            python: "3.11"
+          - os: macos-latest
+            python: "3.10"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install locked workspace
+        run: |
+          python -m pip install uv==0.12.24
+          uv sync --all-packages --locked --python python
+      - name: Check source correctness
+        run: uv run --locked ruff check --select F821,F822,F823,E9 agents/shared/agent-core/agent_core agents/coding/daily-coder-ecosystem/daily_coder agents/research/research-forge/src/research_forge agents/ide/bridge/ide_bridge gui/agent_dashboard
+      - name: Check canonical and generated agents
+        run: |
+          uv run --locked python agents/ide/scripts/import_daily_coder_agents.py --check
+          uv run --locked python agents/ide/scripts/import_rf_agents.py --check
+          uv run --locked python agents/ide/scripts/sync_ide_agents.py --check
+      - name: Offline regression and repository suites
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: uv run --locked python -m pytest -q -p no:cacheprovider
+      - name: Native Daily Coder checks
+        working-directory: agents/coding/daily-coder-ecosystem
+        run: |
+          uv run --locked python -m unittest discover -s tests -v
+          uv run --locked python -m daily_coder validate
+      - name: Publication safety
+        run: uv run --locked python -m agent_core.release_preflight --base origin/main --fixture-manifest config/publication-fixtures.json

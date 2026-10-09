@@ -12,7 +12,7 @@ from agent_dashboard.usage_store import UsageStore
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def make_server_ctx(registry: Registry, *, auth_required: bool = False, token: str = "") -> dict:
+def make_server_ctx(registry: Registry, *, auth_required: bool = True, token: str = "test-token") -> dict:
     data_dir = registry.data_dir
     root = project_root(config_path=ROOT / "config" / "agents.json")
     return {

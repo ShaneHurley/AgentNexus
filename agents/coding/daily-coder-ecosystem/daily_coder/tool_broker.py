@@ -1,6 +1,9 @@
 from __future__ import annotations
 import fnmatch, hashlib, os, re, shlex, subprocess, time
 from pathlib import Path
+from agent_core.contracts import ContractDenied
+from agent_core.runtime_authority import RuntimeAuthority
+from agent_core.isolation import DockerRunner, IsolationUnavailable
 
 class ToolDenied(PermissionError): pass
 
@@ -28,10 +31,17 @@ def file_sha(path:Path)->str:
     return h.hexdigest()
 
 class ToolBroker:
-    def __init__(self,repo,tool_config,policy_config,extra_tools=None):
+    def __init__(self,repo,tool_config,policy_config,extra_tools=None, *, authority=None, isolated_runner=None):
         self.repo=Path(repo).resolve(); self.tools=tool_config; self.policy=policy_config; self._extra=dict(extra_tools or {})
+        self.authority=authority or RuntimeAuthority("dc",self.repo)
+        configured=self.policy.get("execution_policy",{}).get("image")
+        self.isolated_runner=isolated_runner or (DockerRunner(configured,self.repo,deny_paths=self.policy.get("path_policy",{}).get("deny",[])) if configured else None)
+        if self.isolated_runner is not None and (type(self.isolated_runner) is not DockerRunner or self.isolated_runner.workspace != self.repo):
+            raise ToolDenied("runner must be the workspace-bound Docker backend")
 
     def authorize(self,role,tool):
+        try: self.authority.tool(role,tool)
+        except ContractDenied as exc: raise ToolDenied(str(exc)) from exc
         if tool not in self.tools["role_allowlists"].get(role,[]): raise ToolDenied(f"{role} is not allowed to use {tool}")
         if tool in self.tools.get("disabled_until_adapter_configured",[]) and tool not in self._extra:
             raise ToolDenied(f"{tool} has no configured adapter")
@@ -54,10 +64,25 @@ class ToolBroker:
                 raise ToolDenied("write path not in approved plan allowlist")
         return p
 
-    def execute(self,role,tool,arguments,plan_allowlist=None):
+    def execute(self,role,tool,arguments,plan_allowlist=None,cancel_check=None):
         self.authorize(role,tool)
         args=dict(arguments or {})
-        if tool in self._extra: return self._extra[tool](args)
+        if tool in ("shell.readonly", "tests.run"):
+            if self.isolated_runner is None:
+                raise ToolDenied(f"{tool} requires a configured isolated execution runner")
+            argv=args.get("argv") or shlex.split(args.get("command", ""))
+            try:
+                return self.isolated_runner.run(argv,timeout=int(args.get("timeout",900)),cancel_check=cancel_check) if cancel_check is not None else self.isolated_runner.run(argv,timeout=int(args.get("timeout",900)))
+            except (IsolationUnavailable,ValueError) as exc:
+                raise ToolDenied(str(exc)) from exc
+        if tool.startswith(("filesystem.","patch.","repository.")):
+            target=self.safe_path(args.get("path","."),tool in {"filesystem.write","patch.apply"},plan_allowlist)
+            try: self.authority.tool(role,tool,target=target,write=tool in {"filesystem.write","patch.apply"})
+            except ContractDenied as exc: raise ToolDenied(str(exc)) from exc
+        if tool in self._extra:
+            if tool.startswith(("filesystem.","patch.","repository.")):
+                raise ToolDenied("typed built-in operations cannot be replaced by plugin callbacks")
+            return self._extra[tool](args)
         handlers={
             "filesystem.read":self._t_filesystem_read,"filesystem.list":self._t_filesystem_list,
             "filesystem.search":self._t_filesystem_search,"filesystem.write":self._t_filesystem_write,
@@ -95,7 +120,7 @@ class ToolBroker:
         return {"query":a["query"],"hits":hits}
     def _t_repository_status(self,a,_allow=None): return self._git(["status","--porcelain=v1","--branch"])
     def _t_repository_diff(self,a,_allow=None):
-        argv=["diff","--unified=3"]
+        argv=["diff","--no-ext-diff","--no-textconv","--unified=3"]
         if a.get("staged"): argv.append("--cached")
         if a.get("path"): self.safe_path(a["path"]); argv+=["--",a["path"]]
         return self._git(argv)
@@ -112,7 +137,10 @@ class ToolBroker:
         return {"path":a["path"],"bytes":len(a["content"]),"sha256":file_sha(p)}
     def _t_patch_apply(self,a,plan_allowlist=None):
         p=self.safe_path(a["path"],True,plan_allowlist); original=p.read_text(encoding="utf-8")
-        if a.get("expected_sha256") and a["expected_sha256"]!=file_sha(p):
+        expected=a.get("expected_sha256")
+        if not expected:
+            raise ToolDenied("expected_sha256 is required when patching a file")
+        if expected!=file_sha(p):
             raise ToolDenied("file changed since it was read; re-read before patching")
         found=original.count(a["find"])
         if found!=1: raise ToolDenied(f"find text matched {found} times; it must match exactly once")
@@ -122,8 +150,8 @@ class ToolBroker:
     # --- execution ----------------------------------------------------
     def _t_shell_readonly(self,a,_allow=None): return self._run(a.get("argv") or shlex.split(a["command"]),int(a.get("timeout",120)))
     def _t_tests_run(self,a,_allow=None): return self._run(a.get("argv") or shlex.split(a["command"]),int(a.get("timeout",900)))
-    def _git(self,argv): return self._run(["git"]+argv,60)
-    def _run(self,argv,timeout):
+    def _git(self,argv): return self._run(["git","-c","core.fsmonitor=false","-c","core.hooksPath=/dev/null"]+argv,60)
+    def validate_command(self,argv):
         if not isinstance(argv,list) or not argv or any(not isinstance(x,str) for x in argv):
             raise ValueError("argv must be a non-empty string list")
         allow=self.policy.get("command_policy",{}).get("allow",DEFAULT_COMMAND_ALLOW)
@@ -132,6 +160,9 @@ class ToolBroker:
         base=Path(argv[0]).name.lower()
         if base.endswith(".exe"): base=base[:-4]
         if base not in allow: raise ToolDenied(f"command {base} is not in the allowlist")
+        return argv
+    def _run(self,argv,timeout):
+        argv=self.validate_command(argv)
         env={k:v for k,v in {"PATH":os.environ.get("PATH",""),"SYSTEMROOT":os.environ.get("SYSTEMROOT",""),
              "HOME":os.environ.get("HOME",""),"PYTHONIOENCODING":"utf-8"}.items() if v}
         started=time.time()
@@ -144,9 +175,12 @@ class ToolBroker:
 
     # --- compatibility helpers ----------------------------------------
     def read(self,role,path):
-        self.authorize(role,"filesystem.read"); return self.safe_path(path).read_text(encoding="utf-8")
+        self.authorize(role,"filesystem.read")
+        target=self.safe_path(path)
+        try: self.authority.tool(role,"filesystem.read",target=target)
+        except ContractDenied as exc: raise ToolDenied(str(exc)) from exc
+        return redact(target.read_text(encoding="utf-8"))
     def write(self,role,path,content,plan_allowlist):
-        self.authorize(role,"filesystem.write"); p=self.safe_path(path,True,plan_allowlist)
-        p.parent.mkdir(parents=True,exist_ok=True); p.write_text(content,encoding="utf-8")
+        raise ToolDenied("legacy write helper has no approval context; use PolicyGateway.execute")
     def run_tests(self,role,argv,timeout=300):
-        self.authorize(role,"tests.run"); return self._run(argv,timeout)
+        return self.execute(role,"tests.run",{"argv":argv,"timeout":timeout})

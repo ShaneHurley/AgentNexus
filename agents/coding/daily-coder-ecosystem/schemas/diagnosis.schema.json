@@ -17,20 +17,25 @@
     "evidence": {
       "type": "array",
       "items": {
-        "type": "object",
-        "required": ["claim", "locator"],
-        "properties": {
-          "claim": { "type": "string" },
-          "locator": { "type": "string" },
-          "label": { "type": "string", "enum": ["VERIFIED", "INFERENCE", "ASSUMPTION", "HYPOTHESIS", "UNKNOWN"] }
-        },
-        "additionalProperties": false
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "claim": { "type": "string" },
+              "locator": { "type": "string" },
+              "label": { "type": "string", "enum": ["VERIFIED", "INFERENCE", "ASSUMPTION", "HYPOTHESIS", "UNKNOWN"] }
+            },
+            "additionalProperties": true
+          },
+          { "type": "string" }
+        ]
       }
     },
-    "recommended_action": { "type": "string", "enum": ["repair", "stop", "escalate"] },
+    "recommended_action": { "type": "string", "enum": ["repair", "stop", "escalate", "retry"] },
     "target_phase": { "type": "string" },
     "rationale": { "type": "string" },
     "unknowns": { "type": "array", "items": { "type": "string" } }
   },
-  "additionalProperties": false
+  "additionalProperties": true
 }
+

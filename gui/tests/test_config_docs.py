@@ -42,7 +42,7 @@ class ConfigDocsApiTests(unittest.TestCase):
         req = urllib.request.Request(
             self.base + "/api/config/overlay",
             data=json.dumps({"secret_token": "nope", "host": "127.0.0.1"}).encode("utf-8"),
-            headers={"Content-Type": "application/json"},
+            headers={"Content-Type": "application/json", "Authorization": "Bearer test-token"},
             method="POST",
         )
         with self.assertRaises(urllib.error.HTTPError) as ctx:
@@ -53,7 +53,7 @@ class ConfigDocsApiTests(unittest.TestCase):
         req = urllib.request.Request(
             self.base + "/api/config/overlay",
             data=json.dumps({"port": 8866, "auth_required": True}).encode("utf-8"),
-            headers={"Content-Type": "application/json"},
+            headers={"Content-Type": "application/json", "Authorization": "Bearer test-token"},
             method="POST",
         )
         with self.assertRaises(urllib.error.HTTPError) as ctx:
@@ -61,10 +61,12 @@ class ConfigDocsApiTests(unittest.TestCase):
         self.assertEqual(ctx.exception.code, 400)
 
     def test_overlay_writes_under_data_dir_only(self):
+        repo_agents = ROOT / "config" / "agents.json"
+        before = repo_agents.read_bytes() if repo_agents.exists() else None
         req = urllib.request.Request(
             self.base + "/api/config/overlay",
             data=json.dumps({"workspace_roots": ["./docs"]}).encode("utf-8"),
-            headers={"Content-Type": "application/json"},
+            headers={"Content-Type": "application/json", "Authorization": "Bearer test-token"},
             method="POST",
         )
         with urllib.request.urlopen(req, timeout=10) as resp:
@@ -72,25 +74,23 @@ class ConfigDocsApiTests(unittest.TestCase):
         self.assertTrue(body.get("ok"))
         path = overlay_path(self.data)
         self.assertTrue(path.is_file())
-        repo_agents = ROOT / "config" / "agents.json"
-        before = repo_agents.read_text(encoding="utf-8")
         written = path.read_text(encoding="utf-8")
         self.assertIn("workspace_roots", written)
         self.assertIn("docs", written)
-        self.assertEqual(before, repo_agents.read_text(encoding="utf-8"))
+        self.assertEqual(before, repo_agents.read_bytes() if repo_agents.exists() else None)
 
     def test_docs_list_and_fetch(self):
-        with urllib.request.urlopen(self.base + "/api/docs", timeout=10) as resp:
+        with urllib.request.urlopen(urllib.request.Request(self.base + "/api/docs", headers={"Authorization": "Bearer test-token"}), timeout=10) as resp:
             docs = json.loads(resp.read().decode("utf-8"))["docs"]
         names = {d["name"] for d in docs}
         self.assertIn("ARCHITECTURE.md", names)
 
-        with urllib.request.urlopen(self.base + "/api/docs/ARCHITECTURE", timeout=10) as resp:
+        with urllib.request.urlopen(urllib.request.Request(self.base + "/api/docs/ARCHITECTURE", headers={"Authorization": "Bearer test-token"}), timeout=10) as resp:
             doc = json.loads(resp.read().decode("utf-8"))
         self.assertIn("Architecture", doc["content"])
 
     def test_docs_traversal_blocked(self):
-        req = urllib.request.Request(self.base + "/api/docs/..%2F..%2Fetc%2Fpasswd", method="GET")
+        req = urllib.request.Request(self.base + "/api/docs/..%2F..%2Fetc%2Fpasswd", method="GET", headers={"Authorization": "Bearer test-token"})
         with self.assertRaises(urllib.error.HTTPError) as ctx:
             urllib.request.urlopen(req, timeout=10)
         self.assertEqual(ctx.exception.code, 404)

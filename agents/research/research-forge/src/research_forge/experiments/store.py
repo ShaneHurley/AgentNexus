@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -25,13 +26,19 @@ class ExperimentStore:
         )
 
     def exp_dir(self, experiment_id: str, *, create: bool = True) -> Path:
-        d = self.root / experiment_id
+        if not re.fullmatch(r"EXP-[A-Za-z0-9_-]+",experiment_id): raise PermissionError("invalid experiment ID")
+        d = (self.root / experiment_id).resolve()
+        if not d.is_relative_to(self.workspace_root) or not d.is_relative_to(self.root.resolve()): raise PermissionError("experiment path escapes workspace")
         if create:
             d.mkdir(parents=True, exist_ok=True)
         return d
 
     def path(self, experiment_id: str, name: str, *, create_dir: bool = True) -> Path:
-        return self.exp_dir(experiment_id, create=create_dir) / name
+        if not re.fullmatch(r"[A-Za-z0-9_.-]+",name) or name in {".",".."}: raise PermissionError("invalid artifact name")
+        base = self.exp_dir(experiment_id, create=create_dir)
+        target = (base / name).resolve()
+        if not target.is_relative_to(base): raise PermissionError("artifact path escapes experiment")
+        return target
 
     def write_json(self, experiment_id: str, name: str, payload: dict[str, Any]) -> Path:
         p = self.path(experiment_id, name, create_dir=True)

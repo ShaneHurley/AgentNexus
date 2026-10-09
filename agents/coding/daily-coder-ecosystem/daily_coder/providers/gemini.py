@@ -9,7 +9,7 @@ class GeminiProvider(Provider):
     name = "gemini"
 
     def __init__(self, api_key=None, base_url="https://generativelanguage.googleapis.com/v1beta",
-                 default_model="gemini-2.5-flash", timeout=180):
+                 default_model="gemini-3.8-flash", timeout=180):
         self.api_key = api_key
         self.base_url = base_url.rstrip("/")
         self.default_model = default_model

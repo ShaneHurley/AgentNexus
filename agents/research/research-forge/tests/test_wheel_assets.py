@@ -21,6 +21,7 @@ def test_wheel_includes_config_and_schemas(package_root: Path, tmp_path: Path) -
     out = tmp_path / "wheels"
     out.mkdir()
     env = os.environ.copy()
+    env["PIP_NO_INDEX"] = "1"
     proc = subprocess.run(
         [
             sys.executable,
@@ -38,28 +39,9 @@ def test_wheel_includes_config_and_schemas(package_root: Path, tmp_path: Path) -
         check=False,
         env=env,
     )
+    assert proc.returncode == 0, proc.stderr or proc.stdout
     wheels = sorted(out.glob("*.whl"))
-    if not wheels and proc.returncode != 0:
-        # Retry with build isolation (needs network for hatchling)
-        proc = subprocess.run(
-            [
-                sys.executable,
-                "-m",
-                "pip",
-                "wheel",
-                "--no-deps",
-                "-w",
-                str(out),
-                str(package_root),
-            ],
-            capture_output=True,
-            text=True,
-            check=False,
-            env=env,
-        )
-        wheels = sorted(out.glob("*.whl"))
-    if not wheels:
-        pytest.skip(f"could not build wheel: {proc.stderr[:500] or proc.stdout[:500]}")
+    assert wheels, "wheel build succeeded but produced no wheel"
 
     whl = wheels[-1]
     with zipfile.ZipFile(whl, "r") as zf:

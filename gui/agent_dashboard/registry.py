@@ -9,7 +9,14 @@ from .steer_store import SteerStore
 
 
 def load_config(path: Path) -> dict[str, Any]:
-    return json.loads(path.read_text(encoding="utf-8"))
+    path = Path(path)
+    if not path.exists() and path.name == "agents.json":
+        example = path.with_name("agents.json.example")
+        if example.is_file():
+            path = example
+    config = json.loads(path.read_text(encoding="utf-8"))
+    config["auth_required"] = True
+    return config
 
 
 def resolve_path(base: Path, value: str | None) -> Path | None:

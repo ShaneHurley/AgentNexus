@@ -3,33 +3,99 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Agent Orchestration</title>
+  <title>AgentNexus — Coding Workshop</title>
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-  <header class="top">
-    <div>
-      <h1>Agent Orchestration</h1>
-      <p class="muted">Shared control surface for local agents — modular, replaceable UI.</p>
+
+  <!-- Top bar: branding, agent launch chips, health + actions -->
+  <header class="ws-topbar" id="wsTopbar">
+    <div class="ws-brand">
+      <span class="ws-brand-icon">⬡</span>
+      <span class="ws-brand-name">AgentNexus</span>
     </div>
-    <div class="top-actions">
+    <div class="ws-launch-bar" id="wsLaunchBar">
+      <!-- Agent launch chips rendered by workspace.js -->
+    </div>
+    <div class="ws-topbar-right">
       <span id="health" class="pill muted">connecting…</span>
-      <input id="token" type="password" placeholder="API token (if required)" size="22" />
-      <button type="button" id="saveToken">Use token</button>
-      <button type="button" id="refreshBtn">Refresh</button>
+      <button type="button" id="refreshBtn" class="ws-icon-btn" title="Refresh (global)">↺</button>
+      <button type="button" id="settingsBtn" class="ws-icon-btn" title="Settings">⚙</button>
     </div>
+    <!-- Hidden token input kept for API auth compatibility -->
+    <input id="token" type="password" style="display:none" aria-hidden="true" />
   </header>
 
-  <nav id="appTablist" class="app-tabs" role="tablist" aria-label="Dashboard sections">
-    <button type="button" class="app-tab" role="tab" id="tab-home" data-tab="home" aria-controls="viewport" aria-selected="false" tabindex="-1">Home</button>
-    <button type="button" class="app-tab" role="tab" id="tab-agent" data-tab="agent" aria-controls="viewport" aria-selected="false" tabindex="-1">Agent</button>
-    <button type="button" class="app-tab" role="tab" id="tab-docs" data-tab="docs" aria-controls="viewport" aria-selected="false" tabindex="-1">Documentation</button>
-    <button type="button" class="app-tab" role="tab" id="tab-apis" data-tab="apis" aria-controls="viewport" aria-selected="false" tabindex="-1">APIs &amp; abilities</button>
-    <button type="button" class="app-tab" role="tab" id="tab-usage" data-tab="usage" aria-controls="viewport" aria-selected="false" tabindex="-1">Usage</button>
-    <button type="button" class="app-tab" role="tab" id="tab-ide" data-tab="ide" aria-controls="viewport" aria-selected="false" tabindex="-1">IDE</button>
-  </nav>
+  <!-- Main 3-column workspace -->
+  <div class="ws-body" id="wsBody">
 
-  <div id="viewport" class="viewport" role="tabpanel" aria-labelledby="tab-home"></div>
+    <!-- Left: Session Rail + Daily Tasks -->
+    <aside class="ws-sidebar" id="wsSidebar">
+      <div id="sidebarContent"></div>
+    </aside>
+
+    <!-- Resize handle: sidebar ↔ chat -->
+    <div class="ws-resize-handle" id="sidebarResizeHandle"
+         role="separator" aria-label="Resize sidebar" aria-orientation="vertical"></div>
+
+    <!-- Center: Session tab strip + Chat panel -->
+    <main class="ws-chat-area" id="wsChatArea">
+      <div class="ws-session-tabs" id="wsSessionTabs" role="tablist" aria-label="Active sessions"></div>
+      <div class="ws-chat-panel" id="wsChatPanel"></div>
+    </main>
+
+    <!-- Resize handle: chat ↔ panel dock -->
+    <div class="ws-resize-handle" id="dockResizeHandle"
+         role="separator" aria-label="Resize panel dock" aria-orientation="vertical" hidden></div>
+
+    <!-- Right: Panel Dock (browser / code / plan tabs) -->
+    <div class="ws-panel-dock" id="wsPanelDock" hidden>
+      <div class="ws-dock-tabs" id="wsDockTabs" role="tablist" aria-label="Panel dock tabs">
+        <!-- Dock tab strip rendered by workspace.js -->
+      </div>
+      <div class="ws-dock-body" id="wsDockBody"></div>
+    </div>
+
+  </div>
+
+  <!-- Bottom status bar -->
+  <footer class="ws-statusbar" id="wsStatusbar">
+    <span id="statusAgents" class="ws-status-item">– agents</span>
+    <span class="ws-status-sep">|</span>
+    <span id="statusSessions" class="ws-status-item">– sessions</span>
+    <span class="ws-status-sep">|</span>
+    <span id="statusPanels" class="ws-status-item">– panels</span>
+    <span class="ws-status-spacer"></span>
+    <span id="statusClock" class="ws-status-item ws-clock"></span>
+  </footer>
+
+  <!-- Settings modal (hidden by default) -->
+  <div class="ws-modal-backdrop" id="settingsBackdrop" hidden>
+    <div class="ws-modal" id="settingsModal" role="dialog" aria-label="Settings" aria-modal="true">
+      <div class="ws-modal-header">
+        <h3 class="ws-modal-title">Settings</h3>
+        <button type="button" class="mat-interactive" id="settingsClose" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;padding:0;" aria-label="Close">✕</button>
+      </div>
+      <div class="ws-modal-body">
+        <div class="ws-setting-row">
+          <label class="ws-setting-label">API Token</label>
+          <div style="display:flex;gap:8px;flex:1">
+            <input id="tokenVisible" type="password" class="clay-input" placeholder="API bearer token (if required)"
+                   style="flex:1;min-width:0" />
+            <button type="button" id="saveToken" class="mat-interactive" style="width:auto;padding:0 16px;font-weight:600;">Save</button>
+          </div>
+        </div>
+        <div class="ws-setting-row">
+          <label class="ws-setting-label">Mock mode</label>
+          <span class="muted small">Agents with no live backend return mock activity. Set a provider in APIs &amp; abilities to go live.</span>
+        </div>
+        <div class="ws-setting-row">
+          <label class="ws-setting-label">Layout tips</label>
+          <span class="muted small">Drag the dividers between panels to resize. Ctrl+B toggles sidebar. Ctrl+J toggles the panel dock.</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script type="module" src="/app.js"></script>
 </body>

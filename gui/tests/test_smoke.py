@@ -208,23 +208,28 @@ class HealthAdapterTests(unittest.TestCase):
         self.assertIn("requireLiveStartConfirm", agent_js)
         self.assertIn("providerRestartWarn", picker_js)
 
-    def test_dashboard_shell_tabs_and_static_modules(self):
+    def test_workspace_shell_and_static_modules(self):
         html = (ROOT / "agent_dashboard" / "web" / "index.html").read_text(encoding="utf-8")
-        for tab in ("home", "agent", "docs", "apis", "usage", "ide"):
-            self.assertIn(f'data-tab="{tab}"', html, msg=f"missing tab {tab}")
-        self.assertIn('id="viewport"', html)
+        for element_id in (
+            "wsTopbar", "wsBody", "wsSidebar", "wsChatArea", "wsSessionTabs",
+            "wsPanelDock", "wsStatusbar",
+        ):
+            self.assertIn(f'id="{element_id}"', html, msg=f"missing workspace element {element_id}")
         self.assertIn('role="tablist"', html)
+        self.assertIn('<script type="module" src="/app.js"></script>', html)
 
         static_paths = (
-            "/router.js",
+            "/api.js",
+            "/workspace.js",
+            "/agents.js",
+            "/markdown.js",
+            "/poll.js",
             "/state.js",
             "/app.js",
-            "/tabs/agent.js",
-            "/tabs/home.js",
-            "/tabs/docs.js",
-            "/tabs/apis.js",
-            "/tabs/usage.js",
-            "/tabs/ide.js",
+            "/chat-panel.js",
+            "/panel-dock.js",
+            "/sidebar.js",
+            "/resize.js",
         )
         for rel in static_paths:
             file_path = ROOT / "agent_dashboard" / "web" / rel.lstrip("/")
@@ -285,7 +290,7 @@ class ApiSmokeTests(unittest.TestCase):
         cls._tmpdir = tempfile.TemporaryDirectory()
         reg = Registry(cfg, ROOT / "config", Path(cls._tmpdir.name))
         cls.httpd = ThreadingHTTPServer(("127.0.0.1", 0), _Handler)
-        cls.httpd.ctx = make_server_ctx(reg, auth_required=False, token="")
+        cls.httpd.ctx = make_server_ctx(reg, auth_required=True, token="test-token")
         cls.thread = threading.Thread(target=cls.httpd.serve_forever, daemon=True)
         cls.thread.start()
         host, port = cls.httpd.server_address
@@ -298,7 +303,7 @@ class ApiSmokeTests(unittest.TestCase):
         cls._tmpdir.cleanup()
 
     def _get(self, path: str):
-        with urllib.request.urlopen(self.base + path, timeout=5) as resp:
+        with urllib.request.urlopen(urllib.request.Request(self.base + path, headers={"Authorization": "Bearer test-token"}), timeout=5) as resp:
             return json.loads(resp.read().decode("utf-8"))
 
     def test_health_and_agents(self):
@@ -309,7 +314,7 @@ class ApiSmokeTests(unittest.TestCase):
 
     def test_invalid_limit_returns_400(self):
         try:
-            urllib.request.urlopen(self.base + "/api/agents/research-forge/runs?limit=abc", timeout=5)
+            urllib.request.urlopen(urllib.request.Request(self.base + "/api/agents/research-forge/runs?limit=abc", headers={"Authorization": "Bearer test-token"}), timeout=5)
             self.fail("expected HTTPError")
         except urllib.error.HTTPError as exc:
             self.assertEqual(exc.code, 400)
@@ -320,7 +325,7 @@ class ApiSmokeTests(unittest.TestCase):
         req = urllib.request.Request(
             self.base + "/api/agents/research-forge/runs",
             data=json.dumps({"request": "smoke test topic"}).encode("utf-8"),
-            headers={"Content-Type": "application/json"},
+            headers={"Content-Type": "application/json", "Authorization": "Bearer test-token"},
             method="POST",
         )
         with urllib.request.urlopen(req, timeout=5) as resp:
@@ -331,7 +336,7 @@ class ApiSmokeTests(unittest.TestCase):
         req = urllib.request.Request(
             self.base + "/api/agents/research-forge/thread",
             data=json.dumps({"text": "steer: prefer primary sources", "run_id": run_id}).encode("utf-8"),
-            headers={"Content-Type": "application/json"},
+            headers={"Content-Type": "application/json", "Authorization": "Bearer test-token"},
             method="POST",
         )
         with urllib.request.urlopen(req, timeout=5) as resp:
@@ -353,7 +358,7 @@ class ApiSmokeTests(unittest.TestCase):
             "/slash-palette.js",
         )
         for path in modules:
-            req = urllib.request.Request(self.base + path, method="GET")
+            req = urllib.request.Request(self.base + path, method="GET", headers={"Authorization": "Bearer test-token"})
             with urllib.request.urlopen(req, timeout=5) as resp:
                 self.assertEqual(resp.status, 200, msg=path)
                 body = resp.read()
@@ -380,7 +385,7 @@ class SetupRouteTests(unittest.TestCase):
         cls._tmpdir.cleanup()
 
     def _get(self, path: str):
-        with urllib.request.urlopen(self.base + path, timeout=10) as resp:
+        with urllib.request.urlopen(urllib.request.Request(self.base + path, headers={"Authorization": "Bearer test-token"}), timeout=10) as resp:
             return json.loads(resp.read().decode("utf-8"))
 
     def test_expected_agents_includes_daily_task(self):

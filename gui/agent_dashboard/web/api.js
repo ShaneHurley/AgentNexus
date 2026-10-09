@@ -1,6 +1,8 @@
 /** Thin API client — swap this file to point at another gateway. */
 
-let TOKEN = sessionStorage.getItem("ad_token") || "";
+// Remove credentials persisted by older dashboard versions.
+try { sessionStorage.removeItem("ad_token"); } catch { /* Storage may be disabled. */ }
+let TOKEN = "";
 
 export function getToken() {
   return TOKEN;
@@ -8,7 +10,7 @@ export function getToken() {
 
 export function setToken(value) {
   TOKEN = (value || "").trim();
-  sessionStorage.setItem("ad_token", TOKEN);
+  // Keep credentials only in memory; never persist them in browser storage.
 }
 
 export async function api(path, options = {}) {

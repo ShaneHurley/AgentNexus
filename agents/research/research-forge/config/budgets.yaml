@@ -1,4 +1,19 @@
 profiles:
+  XS:
+    label: Cheap
+    discovery_lanes: [1, 2]
+    deep_read_targets: [2, 5]
+    model_calls: 10
+    token_ceiling: 15000
+    director_calls: 1
+    cost_usd: 1.0
+    time_minutes: 15
+    retry_limit: 1
+    reserve_audit_fraction: 0.10
+    rate_limit_calls: 10
+    rate_limit_window: 300
+    rate_limit_max_wait: 300
+    rate_limit_enabled: true
   S:
     label: Quick
     discovery_lanes: [2, 3]
@@ -10,6 +25,9 @@ profiles:
     time_minutes: 30
     retry_limit: 2
     reserve_audit_fraction: 0.10
+    rate_limit_calls: 15
+    rate_limit_window: 300
+    rate_limit_enabled: true
   M:
     label: Standard
     discovery_lanes: [4, 6]
@@ -21,6 +39,9 @@ profiles:
     time_minutes: 120
     retry_limit: 3
     reserve_audit_fraction: 0.10
+    rate_limit_calls: 30
+    rate_limit_window: 300
+    rate_limit_enabled: true
   L:
     label: Deep
     discovery_lanes: [7, 10]
@@ -32,6 +53,9 @@ profiles:
     time_minutes: 480
     retry_limit: 4
     reserve_audit_fraction: 0.10
+    rate_limit_calls: 60
+    rate_limit_window: 300
+    rate_limit_enabled: false
   XL:
     label: Thesis
     discovery_lanes: [10, 16]
@@ -43,6 +67,9 @@ profiles:
     time_minutes: 1440
     retry_limit: 5
     reserve_audit_fraction: 0.10
+    rate_limit_calls: 100
+    rate_limit_window: 300
+    rate_limit_enabled: false
 thresholds:
   warn_fraction: 0.70
   checkpoint_fraction: 0.80

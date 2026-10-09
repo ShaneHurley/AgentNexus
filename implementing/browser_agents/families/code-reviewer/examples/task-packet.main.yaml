@@ -1,0 +1,48 @@
+# Example — independent review after code-crafter (paste in NEW chat)
+task_id: "crv-auth-timeout-01"
+browser_family: "code-reviewer"
+browser_variant: "diff-adversarial"  # omit to use main AGENT_MESSAGE.md
+host: "other"
+mode: "REVIEW"
+objective: "Adversarial review of session timeout patch before ide-bridge handoff."
+audience: "operator"
+background: "code-crafter emitted patch + SELF_REVIEW in prior chat; paste diff below."
+prior_artifact_ref: "prior chat: code-crafter patch-draft run cr-auth-timeout-01"
+in_scope:
+  - "unified diff for auth/session changes"
+  - "author SELF_REVIEW block from craft output"
+out_of_scope:
+  - "implementing fixes in this chat"
+  - "running tests in host"
+inputs:
+  files: []
+  urls: []
+  source_ids:
+    - "S1"  # unified diff paste
+    - "S2"  # code-crafter SELF_REVIEW excerpt
+constraints:
+  - "locator on every finding"
+  - "verdict must be APPROVE|REVISE|BLOCK|INSUFFICIENT_EVIDENCE"
+permissions:
+  read: ["S1", "S2"]
+  write: []
+  execute: []
+  forbidden:
+    - "claim unobserved test execution"
+    - "rewrite patch as author"
+acceptance_criteria:
+  - "Every acceptance criterion from original craft task evaluated against diff"
+  - "Author WOULD_BLOCK_SHIP claim cross-checked against hunks"
+  - "Verdict emitted with severity-ordered findings"
+required_output:
+  format: "structured ROLE_RESULT with PHASE_* blocks"
+  length: "dense; no full patch rewrite"
+  destination_or_paths: []
+budget:
+  tool_calls: "0 unless host provides browse"
+  iterations: "1 review pass"
+  time: ""
+  cost: ""
+freshness_boundary: "diff as pasted; no live repo unless operator supplies"
+known_unknowns:
+  - "full caller graph off-diff"

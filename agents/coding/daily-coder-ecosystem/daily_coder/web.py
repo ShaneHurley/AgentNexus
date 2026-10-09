@@ -6,6 +6,7 @@ SSRF rules, enforce size and content-type limits, and return citations.
 from __future__ import annotations
 import ipaddress, json, re, socket, threading, urllib.parse, urllib.request
 from html.parser import HTMLParser
+from agent_core.rate_limiter import RateLimiter, RateLimiterConfig
 
 class NetworkDenied(PermissionError): pass
 
@@ -74,7 +75,7 @@ def _to_text(body, content_type):
     return body
 
 class WebClient:
-    def __init__(self, policy=None, secrets=None, user_agent="daily-coder/1.0"):
+    def __init__(self, policy=None, secrets=None, user_agent="daily-coder/1.0", rate_limiter=None):
         self.policy = policy or {}
         self.secrets = secrets
         self.user_agent = user_agent
@@ -82,8 +83,10 @@ class WebClient:
         self._lock = threading.Lock()
         self._fetch_cache = {}
         self._search_cache = {}
+        self.rate_limiter = rate_limiter or RateLimiter(RateLimiterConfig.disabled())
 
     def _budget(self):
+        self.rate_limiter.acquire()  # Rate-limit gate (cheap mode)
         with self._lock:
             cap = self.policy.get("max_calls_per_run")
             if cap is not None and self.calls >= cap:

@@ -4,8 +4,11 @@ import json
 import unittest
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[3]
-SCHEMAS = ROOT / "schemas" / "personal"
+from ai_agents_repo.discovery import repo_root
+from ai_agents_repo.paths import schemas_personal_root
+
+ROOT = repo_root()
+SCHEMAS = schemas_personal_root(root=ROOT)
 
 
 class ContractTests(unittest.TestCase):

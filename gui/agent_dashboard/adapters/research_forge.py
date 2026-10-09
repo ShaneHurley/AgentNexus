@@ -26,6 +26,10 @@ class ResearchForgeAdapter:
         self.inbox = data_dir / "research-forge"
         self.inbox.mkdir(parents=True, exist_ok=True)
         self._ensure_path()
+        from .supervised import SupervisorAccess
+        self._supervised = options.get("supervised", True)
+        repository = Path(options.get("repository_root") or Path(__file__).resolve().parents[3])
+        self._supervisor = SupervisorAccess("research-forge", options, repository)
 
     def _ensure_path(self) -> None:
         src = self.package_root / "src"
@@ -119,6 +123,9 @@ class ResearchForgeAdapter:
 
     def list_runs(self, limit: int = 50) -> list[dict[str, Any]]:
         runs: list[dict[str, Any]] = []
+        if self._supervised:
+            runs.extend(self._supervisor.normalize(row, self.id) for row in
+                        self._supervisor.supervisor().runs(engine="research-forge", limit=limit))
         # Dashboard-owned pending / started requests
         if self._pending_path().is_file():
             for line in self._pending_path().read_text(encoding="utf-8").splitlines():
@@ -186,6 +193,18 @@ class ResearchForgeAdapter:
         raise KeyError(run_id)
 
     def start_run(self, request: str, **kwargs: Any) -> dict[str, Any]:
+        if self._supervised:
+            if kwargs.get("forced_subagents"):
+                raise ValueError("Research Forge Wave 1 selects roles through its reviewed registry")
+            try:
+                payload = json.loads(request)
+            except json.JSONDecodeError:
+                payload = {"topic": request, "objective": request}
+            if not isinstance(payload, dict):
+                raise ValueError("Research request must be an object")
+            # Incomplete intake deliberately pauses for clarification in the engine.
+            return self._supervisor.start(payload, self.workspace_root,
+                                          live=kwargs.get("mode") == "live")
         # Persist forced_subagents / UI prefs on inbox artifact; ignore unknown keys safely.
         run_id = f"RF-{uuid.uuid4().hex[:10]}"
         forced = kwargs.get("forced_subagents") or []
@@ -214,9 +233,20 @@ class ResearchForgeAdapter:
             "created_via": "agent-dashboard",
             "created_at": item["created_at"],
         }, indent=2), encoding="utf-8")
-        return {"accepted": True, "run_id": run_id, "artifact": str(artifact), "forced_subagents": forced}
+        return {
+            "accepted": True,
+            "queued": True,
+            "acknowledged": False,
+            "execution_started": False,
+            "run_id": run_id,
+            "artifact": str(artifact),
+            "forced_subagents": forced,
+        }
 
     def approve(self, run_id: str, *, reject: bool = False, note: str | None = None, kind: str = "plan") -> dict[str, Any]:
+        if self._supervised and self._supervisor.owns(run_id):
+            return {"decided": False, "state": "unsupported",
+                    "error": {"code": "POLICY_DENIED", "message": "Use Research Forge signed decision gates; dashboard notes do not approve execution."}}
         decision = "rejected" if reject else "approved"
         path = self.inbox / f"{run_id}.decision.json"
         path.write_text(json.dumps({
@@ -232,6 +262,10 @@ class ResearchForgeAdapter:
 
     def resume(self, run_id: str) -> dict[str, Any]:
         """Resume a paused Wave 1 run from durable state when available (REC-06)."""
+        if self._supervised and self._supervisor.owns(run_id):
+            answers_path = self.inbox / f"{run_id}.answers.json"
+            answers = json.loads(answers_path.read_text()) if answers_path.is_file() else None
+            return self._supervisor.resume(run_id, answers=answers)
         from research_forge.decisions.validator import validate_decisions_for_gate
         from research_forge.errors import ErrorCode, forge_error
         from research_forge.wave1.orchestrator import Wave1Orchestrator
@@ -320,8 +354,23 @@ class ResearchForgeAdapter:
             }
 
     def cancel(self, run_id: str) -> dict[str, Any]:
-        self._patch_pending(run_id, status="CANCELLED", phase="cancelled")
-        return {"cancelled": True, "run_id": run_id}
+        if self._supervised and self._supervisor.owns(run_id):
+            return self._supervisor.cancel(run_id)
+        try:
+            self.get_run(run_id)
+        except KeyError:
+            return {"accepted": False, "run_id": run_id, "error": {"code": "NOT_FOUND", "message": "run not found"}}
+        note = self.inbox / f"{run_id}.cancel.json"
+        note.write_text(json.dumps({"run_id": run_id, "action": "cancel", "at": _now()}, indent=2), encoding="utf-8")
+        self._patch_pending(run_id, status="CANCEL_REQUESTED", phase="cancel_requested")
+        return {
+            "accepted": True,
+            "cancelled": False,
+            "cancellation_requested": True,
+            "acknowledged": False,
+            "run_id": run_id,
+            "inbox_note": str(note),
+        }
 
     def pending_approvals(self) -> list[dict[str, Any]]:
         out = []
@@ -338,6 +387,8 @@ class ResearchForgeAdapter:
 
     def activity(self, run_id: str | None = None, limit: int = 50) -> list[dict[str, Any]]:
         items: list[dict[str, Any]] = []
+        if self._supervised and run_id and self._supervisor.owns(run_id):
+            return self._supervisor.activity(run_id, self.id, limit)
         ledger = self._ledger_path()
         if ledger.is_file():
             for line in ledger.read_text(encoding="utf-8").splitlines():
@@ -372,6 +423,8 @@ class ResearchForgeAdapter:
         return items[-limit:]
 
     def metrics(self) -> dict[str, Any]:
+        if self._supervised:
+            return self._supervisor.metrics()
         runs = self.list_runs(limit=200)
         return {
             "totals": {

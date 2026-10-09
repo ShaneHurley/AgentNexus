@@ -318,11 +318,12 @@ def test_pipeline_failed_run_ok_false(repo: Path) -> None:
     )
     svc = ExperimentService(repo)
     prop = svc.create(**kwargs)
-    summary = svc.pipeline(
-        prop["experiment_id"], approve=True, approve_code=True
-    )
-    assert summary["exit_code"] != 0
-    assert summary["ok"] is False
+    from agent_core.isolation import IsolationUnavailable
+    with pytest.raises(IsolationUnavailable, match="isolated_image"):
+        svc.pipeline(prop["experiment_id"], approve=True, approve_code=True)
+    recorded = svc.store.read_json(prop["experiment_id"], "result.json")
+    assert recorded["exit_code"] != 0
+    assert svc.store.read_json(prop["experiment_id"], "status.json")["status"] == "failed"
 
 
 def test_post_review_group_alpha_not_ab(repo: Path) -> None:

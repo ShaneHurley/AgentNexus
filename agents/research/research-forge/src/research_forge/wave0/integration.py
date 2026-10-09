@@ -178,7 +178,7 @@ def run_wave0_fixture(repo_root: Path, fixture_path: Path | None) -> dict[str, A
             budget,
             cost_usd=0.1,
             auth_kwargs={
-                "role": "host",
+                "role": "orchestrator",
                 "phase": "wave0",
                 "tool_id": "mock_model",
                 "operation": "model_call",

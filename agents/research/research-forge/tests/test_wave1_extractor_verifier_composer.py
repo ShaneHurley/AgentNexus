@@ -49,6 +49,51 @@ def test_verifier_fake_doi(registry) -> None:
     assert out["verifier_status"] == "failed"
 
 
+def test_verifier_rejects_synthetic_fixture_as_evidence(registry) -> None:
+    verifier = CitationVerifier(registry)
+    card = {
+        "evidence_id": "EVD-00000002", "source_id": "SRC-0002",
+        "question_addressed": "RQ-001", "claim": "The study reports a 42% reduction.",
+        "claim_status": "UNKNOWN", "locator": "paragraph:1", "access_level": "full",
+        "confidence": "HIGH", "confidence_reason": "fixture", "verifier_status": "pending",
+    }
+    out = verifier.verify(
+        card,
+        source={
+            "canonical_title": "Study", "canonical_url": "https://example.org/study",
+            "source_authenticity": "synthetic_fixture",
+        },
+        read_response={
+            "canonical_url": "https://example.org/study", "access_level": "full",
+            "chunks": [{"locator": "paragraph:1", "text": card["claim"]}],
+            "metadata": {},
+        },
+        live=True,
+    )
+    assert out["verifier_status"] == "failed"
+    assert "synthetic_source" in out["verifier_notes"]
+
+
+def test_lexical_overlap_is_not_verified_entailment(registry) -> None:
+    verifier = CitationVerifier(registry)
+    card = {
+        "evidence_id": "EVD-00000003", "source_id": "SRC-0003",
+        "question_addressed": "RQ-001", "claim": "The method improves system reliability.",
+        "claim_status": "UNKNOWN", "locator": "paragraph:1", "access_level": "full",
+        "confidence": "MEDIUM", "confidence_reason": "overlap", "verifier_status": "pending",
+    }
+    out = verifier.verify(
+        card,
+        source={"canonical_title": "Study", "canonical_url": "https://paper.example/study"},
+        read_response={
+            "canonical_url": "https://paper.example/study", "access_level": "full",
+            "chunks": [{"locator": "paragraph:1", "text": "Reliability is discussed alongside another method."}],
+        },
+    )
+    assert out["verifier_status"] == "failed"
+    assert out["claim_status"] == "REJECTED"
+
+
 def test_composer_material_claim_requires_evid(registry) -> None:
     comp = ReportComposer(registry)
     charter = {

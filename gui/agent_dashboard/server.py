@@ -4,7 +4,6 @@ from __future__ import annotations
 import json
 import mimetypes
 import os
-import secrets as _secrets
 import urllib.parse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -57,7 +56,49 @@ class _Handler(BaseHTTPRequestHandler):
             ctype = "text/html; charset=utf-8"
         return self._send(200, file_path.read_bytes(), ctype)
 
+    def _valid_endpoint(self) -> bool:
+        """Reject DNS rebinding and cross-origin browser requests before routing."""
+        hosts = self.headers.get_all("Host", [])
+        if len(hosts) != 1:
+            return False
+        bound_host, bound_port = self.server.server_address[:2]
+        allowed = {str(bound_host).lower()}
+        configured = self.server.ctx.get("bound_host")
+        if configured:
+            allowed.add(configured.lower())
+        if bound_host in {"127.0.0.1", "::1"}:
+            allowed.add("localhost")
+        try:
+            endpoint = urllib.parse.urlsplit("http://" + hosts[0])
+            if (endpoint.username is not None or endpoint.password is not None
+                    or endpoint.path or endpoint.query or endpoint.fragment
+                    or endpoint.hostname not in allowed
+                    or (endpoint.port or 80) != bound_port):
+                return False
+            origins = self.headers.get_all("Origin", [])
+            if len(origins) > 1:
+                return False
+            if origins:
+                origin = urllib.parse.urlsplit(origins[0])
+                if (origin.scheme != "http" or origin.username is not None
+                        or origin.password is not None or origin.path
+                        or origin.query or origin.fragment
+                        or origin.hostname != endpoint.hostname
+                        or (origin.port or 80) != bound_port):
+                    return False
+        except ValueError:
+            return False
+        return True
+
+    def _check_endpoint(self) -> bool:
+        if self._valid_endpoint():
+            return True
+        self._send(403, {"error": "invalid request endpoint"})
+        return False
+
     def do_GET(self):
+        if not self._check_endpoint():
+            return
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
         query = urllib.parse.parse_qs(parsed.query)
@@ -71,6 +112,8 @@ class _Handler(BaseHTTPRequestHandler):
         return self._send(404, {"error": "not found"})
 
     def do_POST(self):
+        if not self._check_endpoint():
+            return
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
         if path.startswith("/api/") and not self._authorized():
@@ -81,6 +124,8 @@ class _Handler(BaseHTTPRequestHandler):
         return self._send(404, {"error": "not found"})
 
     def do_PUT(self):
+        if not self._check_endpoint():
+            return
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
         query = urllib.parse.parse_qs(parsed.query)
@@ -101,7 +146,9 @@ def serve(
     config_path = Path(config_path).resolve() if config_path else None
     root = project_root(config_path=config_path)
     config_path = config_path or (root / "config" / "agents.json")
-    if not config_path.is_file():
+    if not config_path.is_file() and not (
+        config_path.name == "agents.json" and config_path.with_name("agents.json.example").is_file()
+    ):
         raise SystemExit(
             f"Config not found: {config_path}\n"
             "Run from the agent-dashboard folder via start.py / start.bat, "
@@ -113,19 +160,20 @@ def serve(
     registry = Registry(config, config_path.parent, data_dir)
     docs_path = docs_dir(config_dir=config_path.parent, project=root)
     host = host or config.get("host", "127.0.0.1")
-    port = int(port or config.get("port", 8866))
-    auth_required = bool(config.get("auth_required", False))
+    port = int(config.get("port", 8866) if port is None else port)
+    auth_required = True
     token = (
         (token or "").strip()
         or (os.environ.get("AGENT_DASHBOARD_TOKEN") or "").strip()
-        or _secrets.token_urlsafe(24)
     )
 
-    if host not in {"127.0.0.1", "localhost", "::1"} and not auth_required:
+    if not token:
         raise SystemExit(
-            f"Refusing to bind {host} without auth. "
-            "Set auth_required: true in config, or bind to 127.0.0.1 / localhost / ::1."
+            "Set AGENT_DASHBOARD_TOKEN before starting the dashboard, then enter "
+            "the token in browser Settings. CLI clients use Authorization: Bearer."
         )
+    if host in {"0.0.0.0", "::", ""}:
+        raise SystemExit("Bind to a specific interface address for Host/Origin validation.")
 
     profiles_path = root / "config" / "terminal_profiles.json"
     if not profiles_path.is_file():
@@ -133,6 +181,7 @@ def serve(
     httpd = ThreadingHTTPServer((host, port), _Handler)
     httpd.ctx = {
         "registry": registry,
+        "bound_host": host,
         "auth_required": auth_required,
         "token": token,
         "config": config,
@@ -154,9 +203,9 @@ def serve(
             flush=True,
         )
     print(json.dumps({
-        "listening": f"http://{host}:{port}",
+        "listening": f"http://{host}:{httpd.server_port}",
         "auth_required": auth_required,
-        "api_token": token if auth_required else None,
+        "token_entry": "Browser Settings or Authorization header (token is memory-only)",
         "agents": list(registry.adapters),
         "config": config_display,
         "project_root": str(root),

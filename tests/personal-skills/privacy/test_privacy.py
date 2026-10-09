@@ -5,20 +5,26 @@ import tempfile
 import unittest
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[3]
+from ai_agents_repo.discovery import repo_root
+from ai_agents_repo.paths import agent_core_root, schemas_personal_root, skills_root
+
+ROOT = repo_root()
+SCHEMAS = schemas_personal_root(root=ROOT)
+SKILLS = skills_root(root=ROOT)
+AGENT_CORE = agent_core_root(root=ROOT)
 
 
 class PrivacyTests(unittest.TestCase):
     def test_browser_handoff_persisted_false(self) -> None:
         schema = json.loads(
-            (ROOT / "schemas" / "personal" / "browser-handoff.schema.json").read_text(
+            (SCHEMAS / "browser-handoff.schema.json").read_text(
                 encoding="utf-8"
             )
         )
         self.assertEqual(schema["properties"]["persisted"].get("const"), False)
 
     def test_career_confidential_not_in_public_resume_rule(self) -> None:
-        text = (ROOT / "skills" / "personal" / "career-tools" / "SKILL.md").read_text(
+        text = (SKILLS / "personal" / "career-tools" / "SKILL.md").read_text(
             encoding="utf-8"
         )
         self.assertIn("confidential", text.lower())
@@ -27,7 +33,7 @@ class PrivacyTests(unittest.TestCase):
     def test_personal_store_export_purge(self) -> None:
         import sys
 
-        sys.path.insert(0, str(ROOT / "agent-core"))
+        sys.path.insert(0, str(AGENT_CORE))
         from agent_core.personal_store import (
             append_accomplishment,
             delete_store,

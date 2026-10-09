@@ -140,10 +140,9 @@ class _Handler(BaseHTTPRequestHandler):
         if path.endswith("/cancel") and path.startswith("/api/runs/"):
             if len(parts) != 4: return self._send(404, {"error": "not found"})
             run_id = parts[2]
-            store.set_status(run_id, "CANCELLED")
-            for job in store.jobs(run_id, active_only=True):
-                ctx["jobs"].cancel(job["job_id"])
-            return self._send(200, {"cancelled": True})
+            row=store.request_cancel(run_id)
+            ctx["executor"].submit(_safe_resume,ctx,run_id)
+            return self._send(202,{"run_id":run_id,"status":row["status"]})
         if path == "/api/secrets":
             name, value = body.get("name"), body.get("value")
             if not name or not value:

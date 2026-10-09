@@ -373,11 +373,16 @@ function wireEvents() {
     const startResult = document.getElementById("startResult");
     try {
       startResult.textContent = "Ensuring server…";
-      await ensureBackend(state.agentId, {
+      if (!requireLiveStartConfirm(state.agentId, "start")) {
+        startResult.textContent = "Live start cancelled";
+        return;
+      }
+      const backendResult = await ensureBackend(state.agentId, {
         provider: state.agentId === "daily-coder" ? selectedProvider() : undefined,
-        requireLiveConfirm: requireLiveStartConfirm,
+        requireLiveConfirm: () => true,
         agents: state.agents,
       });
+      if (!backendResult.ok) throw new Error(backendResult.error || "Backend unavailable");
       const body = {
         request,
         context: values.context,
@@ -386,6 +391,7 @@ function wireEvents() {
       };
       if (state.agentId === "daily-coder") {
         body.model = values.model;
+        body.mode = isLiveProvider(selectedProvider()) ? "live" : "mock";
         if (values.repo) body.repo = values.repo;
       }
       const result = await api(`/api/agents/${encodeURIComponent(state.agentId)}/runs`, {
@@ -398,7 +404,8 @@ function wireEvents() {
       if (result.git_dirty === true) repoBits.push("dirty");
       else if (result.git_dirty === false) repoBits.push("clean");
       const repoLine = repoBits.length ? ` · ${repoBits.join(" · ")}` : "";
-      startResult.textContent = `accepted ${result.run_id || ""}${repoLine}`;
+      const startState = result.execution_started === false ? "queued (not started)" : "accepted";
+      startResult.textContent = `${startState} ${result.run_id || ""}${repoLine}`;
       const ta = document.getElementById("workRequest");
       if (ta) ta.value = "";
       if (result.run_id) {

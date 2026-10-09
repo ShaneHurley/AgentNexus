@@ -1,8 +1,10 @@
 import json
+import hashlib
 import shutil
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 
 from daily_coder.acceptance import evaluate
 from daily_coder.budget import BudgetExceeded, BudgetManager
@@ -275,7 +277,7 @@ class TestTrivialWorkflow(unittest.TestCase):
             package = self._package(d)
             store = StateStore(Path(d) / "state.sqlite")
             result = Orchestrator(package, store, MockProvider(), live=False).start("Fix off-by-one in parser", package)
-            self.assertEqual(result["status"], "SIMULATED")
+            self.assertEqual(result["status"], "SIMULATED", result)
             sizing = Orchestrator(package, store, MockProvider(), live=False).artifacts.load_all(result["run_id"])["sizing"]
             self.assertEqual(sizing["workflow"], "S")
             roles = [i["role"] for i in store.invocations(result["run_id"], 1000)]
@@ -384,6 +386,29 @@ class TestPolicy(RuntimeFixture):
             broker.execute("implementer", "filesystem.write",
                            {"path": "a.py", "content": "new", "expected_sha256": "stale"}, ["a.py"])
 
+    def test_patch_requires_compare_and_swap_hash(self):
+        tools, policy = self.configs()
+        tools["role_allowlists"]["implementer"].append("patch.apply")
+        path = self.root / "a.py"; path.write_text("old", encoding="utf-8")
+        broker = ToolBroker(self.root, tools, policy)
+        with self.assertRaisesRegex(ToolDenied, "expected_sha256 is required"):
+            broker.execute("implementer", "patch.apply",
+                           {"path": "a.py", "find": "old", "replace": "new"}, ["a.py"])
+
+    def test_patch_rejects_stale_hash_and_accepts_current_hash(self):
+        tools, policy = self.configs()
+        tools["role_allowlists"]["implementer"].append("patch.apply")
+        path = self.root / "a.py"; path.write_text("old", encoding="utf-8")
+        broker = ToolBroker(self.root, tools, policy)
+        arguments = {"path": "a.py", "find": "old", "replace": "new"}
+        with self.assertRaisesRegex(ToolDenied, "file changed since it was read"):
+            broker.execute("implementer", "patch.apply",
+                           {**arguments, "expected_sha256": "stale"}, ["a.py"])
+        digest = hashlib.sha256(b"old").hexdigest()
+        result = broker.execute("implementer", "patch.apply",
+                                {**arguments, "expected_sha256": digest}, ["a.py"])
+        self.assertTrue(result["applied"])
+
     def test_redaction(self):
         self.assertNotIn("abc123", redact("api_key=abc123"))
 
@@ -394,6 +419,50 @@ class TestPolicy(RuntimeFixture):
         broker = ToolBroker(self.root, tools, policy)
         with self.assertRaises(ToolDenied):
             broker.execute("researcher", "shell.readonly", {"argv": [str(Path(__file__).parent / "python"), "-V"]})
+
+    def test_host_interpreter_is_denied_without_isolated_runner(self):
+        tools = {"role_allowlists": {"researcher": ["shell.readonly"]}, "disabled_until_adapter_configured": []}
+        policy = {"path_policy": {"deny": [], "write_requires_plan_allowlist": True},
+                  "command_policy": {"allow": ["python"]}}
+        broker = ToolBroker(self.root, tools, policy)
+        with self.assertRaises(ToolDenied):
+            broker.execute("researcher", "shell.readonly", {"argv": ["python", "-c", "print('no')"]})
+
+    def test_compatibility_test_runner_cannot_bypass_isolation(self):
+        tools = {"role_allowlists": {"researcher": ["tests.run"]}, "disabled_until_adapter_configured": []}
+        policy = {"path_policy": {"deny": [], "write_requires_plan_allowlist": True},
+                  "command_policy": {"allow": ["python"]}}
+        broker = ToolBroker(self.root, tools, policy)
+        with self.assertRaises(ToolDenied):
+            broker.run_tests("researcher", ["python", "-c", "print('no')"])
+
+    def test_detached_jobs_reject_unallowlisted_executable(self):
+        class JobSpy:
+            started = False
+
+            def estimate(self, repo, argv):
+                return None
+
+            def start(self, *args, **kwargs):
+                self.started = True
+                return {"job_id": "unexpected"}
+
+        orchestrator = object.__new__(Orchestrator)
+        orchestrator.live = True
+        orchestrator.state = SimpleNamespace(get=lambda _run_id: {"repo": str(self.root)},
+                                             set_status=lambda *_args: None)
+        orchestrator.jobs = JobSpy()
+        orchestrator.config = {"job_timeout_s": 30}
+        orchestrator.artifacts = SimpleNamespace(put=lambda *_args: None)
+        broker = ToolBroker(self.root,
+                            {"role_allowlists": {"test_executor": ["tests.run"]},
+                             "disabled_until_adapter_configured": []},
+                            {"command_policy": {"allow": ["python"]}})
+        packet = {"plan": {"verification_commands": [["python", "-c", "print('no')"]]}}
+
+        with self.assertRaisesRegex(ToolDenied, "isolated execution backend"):
+            orchestrator._maybe_start_job("r", packet, broker)
+        self.assertFalse(orchestrator.jobs.started)
 
 
 class TestAcceptance(unittest.TestCase):
@@ -416,6 +485,64 @@ class TestAcceptance(unittest.TestCase):
                           approvals_ok=True, live=True, config={"acceptance": {}})
         self.assertEqual(result["verdict"], "fail")
         self.assertIn("test evidence is missing or not passing", result["failures"])
+
+    def test_live_rejects_passing_verdict_with_failed_command(self):
+        packet = {"decide": {"acceptance_criteria": ["x"]}, "plan": {"unresolved_questions": [], "file_allowlist": ["a.py"]},
+                  "plan_review": {"verdict": "pass"}, "implement": {"changed_files": ["a.py"]},
+                  "alignment": {"verdict": "pass"}, "code_review": {"verdict": "pass"},
+                  "test_design": {"test_required": True},
+                  "test_execute": {"verdict": "pass", "commands": [{"argv": ["pytest"], "returncode": 0}]}}
+        result = evaluate(run={"revision": "abc"}, packet=packet,
+                          artifacts=[{"kind": k} for k in ("decide", "plan", "plan_review")],
+                          approvals_ok=True, live=True, config={"acceptance": {}},
+                          verification_results=[{"decision": "allow", "returncode": 1, "timeout": False}])
+        self.assertEqual(result["verdict"], "fail")
+
+    def test_live_rejects_passing_verdict_with_failed_detached_job(self):
+        packet = {"decide": {"acceptance_criteria": ["x"]}, "plan": {"unresolved_questions": [], "file_allowlist": ["a.py"]},
+                  "plan_review": {"verdict": "pass"}, "implement": {"changed_files": ["a.py"]},
+                  "alignment": {"verdict": "pass"}, "code_review": {"verdict": "pass"},
+                  "test_design": {"test_required": True}, "job_evidence": {"state": "failed", "exit_code": 1},
+                  "test_execute": {"verdict": "pass", "commands": [{"argv": ["pytest"], "returncode": 0}]}}
+        result = evaluate(run={"revision": "abc"}, packet=packet,
+                          artifacts=[{"kind": k} for k in ("decide", "plan", "plan_review")],
+                          approvals_ok=True, live=True, config={"acceptance": {}},
+                          job_results=[{"kind": "tests", "state": "failed", "exit_code": 1}])
+        self.assertEqual(result["verdict"], "fail")
+
+    def test_live_accepts_only_recorded_successful_test_results(self):
+        packet = {"decide": {"acceptance_criteria": ["x"]}, "plan": {"unresolved_questions": [], "file_allowlist": ["a.py"]},
+                  "plan_review": {"verdict": "pass"}, "implement": {"changed_files": ["a.py"]},
+                  "alignment": {"verdict": "pass"}, "code_review": {"verdict": "pass"},
+                  "test_design": {"test_required": True},
+                  "test_execute": {"verdict": "pass", "commands": [{"argv": ["pytest"], "returncode": 0}]}}
+        result = evaluate(run={"revision": "abc"}, packet=packet,
+                          artifacts=[{"kind": k} for k in ("decide", "plan", "plan_review")],
+                          approvals_ok=True, live=True, config={"acceptance": {}},
+                          verification_results=[{"decision": "allow", "returncode": 0, "timeout": False}])
+        self.assertEqual(result["verdict"], "pass")
+
+
+class TestRecordedVerification(RuntimeFixture):
+    def test_gateway_records_test_exit_status_without_output(self):
+        tools = {"role_allowlists": {"test_executor": ["tests.run"]}, "disabled_until_adapter_configured": []}
+        policy = {"path_policy": {"deny": [], "write_requires_plan_allowlist": True},
+                  "execution_policy": {"isolated_tools": ["tests.run"]},
+                  "command_policy": {"allow": ["python"]}}
+        from agent_core.isolation import DockerRunner
+        from unittest.mock import patch
+        runner = DockerRunner("python@sha256:" + "a" * 64, self.root)
+        broker = ToolBroker(self.root, tools, policy, isolated_runner=runner)
+        patched = patch.object(DockerRunner, "run", return_value={"returncode": 0, "timeout": False, "stdout": "ok", "stderr": ""})
+        patched.start()
+        self.addCleanup(patched.stop)
+        gateway = PolicyGateway(broker, self.store, policy, approvals_required=False)
+        gateway.execute("r", "test_executor", "TEST_EXECUTE", "tests.run",
+                        {"argv": ["python", "-c", "print('ok')"]})
+        call = self.store.tool_calls("r")[0]
+        summary = json.loads(call["result_summary"])
+        self.assertEqual(summary, {"returncode": 0, "timeout": False})
+        self.assertNotIn("stdout", summary)
 
 
 class TestSecrets(unittest.TestCase):
@@ -442,6 +569,14 @@ class TestProviderParsing(unittest.TestCase):
 
 
 class TestState(RuntimeFixture):
+    def test_duplicate_invocation_is_idempotent_for_cost_and_usage(self):
+        arguments = ("r", "researcher", "RESEARCH", 0, 0, "lowest", "mock",
+                     10, 5, 0.02, 10, "ok", None, "same-call")
+        self.store.record_invocation(*arguments)
+        self.store.record_invocation(*arguments)
+        self.assertEqual(self.store.get("r")["est_usd"], 0.02)
+        self.assertEqual(self.store.total_usage("r"), {"calls": 1, "tokens": 15})
+
     def test_status_is_separate_from_phase(self):
         self.store.set_status("r", RunStatus.WAITING_HUMAN)
         row = self.store.get("r")
@@ -534,6 +669,10 @@ class TestResearchFanout(unittest.TestCase):
         package.mkdir()
         for name in ("agents", "schemas", "skills", "config"):
             shutil.copytree(source / name, package / name)
+        pricing_path = package / "config" / "pricing.json"
+        pricing = json.loads(pricing_path.read_text(encoding="utf-8"))
+        pricing["fake"] = {"input_per_1k": 0.0, "output_per_1k": 0.0}
+        pricing_path.write_text(json.dumps(pricing), encoding="utf-8")
         return package
 
     def test_repo_map_none_when_not_live(self):
@@ -564,12 +703,14 @@ class TestResearchFanout(unittest.TestCase):
             store = StateStore(Path(d) / "state.sqlite")
             provider = ClosedResearch()
             result = Orchestrator(package, store, provider, live=False).start(self.L_REQUEST, package)
-            self.assertEqual(result["status"], "SIMULATED")
+            self.assertEqual(result["status"], "SIMULATED",
+                             {"run": result, "events": store.events(result["run_id"]),
+                              "researcher_calls": provider.researcher_calls})
             self.assertEqual(result["profile"], "L")
-            self.assertEqual(provider.researcher_calls, 4)
+            self.assertEqual(provider.researcher_calls, 2) # root concurrency ceiling
             research = Orchestrator(package, store, MockProvider(), live=False).artifacts.load_all(result["run_id"])["research"]
             self.assertTrue(research["early_stop"])
-            self.assertEqual(len(research["cards"]), 4)
+            self.assertEqual(len(research["cards"]), 2)
             first = research["cards"][0]
             self.assertIn("lane", first)
             self.assertIn("angle", first)
@@ -597,7 +738,7 @@ class TestResearchFanout(unittest.TestCase):
             store = StateStore(Path(d) / "state.sqlite")
             provider = UnknownResearch()
             result = Orchestrator(package, store, provider, live=False).start(self.L_REQUEST, package)
-            self.assertEqual(result["status"], "SIMULATED")
+            self.assertEqual(result["status"], "SIMULATED", result)
             self.assertEqual(provider.researcher_calls, 5)
             research = Orchestrator(package, store, MockProvider(), live=False).artifacts.load_all(result["run_id"])["research"]
             self.assertFalse(research["early_stop"])

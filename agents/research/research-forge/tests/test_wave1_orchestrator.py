@@ -22,7 +22,13 @@ def test_e2e_mock_hashes_stable(repo_root: Path) -> None:
     orch2 = Wave1Orchestrator(repo_root, live=False)
     out2 = orch2.run(req)
     assert out2["report_hash"] == out1["report_hash"]
-    assert out2["packet_hash"] == out1["packet_hash"]
+    assert out2["run_id"] != out1["run_id"]
+    # Per-run request identity is part of the packet; its hash must differ.
+    assert out2["packet_hash"] != out1["packet_hash"]
+    packet1, packet2 = dict(out1["packet"]), dict(out2["packet"])
+    assert packet1.pop("request_id") == out1["run_id"]
+    assert packet2.pop("request_id") == out2["run_id"]
+    assert packet1 == packet2
 
 
 def test_pause_resume_no_duplicate_search(repo_root: Path) -> None:
@@ -38,6 +44,7 @@ def test_pause_resume_no_duplicate_search(repo_root: Path) -> None:
         clarification=sd.get("clarification"),
         paused=sd.get("paused", True),
         resume_token=sd.get("resume_token"),
+        registry_hash=sd["registry_hash"],
     )
     resumed = orch.resume(
         state,

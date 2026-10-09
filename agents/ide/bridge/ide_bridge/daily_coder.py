@@ -43,6 +43,11 @@ def _run_dc(
 
 
 def cmd_run(args: argparse.Namespace) -> int:
+    if getattr(args, "supervisor_dir", None):
+        from ide_bridge.supervised import execute
+        if args.provider in ("command", "http") or args.provider_command or args.provider_endpoint:
+            raise ValueError("Command/HTTP provider arguments require native Daily Coder execution")
+        return execute(args, "daily-coder")
     argv = ["run", "--request", args.request, "--repo", args.repo, "--provider", args.provider]
     if args.live:
         argv.append("--live")
@@ -63,6 +68,9 @@ def cmd_approve(args: argparse.Namespace) -> int:
 
 
 def cmd_resume(args: argparse.Namespace) -> int:
+    if getattr(args, "supervisor_dir", None):
+        from ide_bridge.supervised import execute
+        return execute(args, "daily-coder", resume=True)
     argv = ["resume", args.run_id, "--provider", args.provider]
     if args.live:
         argv.append("--live")
@@ -83,6 +91,8 @@ def register(sub: argparse._SubParsersAction) -> None:
     run_p.add_argument("--cwd", default=".")
     run_p.add_argument("--mark-simulated", action="store_true", default=True)
     run_p.add_argument("--no-mark-simulated", dest="mark_simulated", action="store_false")
+    from ide_bridge.supervised import add_options
+    add_options(run_p)
     run_p.set_defaults(handler=cmd_run)
 
     approve_p = dc_sub.add_parser("approve")
@@ -99,4 +109,5 @@ def register(sub: argparse._SubParsersAction) -> None:
     resume_p.add_argument("--provider", default="mock")
     resume_p.add_argument("--live", action="store_true")
     resume_p.add_argument("--cwd", default=".")
+    add_options(resume_p)
     resume_p.set_defaults(handler=cmd_resume)

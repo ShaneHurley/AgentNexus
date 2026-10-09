@@ -9,3 +9,19 @@ blocked_http_methods:
   - PUT
   - PATCH
   - DELETE
+role_tool_allowlist:
+  orchestrator:
+    - mock_search
+    - mock_model
+    - mock_search_v1
+    - public_search_v1
+    - live_search_v1
+    - local_reader_v1
+    - web_reader_v1
+    - live_reader_v1
+    - ledger
+  experiment_operator:
+    - experiment.create
+    - experiment.pre_review
+    - experiment.run
+    - experiment.read

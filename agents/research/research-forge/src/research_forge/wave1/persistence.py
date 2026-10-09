@@ -17,14 +17,22 @@ SCHEMA_VERSION = "wave1-run-state/1.0"
 
 
 def runs_root(repo_root: Path) -> Path:
-    return (repo_root / "runs" / "wave1").resolve()
+    root=repo_root.resolve()
+    target=root / "runs" / "wave1"
+    if (root/"runs").is_symlink() or target.is_symlink():
+        raise ValueError("RF runtime directories must not be symlinks")
+    return target
 
 
 def state_path(repo_root: Path, run_id: str) -> Path:
-    safe = "".join(c for c in run_id if c.isalnum() or c in ("-", "_", "."))
-    if not safe or safe != run_id:
+    safe = "".join(c for c in run_id if c.isalnum() or c in ("-", "_"))
+    if not safe or safe != run_id or safe in {".", ".."}:
         raise ValueError(f"invalid run_id: {run_id!r}")
-    return runs_root(repo_root) / safe / "state.json"
+    directory=runs_root(repo_root) / safe
+    path=directory / "state.json"
+    if directory.is_symlink() or path.is_symlink():
+        raise ValueError("RF run paths must not be symlinks")
+    return path
 
 
 def save_run_state(repo_root: Path, state: RunState | dict[str, Any], *, live: bool = False) -> Path:
@@ -47,6 +55,11 @@ def save_run_state(repo_root: Path, state: RunState | dict[str, Any], *, live: b
             fh.flush()
             os.fsync(fh.fileno())
         os.replace(tmp_name, path)
+        dir_fd = os.open(path.parent, os.O_RDONLY)
+        try:
+            os.fsync(dir_fd)
+        finally:
+            os.close(dir_fd)
     except Exception:
         try:
             os.unlink(tmp_name)
@@ -58,6 +71,12 @@ def save_run_state(repo_root: Path, state: RunState | dict[str, Any], *, live: b
 
 def load_run_state(repo_root: Path, run_id: str) -> tuple[RunState, dict[str, Any]]:
     path = state_path(repo_root, run_id)
+    if (path.parent / "lifecycle.sqlite").is_file():
+        from research_forge.wave1.lifecycle import LifecycleJournal
+        committed = LifecycleJournal(repo_root,run_id).load()
+        if committed:
+            payload = {"schema_version":SCHEMA_VERSION, "live":committed["pins"]["live"], "state":committed["state"]}
+            return RunState.from_dict(committed["state"]), payload
     if not path.is_file():
         raise FileNotFoundError(f"no persisted state for run {run_id}")
     payload = json.loads(path.read_text(encoding="utf-8"))

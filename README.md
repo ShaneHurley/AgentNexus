@@ -221,3 +221,7 @@ ai_agents/
 ├── AGENTS.md
 └── README.md
 ```
+
+## Current ANX implementation roadmap
+
+[Approved ANX roadmap](docs/superpowers/plans/2026-10-09-agentnexus-roadmap.md) governs the incremental baseline, provider/routing, memory and integration work. [Quickstart](QUICKSTART.md) documents the locked local installation; [Technical reference](TECHNICAL_REFERENCE.md) distinguishes implemented contracts from planned capabilities. Historical phase labels below remain document-qualified.

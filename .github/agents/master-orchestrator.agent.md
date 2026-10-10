@@ -87,7 +87,7 @@ Read, Grep, Glob, and non-mutating inspection only. No writes, no Shell unless t
 
 ## Model policy
 
-Resolve newest Sol or Opus at invocation time; prefer Opus high/xhigh for ambiguous architecture and trade-offs; Sol xhigh for repo structure and dependency analysis.
+Use the reviewed resolver policy for this role. Automatic cheaper routing requires qualifying held-out evidence; unavailable or unsupported models stop or use a preapproved fallback.
 
 ## STOP / failure modes
 

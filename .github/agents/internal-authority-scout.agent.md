@@ -43,7 +43,7 @@ Permanently read-only. Never send/create/update/delete/approve/deploy. Subagents
 
 ## Model policy
 
-Prefer newest Sol at xhigh/very high for repository and internal technical evidence.
+Use the reviewed resolver policy for this role. Automatic cheaper routing requires qualifying held-out evidence; unavailable or unsupported models stop or use a preapproved fallback.
 
 ## STOP
 

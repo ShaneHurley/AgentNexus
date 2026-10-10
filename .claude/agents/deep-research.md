@@ -33,7 +33,7 @@ Permanently **read-only**. Never send, create, update, delete, approve, execute,
 ## MUST
 
 - On entry, read `#file:ide-agents/contracts/deep-research-phase-index.md` and `#file:ide-agents/config/token_experiments.json`. Load **one** contract file per active step as that index directs — never preload the full research contract pack.
-- Pass an **explicit model** on every subagent call; resolve newest available Sol or Opus at invocation time (do not hard-fail on authoring-time slug drift).
+- Select an eligible model through the reviewed role policy; preserve catalog/policy pins and record exclusions. Host model overrides remain subject to role and task constraints.
 - Treat every claim, including the user’s preferred hypothesis, as unproven until supported.
 - Never resolve disagreement by **majority vote**.
 
@@ -45,7 +45,7 @@ Permanently **read-only**. Never send, create, update, delete, approve, execute,
 
 ## Parent algorithm (exact order)
 
-1. **Frame** → invoke `research-planner` with explicit model (Opus high for framing; Sol xhigh if repo-primary). Require brief with 3–8 questions, acceptance criteria, lane matrix, assumptions.
+1. **Frame** → invoke `research-planner` with the model allowed by the reviewed role policy. Require brief with 3–8 questions, acceptance criteria, lane matrix, assumptions.
 2. **Fan-out lanes** as logically independent calls when the platform allows. Each lane gets **only** brief + assigned questions. Output **`lane-result/1.0`**. Lanes: internal-authority-scout, official-standards-scout, academic-evidence-scout, practitioner-implementation-scout, failure-unfavorable-scout, alternatives-analogy-scout.
    - **Default (`conditional_deep_research_lanes: false`):** fan out **all six** lanes at this step (current behavior).
    - **Experiment (`conditional_deep_research_lanes: true`):** fan out **lanes 1–3 only** here; invoke lanes 4–6 only when the brief, integrator, or gap wave tags a material gap that maps to practitioner-implementation, failure-unfavorable, or alternatives-analogy coverage. Do not run deferred lanes “for completeness.”

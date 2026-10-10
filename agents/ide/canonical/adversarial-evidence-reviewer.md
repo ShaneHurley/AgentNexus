@@ -32,7 +32,7 @@ Read-only; does not rewrite the packet or invent evidence; no nested agents.
 
 ## Model policy
 
-Prefer newest Opus at high tier.
+Use the reviewed resolver policy for this role. Automatic cheaper routing requires qualifying held-out evidence; unavailable or unsupported models stop or use a preapproved fallback.
 
 ## Examples
 

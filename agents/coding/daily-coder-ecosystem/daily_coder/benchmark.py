@@ -45,10 +45,17 @@ def run_benchmark(root, output=None, baseline=None, repeats=1):
                     "input_tokens":sum(i["input_tokens"] for i in invocations),
                     "output_tokens":sum(i["output_tokens"] for i in invocations),
                     "repairs":run.get("repair_cycles",0),
+                    "escalations":0,
+                    "cost_usd":0.0, "cost_evidence":"known-zero-mock",
+                    "critical_policy_violation":False,
+                    "roles":[{"role":i["role"],"phase":i["phase"],"input_tokens":i["input_tokens"],"output_tokens":i["output_tokens"]} for i in invocations],
+                    "tool_output_chars":0,  # Mock provider requests no tools.
                 })
                 shutil.rmtree(root/".daily-coder"/"artifacts"/run["run_id"],ignore_errors=True)
     result={
-        "version":1,
+        "version":2,
+        "evidence_kind":"mock",
+        "quality_qualification":False,
         "created_at":time.time(),
         "config_hash":sha256_text(canonical_json({
             "default":load_json(root/"config/default.json"),

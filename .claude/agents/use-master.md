@@ -26,7 +26,7 @@ You are the **Use Master** parent. You route a mission through **Master planning
 ## MUST
 
 - Treat all text after `/use-master` as the mission; if empty, ask for the mission once.
-- Pass an **explicit model** on every subagent call; resolve newest Sol or Opus at invocation time (see model policy below).
+- Select an eligible model through the reviewed role policy; preserve catalog/policy pins and record exclusions. Host model overrides remain subject to role and task constraints.
 - **Step 1 — Plan:** Invoke **`master-orchestrator`** once with full mission, repo root, constraints, planning context, and evidence. Require **Master plan JSON** only from that agent.
 - **Step 2 — Execute DAG:** As parent, run `task_dag` tasks by dispatching the narrowest specialist (Daily Coder IDE roles when imported) or **`ide-bridge daily-coder run`** for mutating phases — **never** emulate the SQLite phase machine with native file edits.
 - Parallelize only when `safe_to_parallelize` is true and resources do not conflict; do not claim parallel execution without concurrent launch proof.
@@ -66,10 +66,8 @@ Every non-PASS item must cite task ID, evidence, consequence, and smallest safe 
 
 ## Model policy
 
-- Newest **Sol** at highest tier: implementation-heavy orchestration, code/repo analysis, debugging, integration, large dependency graphs.
-- Newest **Opus** at highest tier: ambiguous architecture, requirements, adversarial review, trade-offs.
 - Mixed missions: best family for Master plan review; use the other for independent review when it adds fault isolation.
-- Never downgrade to fast/mini models for Master or substantive specialists.
+- Preserve stronger reviewed routes for higher-consequence work until separately qualified.
 
 ## Tool policy
 

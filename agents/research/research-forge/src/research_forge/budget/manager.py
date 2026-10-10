@@ -30,6 +30,10 @@ class BudgetState:
         return max(0.0, self.limit_usd - self.spent_usd - self.reserved_usd - audit_reserve)
 
     audit_fraction: float = 0.10
+    limit_tokens: int = 0
+    actual_tokens: int = 0
+    reserved_tokens: int = 0
+    unknown_token_calls: int = 0
 
 
 class BudgetManager:
@@ -51,20 +55,39 @@ class BudgetManager:
             profile=profile,
             limit_usd=min(float(p["cost_usd"]),float(self.resource_limits["usd"])) if self.resource_limits else float(p["cost_usd"]),
             audit_fraction=float(p.get("reserve_audit_fraction", 0.10)),
+            limit_tokens=min(int(p.get("token_ceiling",0)),int(self.resource_limits.get("tokens",0))) if self.resource_limits is not None else int(p.get("token_ceiling",0)),
         )
         rl_cfg = RateLimiterConfig.from_profile(p)
         self.rate_limiter = RateLimiter(rl_cfg)
         return self.state
 
-    def reserve(self, amount_usd: float, *, role: str = "host", lane: str = "default") -> ForgeError | None:
+    def reserve(self, amount_usd: float, *, role: str = "host", lane: str = "default", reservation_tokens: int | None = None) -> ForgeError | None:
+        import math
+        if not math.isfinite(amount_usd) or amount_usd<0:
+            return forge_error(ErrorCode.BUDGET_EXCEEDED,"Invalid cost reservation")
+        if reservation_tokens is not None and (not isinstance(reservation_tokens,int) or isinstance(reservation_tokens,bool) or reservation_tokens<0):
+            return forge_error(ErrorCode.BUDGET_EXCEEDED,"Invalid token reservation")
         if self.resource_limits and self.resource_limits.get("deadline") is not None and time.time() >= self.resource_limits["deadline"]:
             return forge_error(ErrorCode.BUDGET_EXCEEDED, "Run deadline exhausted")
         if not self.state or self.state.hard_stopped:
             return forge_error(ErrorCode.BUDGET_EXCEEDED, "Budget hard stopped")
         if self.state.limit_usd <= 0:
             return forge_error(ErrorCode.BUDGET_EXCEEDED, "Run cost limit exhausted")
-        if amount_usd > self.state.available:
+        available=self.state.available
+        if self.resource_limits is not None:
+            usd_limit=min(self.state.limit_usd,float(self.resource_limits.get("usd",0)))
+            available=min(available,max(0,usd_limit*(1-self.state.audit_fraction)-self.state.spent_usd-self.state.reserved_usd))
+            if usd_limit<=0:
+                return forge_error(ErrorCode.BUDGET_EXCEEDED,"Run cost limit exhausted")
+        if amount_usd > available:
             return forge_error(ErrorCode.BUDGET_EXCEEDED, "Insufficient reserve")
+        if reservation_tokens is not None:
+            limit=self.state.limit_tokens
+            if self.resource_limits is not None: limit=min(limit,int(self.resource_limits.get("tokens",0)))
+            if limit<=0 or self.state.actual_tokens+self.state.reserved_tokens+reservation_tokens>limit:
+                return forge_error(ErrorCode.BUDGET_EXCEEDED,"Token ceiling exhausted")
+            self.state.reserved_tokens+=reservation_tokens
+            self.state.unknown_token_calls+=1
         self.state.reserved_usd += amount_usd
         self.events.append({"type": "reserve", "amount_usd": amount_usd, "role": role, "lane": lane})
         return None
@@ -89,6 +112,15 @@ class BudgetManager:
         if frac >= self.thresholds["hard_stop_fraction"]:
             self.state.hard_stopped = True
         return None
+
+    def account_tokens(self, actual_tokens: int | None, reservation_tokens: int) -> None:
+        if self.state is None or actual_tokens is None:
+            return
+        self.state.reserved_tokens=max(0,self.state.reserved_tokens-reservation_tokens)
+        self.state.unknown_token_calls=max(0,self.state.unknown_token_calls-1)
+        self.state.actual_tokens+=actual_tokens
+        if self.state.actual_tokens+self.state.reserved_tokens>self.state.limit_tokens:
+            self.state.hard_stopped=True
 
     def threshold_status(self) -> str:
         if not self.state:
@@ -131,6 +163,10 @@ class BudgetManager:
             "profile": self.state.profile,
             "limit_usd": self.state.limit_usd,
             "spent_usd": self.state.spent_usd,
+            "limit_tokens": self.state.limit_tokens,
+            "actual_tokens": self.state.actual_tokens,
+            "reserved_tokens": self.state.reserved_tokens,
+            "unknown_token_calls": self.state.unknown_token_calls,
             "reserved_usd": self.state.reserved_usd,
             "director_calls": self.state.director_calls,
             "role_spent": dict(self.state.role_spent),

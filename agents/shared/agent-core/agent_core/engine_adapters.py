@@ -15,27 +15,55 @@ def source_snapshot(root, engine, live, provider, workspace):
         if directory.exists():
             paths.extend(p for p in directory.rglob("*") if p.is_file() and p.suffix in (".json",".yaml",".yml",".md",".py") and "__pycache__" not in p.parts)
     files={str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(paths)}
+    shared=root.parents[2]/"agents/shared/agent-core"
+    for folder in ("agent_core","config"):
+        for path in sorted((shared/folder).rglob("*")):
+            if path.is_file() and path.suffix in {".py",".yaml",".json"}:
+                files["shared/"+str(path.relative_to(shared))]=hashlib.sha256(path.read_bytes()).hexdigest()
     return {"engine":engine,"live":live,"provider":provider,"workspace":str(Path(workspace).resolve()),"source_hashes":files,
             "effective_environment":{k:os.environ.get(k) for k in ("RF_MODE", "RF_RATE_LIMIT_CALLS", "RF_RATE_LIMIT_WINDOW", "RF_RATE_LIMIT_MAX_WAIT", "RF_RATE_LIMIT_ENABLED") if engine == "research-forge"}}
 
 
 class DailyCoderAdapter:
     def __init__(self, root): self.root=Path(root)
-    def snapshot(self, workspace, live, provider):
+    def snapshot(self, workspace, live, provider, *, pinned=None):
         from daily_coder.providers.registry import is_live, PROVIDERS
         if provider not in PROVIDERS: raise ContractDenied("unknown provider")
         if is_live(provider) != bool(live): raise ContractDenied("provider and explicit live authorization differ")
-        return source_snapshot(self.root,"daily-coder",live,provider,workspace)
+        from .routing_runtime import load_model_settings
+        return {**source_snapshot(self.root,"daily-coder",live,provider,workspace),**load_model_settings(self.root.parents[2],pinned=pinned)}
     def _engine(self, row):
         from daily_coder.state_store import StateStore
         from daily_coder.orchestrator import Orchestrator
-        from daily_coder.providers.registry import build_provider
-        from daily_coder.secrets import SecretStore
+        from daily_coder.providers.mock import MockProvider
+        from .providers.registry import build_provider
+        from .routing_runtime import SupervisedProvider,load_model_settings
+        from .secret_broker import SecretBroker
+        name=row["snapshot"]["provider"]
+        if name not in {"mock","openrouter","openai","anthropic","local"}:
+            raise ContractDenied("provider lacks reviewed supervised adapter; legacy native interface remains available")
         config=json.loads((self.root/"config/default.json").read_text())
-        secret_store=SecretStore(self.root/".daily-coder/secrets.json")
-        provider=build_provider(row["snapshot"]["provider"],config=config,secrets=secret_store)
-        return Orchestrator(self.root,StateStore(self.root/".daily-coder/state.sqlite"),provider,live=row["live"],secrets=secret_store,
+        pins=load_model_settings(self.root.parents[2],pinned=row["snapshot"])
+        broker=SecretBroker(self.root.parents[2]/".agentnexus/secret-references.sqlite") if name not in {"mock","local"} else None
+        wrapper=SupervisedProvider(None,pins,provider_name=name,run_id=row["run_id"],workspace=row["workspace"],broker=broker)
+        wrapper.provider=MockProvider() if name=="mock" else build_provider(name,config=config,secret_broker=broker,secret_grant_factory=wrapper.secret_grant)
+        wrapper.capabilities=getattr(wrapper.provider,"capabilities",None)
+        class ReferencesOnly:
+            def get(self,*args,**kwargs):raise ContractDenied("tool credential use requires SecretBroker authorization")
+        engine=Orchestrator(self.root,StateStore(self.root/".daily-coder/state.sqlite"),wrapper,live=row["live"],secrets=ReferencesOnly(),
                             resource_limits={"tokens":row["limit_tokens"],"usd":row["limit_usd"],"deadline":row["deadline"]})
+        # Shared routing prices are the authority; unknown catalog prices must
+        # not inherit unrelated legacy estimates for the same model name.
+        engine.pricing.clear()
+        for model in pins["model_catalog"]["models"].values():
+            if model["provider"]!=name:continue
+            price=model["pricing"]
+            if price["input_per_million"] is not None and price["output_per_million"] is not None:
+                reviewed={"input_per_1k":price["input_per_million"]/1000,"output_per_1k":price["output_per_million"]/1000}
+                previous=engine.pricing.get(model["model"])
+                if previous is not None and previous!=reviewed:raise ContractDenied("conflicting prices for provider/model")
+                engine.pricing[model["model"]]=reviewed
+        return engine
     def create(self, row): return self._engine(row).create(row["request"],row["workspace"],run_id=row["run_id"])
     def execute(self, row, answers=None):
         self._engine(row).run(row["legacy_id"])
@@ -61,19 +89,36 @@ class DailyCoderAdapter:
 
 class ResearchForgeAdapter:
     def __init__(self, root): self.root=Path(root)
-    def snapshot(self,workspace,live,provider):
+    def snapshot(self,workspace,live,provider, *, pinned=None):
         from research_forge.decisions.validator import validate_decisions_for_gate
         from research_forge.settings import load_settings
         ok,messages=validate_decisions_for_gate(self.root,"wave_1_live" if live else "wave_1_mock")
         if not ok: raise ContractDenied("RF decision gate denied execution: " + "; ".join(messages))
-        if live and not os.environ.get("OPENROUTER_API_KEY"): raise ContractDenied("RF live credential reference unavailable")
+        # Wave 1 uses retrieval, not model calls. Credentials are checked by the
+        # authorized search adapter immediately before dispatch.
         snap=source_snapshot(self.root,"research-forge",live,"live" if live else "mock",workspace)
         settings=load_settings(self.root)
         snap["effective_settings"]={"mode":settings.mode,"policy_config":settings.policy_config,"budget_config":settings.budget_config,"extra_hash":hashlib.sha256(json.dumps(settings.extra,sort_keys=True,default=str).encode()).hexdigest()}
+        from .routing_runtime import load_model_settings
+        snap.update(load_model_settings(self.root.parents[2],pinned=pinned))
         return snap
     def _engine(self,row):
         from research_forge.wave1.orchestrator import Wave1Orchestrator
-        return Wave1Orchestrator(self.root,live=row["live"],workspace=Path(row["workspace"]),
+        search=None
+        if row["live"]:
+            from .secret_broker import SecretBroker
+            from .routing_runtime import SupervisedProvider
+            from research_forge.providers.live_search import LiveSearchAdapter
+            broker=SecretBroker(self.root.parents[2]/".agentnexus/secret-references.sqlite")
+            authority=SupervisedProvider(None,row["snapshot"],provider_name="brave",run_id=row["run_id"],workspace=row["workspace"],namespace="rf",broker=broker)
+            class AuthorizedSearch:
+                def search(self,query,**kwargs):
+                    request=type("Search",(),dict(run_id=row["run_id"],role="orchestrator",credential_ref="provider/brave",deadline=row["deadline"]))()
+                    grant=authority.secret_grant(request)
+                    if not broker.probe(grant):raise ContractDenied("retrieval credential unavailable")
+                    return broker.use(grant,lambda key:LiveSearchAdapter(api_key=key).search(query,**kwargs))
+            search=AuthorizedSearch()
+        return Wave1Orchestrator(self.root,live=row["live"],workspace=Path(row["workspace"]),search_adapter=search,model=object() if row["live"] else None,
                                  resource_limits={"tokens":row["limit_tokens"],"usd":row["limit_usd"],"deadline":row["deadline"]})
     def create(self,row): return "run-" + str(uuid.uuid4())
     def execute(self,row,answers=None):
@@ -108,7 +153,7 @@ class ResearchForgeAdapter:
             if any(e["kind"] == "cancel_acknowledged" for e in view["events"]) and not view["reconciliation_required"]: status="CANCELLED"
         budget=view["budget"] or {}
         return {"status":status,"phase":state.get("phase","new"),"state":state,"lifecycle":view,
-                "usage":{"tokens":0,"usd":budget.get("spent_usd",0.0),"usage_status":"estimated","unknown":view["reconciliation_required"]},
+                "usage":{"tokens":budget.get("actual_tokens",0),"usd":budget.get("spent_usd",0.0),"usage_status":"estimated","unknown":view["reconciliation_required"] or bool(budget.get("unknown_token_calls",0))},
                 "artifacts":[]}
     def cancel(self,row):
         engine=self._engine(row)

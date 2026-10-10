@@ -1,0 +1,896 @@
+{
+  "version": 2,
+  "evidence_kind": "mock",
+  "quality_qualification": false,
+  "created_at": 1791599887.3313751,
+  "config_hash": "5e06adf1f7371647f2618664dc14cb6e72da33ce9412c9cb104543b8b3fe576a",
+  "records": [
+    {
+      "scenario": "trivial",
+      "repeat": 0,
+      "run_id": "61129187-d12d-429a-aa0d-ad34a81fbff8",
+      "expected_profile": "S",
+      "profile": "S",
+      "status": "SIMULATED",
+      "calls": 7,
+      "tokens": 700,
+      "latency_ms": 563.309,
+      "input_tokens": 350,
+      "output_tokens": 350,
+      "repairs": 0,
+      "escalations": 0,
+      "cost_usd": 0.0,
+      "cost_evidence": "known-zero-mock",
+      "critical_policy_violation": false,
+      "roles": [
+        {
+          "role": "alignment_checker",
+          "phase": "ALIGNMENT",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "code_reviewer",
+          "phase": "CODE_REVIEW",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "test_executor",
+          "phase": "TEST_EXECUTE",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "implementer",
+          "phase": "IMPLEMENT",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "plan_reviewer",
+          "phase": "PLAN_REVIEW",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "planner",
+          "phase": "PLAN",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "master",
+          "phase": "DECIDE",
+          "input_tokens": 50,
+          "output_tokens": 50
+        }
+      ],
+      "tool_output_chars": 0
+    },
+    {
+      "scenario": "trivial",
+      "repeat": 1,
+      "run_id": "5017504d-f840-434d-9c54-7df391982c05",
+      "expected_profile": "S",
+      "profile": "S",
+      "status": "SIMULATED",
+      "calls": 7,
+      "tokens": 700,
+      "latency_ms": 526.248,
+      "input_tokens": 350,
+      "output_tokens": 350,
+      "repairs": 0,
+      "escalations": 0,
+      "cost_usd": 0.0,
+      "cost_evidence": "known-zero-mock",
+      "critical_policy_violation": false,
+      "roles": [
+        {
+          "role": "alignment_checker",
+          "phase": "ALIGNMENT",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "code_reviewer",
+          "phase": "CODE_REVIEW",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "test_executor",
+          "phase": "TEST_EXECUTE",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "implementer",
+          "phase": "IMPLEMENT",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "plan_reviewer",
+          "phase": "PLAN_REVIEW",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "planner",
+          "phase": "PLAN",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "master",
+          "phase": "DECIDE",
+          "input_tokens": 50,
+          "output_tokens": 50
+        }
+      ],
+      "tool_output_chars": 0
+    },
+    {
+      "scenario": "contained",
+      "repeat": 0,
+      "run_id": "ae82e059-8c4c-43ed-8623-06b7d9addff8",
+      "expected_profile": "M",
+      "profile": "M",
+      "status": "SIMULATED",
+      "calls": 14,
+      "tokens": 1400,
+      "latency_ms": 782.741,
+      "input_tokens": 700,
+      "output_tokens": 700,
+      "repairs": 0,
+      "escalations": 0,
+      "cost_usd": 0.0,
+      "cost_evidence": "known-zero-mock",
+      "critical_policy_violation": false,
+      "roles": [
+        {
+          "role": "alignment_checker",
+          "phase": "ALIGNMENT",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "documenter",
+          "phase": "DOCUMENT",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "code_reviewer",
+          "phase": "CODE_REVIEW",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "test_executor",
+          "phase": "TEST_EXECUTE",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "test_author",
+          "phase": "TEST_AUTHOR",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "implementer",
+          "phase": "IMPLEMENT",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "plan_reviewer",
+          "phase": "PLAN_REVIEW",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "alignment_checker",
+          "phase": "PLAN",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "planner",
+          "phase": "PLAN",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "test_designer",
+          "phase": "TEST_DESIGN",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "master",
+          "phase": "DECIDE",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "researcher",
+          "phase": "RESEARCH",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "researcher",
+          "phase": "RESEARCH",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "researcher",
+          "phase": "RESEARCH",
+          "input_tokens": 50,
+          "output_tokens": 50
+        }
+      ],
+      "tool_output_chars": 0
+    },
+    {
+      "scenario": "contained",
+      "repeat": 1,
+      "run_id": "cd2f7bef-0944-480d-9260-59bfd3c9c735",
+      "expected_profile": "M",
+      "profile": "M",
+      "status": "SIMULATED",
+      "calls": 14,
+      "tokens": 1400,
+      "latency_ms": 790.554,
+      "input_tokens": 700,
+      "output_tokens": 700,
+      "repairs": 0,
+      "escalations": 0,
+      "cost_usd": 0.0,
+      "cost_evidence": "known-zero-mock",
+      "critical_policy_violation": false,
+      "roles": [
+        {
+          "role": "alignment_checker",
+          "phase": "ALIGNMENT",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "documenter",
+          "phase": "DOCUMENT",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "code_reviewer",
+          "phase": "CODE_REVIEW",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "test_executor",
+          "phase": "TEST_EXECUTE",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "test_author",
+          "phase": "TEST_AUTHOR",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "implementer",
+          "phase": "IMPLEMENT",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "plan_reviewer",
+          "phase": "PLAN_REVIEW",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "alignment_checker",
+          "phase": "PLAN",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "planner",
+          "phase": "PLAN",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "test_designer",
+          "phase": "TEST_DESIGN",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "master",
+          "phase": "DECIDE",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "researcher",
+          "phase": "RESEARCH",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "researcher",
+          "phase": "RESEARCH",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "researcher",
+          "phase": "RESEARCH",
+          "input_tokens": 50,
+          "output_tokens": 50
+        }
+      ],
+      "tool_output_chars": 0
+    },
+    {
+      "scenario": "cross_cutting",
+      "repeat": 0,
+      "run_id": "82b92268-8621-4088-9be2-dfafe3d6391e",
+      "expected_profile": "L",
+      "profile": "L",
+      "status": "SIMULATED",
+      "calls": 18,
+      "tokens": 1800,
+      "latency_ms": 924.491,
+      "input_tokens": 900,
+      "output_tokens": 900,
+      "repairs": 0,
+      "escalations": 0,
+      "cost_usd": 0.0,
+      "cost_evidence": "known-zero-mock",
+      "critical_policy_violation": false,
+      "roles": [
+        {
+          "role": "alignment_checker",
+          "phase": "ALIGNMENT",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "documenter",
+          "phase": "DOCUMENT",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "code_reviewer",
+          "phase": "CODE_REVIEW",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "test_executor",
+          "phase": "TEST_EXECUTE",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "test_author",
+          "phase": "TEST_AUTHOR",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "alignment_checker",
+          "phase": "IMPLEMENT",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "implementer",
+          "phase": "IMPLEMENT",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "plan_reviewer",
+          "phase": "PLAN_REVIEW",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "alignment_checker",
+          "phase": "PLAN",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "planner",
+          "phase": "PLAN",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "test_designer",
+          "phase": "TEST_DESIGN",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "master",
+          "phase": "DECIDE",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "brainstormer",
+          "phase": "BRAINSTORM",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "researcher",
+          "phase": "RESEARCH",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "researcher",
+          "phase": "RESEARCH",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "researcher",
+          "phase": "RESEARCH",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "researcher",
+          "phase": "RESEARCH",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "researcher",
+          "phase": "RESEARCH",
+          "input_tokens": 50,
+          "output_tokens": 50
+        }
+      ],
+      "tool_output_chars": 0
+    },
+    {
+      "scenario": "cross_cutting",
+      "repeat": 1,
+      "run_id": "07472d7b-df36-494e-85db-c61302ee5a83",
+      "expected_profile": "L",
+      "profile": "L",
+      "status": "SIMULATED",
+      "calls": 18,
+      "tokens": 1800,
+      "latency_ms": 912.072,
+      "input_tokens": 900,
+      "output_tokens": 900,
+      "repairs": 0,
+      "escalations": 0,
+      "cost_usd": 0.0,
+      "cost_evidence": "known-zero-mock",
+      "critical_policy_violation": false,
+      "roles": [
+        {
+          "role": "alignment_checker",
+          "phase": "ALIGNMENT",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "documenter",
+          "phase": "DOCUMENT",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "code_reviewer",
+          "phase": "CODE_REVIEW",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "test_executor",
+          "phase": "TEST_EXECUTE",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "test_author",
+          "phase": "TEST_AUTHOR",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "alignment_checker",
+          "phase": "IMPLEMENT",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "implementer",
+          "phase": "IMPLEMENT",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "plan_reviewer",
+          "phase": "PLAN_REVIEW",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "alignment_checker",
+          "phase": "PLAN",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "planner",
+          "phase": "PLAN",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "test_designer",
+          "phase": "TEST_DESIGN",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "master",
+          "phase": "DECIDE",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "brainstormer",
+          "phase": "BRAINSTORM",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "researcher",
+          "phase": "RESEARCH",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "researcher",
+          "phase": "RESEARCH",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "researcher",
+          "phase": "RESEARCH",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "researcher",
+          "phase": "RESEARCH",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "researcher",
+          "phase": "RESEARCH",
+          "input_tokens": 50,
+          "output_tokens": 50
+        }
+      ],
+      "tool_output_chars": 0
+    },
+    {
+      "scenario": "high_risk",
+      "repeat": 0,
+      "run_id": "cf06c15a-9635-4303-ac48-02d747979c47",
+      "expected_profile": "XL",
+      "profile": "XL",
+      "status": "SIMULATED",
+      "calls": 20,
+      "tokens": 2000,
+      "latency_ms": 979.086,
+      "input_tokens": 1000,
+      "output_tokens": 1000,
+      "repairs": 0,
+      "escalations": 0,
+      "cost_usd": 0.0,
+      "cost_evidence": "known-zero-mock",
+      "critical_policy_violation": false,
+      "roles": [
+        {
+          "role": "alignment_checker",
+          "phase": "ALIGNMENT",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "documenter",
+          "phase": "DOCUMENT",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "code_reviewer",
+          "phase": "CODE_REVIEW",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "test_executor",
+          "phase": "TEST_EXECUTE",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "test_author",
+          "phase": "TEST_AUTHOR",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "alignment_checker",
+          "phase": "IMPLEMENT",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "implementer",
+          "phase": "IMPLEMENT",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "plan_reviewer",
+          "phase": "PLAN_REVIEW",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "alignment_checker",
+          "phase": "PLAN",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "planner",
+          "phase": "PLAN",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "test_designer",
+          "phase": "TEST_DESIGN",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "master",
+          "phase": "DECIDE",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "brainstormer",
+          "phase": "BRAINSTORM",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "alignment_checker",
+          "phase": "RESEARCH",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "researcher",
+          "phase": "RESEARCH",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "researcher",
+          "phase": "RESEARCH",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "researcher",
+          "phase": "RESEARCH",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "researcher",
+          "phase": "RESEARCH",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "researcher",
+          "phase": "RESEARCH",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "researcher",
+          "phase": "RESEARCH",
+          "input_tokens": 50,
+          "output_tokens": 50
+        }
+      ],
+      "tool_output_chars": 0
+    },
+    {
+      "scenario": "high_risk",
+      "repeat": 1,
+      "run_id": "0712f24d-1253-4197-b528-66a6205b6552",
+      "expected_profile": "XL",
+      "profile": "XL",
+      "status": "SIMULATED",
+      "calls": 20,
+      "tokens": 2000,
+      "latency_ms": 993.017,
+      "input_tokens": 1000,
+      "output_tokens": 1000,
+      "repairs": 0,
+      "escalations": 0,
+      "cost_usd": 0.0,
+      "cost_evidence": "known-zero-mock",
+      "critical_policy_violation": false,
+      "roles": [
+        {
+          "role": "alignment_checker",
+          "phase": "ALIGNMENT",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "documenter",
+          "phase": "DOCUMENT",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "code_reviewer",
+          "phase": "CODE_REVIEW",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "test_executor",
+          "phase": "TEST_EXECUTE",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "test_author",
+          "phase": "TEST_AUTHOR",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "alignment_checker",
+          "phase": "IMPLEMENT",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "implementer",
+          "phase": "IMPLEMENT",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "plan_reviewer",
+          "phase": "PLAN_REVIEW",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "alignment_checker",
+          "phase": "PLAN",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "planner",
+          "phase": "PLAN",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "test_designer",
+          "phase": "TEST_DESIGN",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "master",
+          "phase": "DECIDE",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "brainstormer",
+          "phase": "BRAINSTORM",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "alignment_checker",
+          "phase": "RESEARCH",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "researcher",
+          "phase": "RESEARCH",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "researcher",
+          "phase": "RESEARCH",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "researcher",
+          "phase": "RESEARCH",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "researcher",
+          "phase": "RESEARCH",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "researcher",
+          "phase": "RESEARCH",
+          "input_tokens": 50,
+          "output_tokens": 50
+        },
+        {
+          "role": "researcher",
+          "phase": "RESEARCH",
+          "input_tokens": 50,
+          "output_tokens": 50
+        }
+      ],
+      "tool_output_chars": 0
+    }
+  ],
+  "summary": {
+    "runs": 8,
+    "verified_routes": 8,
+    "successful": 8,
+    "median_calls": 16.0,
+    "p90_calls": 20,
+    "median_tokens": 1600.0,
+    "p90_tokens": 2000,
+    "median_latency_ms": 851.313,
+    "p90_latency_ms": 979.086
+  }
+}

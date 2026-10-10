@@ -23,7 +23,7 @@ class MockProvider(Provider):
                 input_tokens=10,
                 output_tokens=10,
                 model="mock",
-                usage=TokenUsage(input_tokens=10, output_tokens=10, total_tokens=20),
+                usage=TokenUsage(input_tokens=10, output_tokens=10, total_tokens=20, cost_usd=0.0, evidence_status="reported"),
             )
 
         q = request.input_packet.get("request") or request.input_packet.get("ORIGINAL_REQUEST", "")
@@ -66,5 +66,5 @@ class MockProvider(Provider):
             input_tokens=50,
             output_tokens=50,
             model="mock",
-            usage=TokenUsage(input_tokens=50, output_tokens=50, total_tokens=100),
+            usage=TokenUsage(input_tokens=50, output_tokens=50, total_tokens=100, cost_usd=0.0, evidence_status="reported"),
         )

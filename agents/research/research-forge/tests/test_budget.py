@@ -73,6 +73,7 @@ def test_wrapped_call(repo_root: Path) -> None:
         gw,
         bm,
         cost_usd=0.01,
+        reservation_tokens=10,
         auth_kwargs={
             "role": "orchestrator",
             "phase": "wave0",

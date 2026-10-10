@@ -168,15 +168,22 @@ def run_wave0_fixture(repo_root: Path, fixture_path: Path | None) -> dict[str, A
         budget.start("S")
 
         model = MockModel()
+        model_prompt="fixture prompt"
+        max_output_tokens=4096
+        # UTF-8 bytes bound the prompt estimate conservatively for this fixture.
+        token_reservation=len(model_prompt.encode("utf-8"))+max_output_tokens
 
         @mark_wrapped
         def _model_call() -> dict[str, Any]:
-            return model.complete("fixture prompt", task_id=run_id)
+            result=model.complete(model_prompt, task_id=run_id)
+            result.setdefault("usage",{})["cost_usd"]=0.0
+            return result
 
         wrapped = budget_wrapped_call(
             gateway,
             budget,
             cost_usd=0.1,
+            reservation_tokens=token_reservation,
             auth_kwargs={
                 "role": "orchestrator",
                 "phase": "wave0",

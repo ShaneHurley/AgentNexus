@@ -23,3 +23,13 @@ Tests: explicit zero vs missing usage, tool/stream conformance, no unknown retry
 ## Integration gate
 
 All offline regression/native/projection checks, independent source review and Linux/macOS CI; reviewed PR closes #5/#6/#7/#8. ANX-5 starts only after merge. Wave0 model usage receives explicit accounting; current retrieval-only Wave1 retains known zero.
+
+## Implementation evidence
+
+ANX-0 merged PR18. ANX-4 implements reference-based macOS broker, native shared tool/stream adapters, usage uncertainty and reservations, reviewed routing snapshots, evaluation policy binding, offline commands and bounded utilities. Independent review found split-stream credential redaction, stale policy qualification and cached-token undercount; regression fixes were added. Final integration checks and PR evidence are recorded at publication. No paid calls, actual credential mutations or automatic low-cost policy activation.
+
+### Review and publication gate
+
+Local full offline run:793 passed+23 subtests; native Daily Coder121 passed. Additional negative catalog-price regression passed after that run. Canonical DC/RF import, projection sync, selected Ruff correctness rules and staged redacted preflight passed. Eight mock benchmark runs completed with known-zero mock cost; these are not model-quality evidence.
+
+Stable-module independent review identified three issues and each received a regression fix. Final full integration review could not complete because the review subagent hit the account usage limit. Its failure is recorded; no final review pass is claimed. ANX-4 is published as a draft PR pending exact-head review and CI. ANX-5 implementation remains queued behind the required merge gate. No real Keychain credential operation, live provider call or paid evaluation occurred.

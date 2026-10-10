@@ -43,11 +43,11 @@
     },
     {
       "path": "agents/research/research-forge/tests/test_live_providers.py",
-      "sha256": "74e1f06457cecdeacad19844ecdf04f28f11ebf8b743124c13c6b9e8a3433682",
+      "sha256": "86ffed5ee51b8860559dde83e7fc7e78904dbd77a0cc13cf5bb0000ae7bacaa2",
       "spans": [
         {
-          "start": 4473,
-          "end": 4499
+          "start": 4517,
+          "end": 4543
         }
       ]
     },

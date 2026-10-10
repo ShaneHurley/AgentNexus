@@ -42,7 +42,7 @@ Read-only; no nested agents; no reopening passed scope.
 
 ## Model policy
 
-Newest Sol or Opus top tier matching the named gap (code vs judgment).
+Use the reviewed resolver policy for this role. Automatic cheaper routing requires qualifying held-out evidence; unavailable or unsupported models stop or use a preapproved fallback.
 
 ## STOP
 

@@ -37,7 +37,7 @@ Read-only; no agent invocation; no majority vote.
 
 ## Model policy
 
-Prefer newest Sol at xhigh/very high.
+Use the reviewed resolver policy for this role. Automatic cheaper routing requires qualifying held-out evidence; unavailable or unsupported models stop or use a preapproved fallback.
 
 ## Examples
 

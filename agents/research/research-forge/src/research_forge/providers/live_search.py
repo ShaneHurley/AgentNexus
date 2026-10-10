@@ -23,9 +23,10 @@ class LiveSearchAdapter:
         api_key: str | None = None,
         model: Any | None = None,
         timeout: float = 10.0,
+        allow_environment: bool = False,
     ) -> None:
         self.adapter_id = adapter_id
-        self.api_key = api_key or os.environ.get("BRAVE_SEARCH_API_KEY", "")
+        self.api_key = api_key or (os.environ.get("BRAVE_SEARCH_API_KEY", "") if allow_environment else "")
         self.timeout = timeout
         # Retained for constructor compatibility. Models must never invent search evidence.
         self._model = model
@@ -42,7 +43,7 @@ class LiveSearchAdapter:
         """Return provider results or an explicit empty/unavailable result."""
         int_cursor = int(cursor or 0)
         results: list[dict[str, Any]] = []
-        brave_key = self.api_key or os.environ.get("BRAVE_SEARCH_API_KEY", "")
+        brave_key = self.api_key
         retrieval_status = "unavailable"
         if brave_key:
             try:

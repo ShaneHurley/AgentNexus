@@ -38,7 +38,7 @@ The redacted response steps for the credential-like value found in historical re
 
 Research Forge's supported CLI composes Wave 0 and Wave 1. Individual later-wave modules do not constitute a complete multi-wave pipeline. A mock run exercises fixtures and must not be described as live retrieval. `research-forge validate --gate wave_1_mock` validates the runtime gate, not a research packet. Supervised decision gates select the RF package explicitly. Native RF commands require the RF package as working directory; root invocation still reports missing decision configuration. Missing or invalid gates deny execution.
 
-Durable sessions and the shared supervisor are implemented for DC and RF Wave 1. ModelResolver, unified knowledge memory, and SecretBroker remain planned work. See the architecture roadmap and the relevant runtime docs before treating these contracts as implemented.
+Durable sessions and the shared supervisor are implemented for DC and RF Wave 1. ANX-4 implements reviewed model resolution and SecretBroker; ANX-5 implements isolated knowledge stores and authorized draft retention. Automatic memory-to-engine context retrieval, validated profiles, and complete handoff/compaction integration remain ANX-6 work. See the sections below for implemented boundaries and measured limitations.
 
 
 ## Shared contracts and source precedence
@@ -122,3 +122,10 @@ Optional session-scoped --memory-binding pins configuration and store identity, 
 Review corrections: search refuses overrides above eight records/4,000 token units; opaque source IDs round-trip; recognized modern provider tokens and encoded credential fields are rejected; imports retain stale/conflicted restrictions; Shared promotion requires matching current dependency fingerprints via --fingerprints when dependencies exist. Confirmed personal mutations serialize across processes, while previews create no lock or store files.
 
 Post-release ANX-5 review corrections: personal import parses and schema-validates one descriptor-bound byte snapshot, hashes those exact bytes and retains matching source metadata; an in-place change during the read is refused. Runtime checkpoint recovery recognizes authorized deletion tombstones and skips reingestion without resurrecting content or blocking otherwise reconciled execution. RF/DC recovery regressions verify that this does not redispatch native work or retain settled reservations.
+
+
+## General-purpose orchestration execution
+
+The approved [execution plan](docs/superpowers/plans/2026-10-10-general-purpose-orchestration.md) targets this Mac with Codex-only access first, then portable Linux deployment. Daily, Research and Code are profiles over the existing six orchestrators; project instances will isolate settings, grants, memory and state while sharing versioned runtime code. These profile/instance interfaces are pending implementation.
+
+Daily Coder tool-result projection now bounds the complete serialized packet, including Unicode escaping, and retains status plus gateway tool-operation receipt references. Small arguments remain when they fit; oversized observations and optional arguments are reduced first. Essential references that cannot fit stop the invocation rather than silently discarding evidence. Full tool receipts remain in authoritative execution state; role-originated inspection/expansion must pass its normal gateway and workspace checks. Optional GitHub adapter registration performs no credential lookup; credential use remains checked when the handler is invoked.

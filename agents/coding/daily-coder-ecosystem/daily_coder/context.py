@@ -159,32 +159,57 @@ def build_packet(role, packet, extra=None):
     return sliced
 
 def project_tool_results(results, max_chars=MAX_TOOL_CONTEXT_CHARS, recent=RECENT_TOOL_RESULTS):
-    """Keep recent observations intact and reduce older results to evidence references."""
+    """Bound the serialized packet, retaining status and durable receipt references.
+
+    Full results remain in the gateway's tool-operation receipts. If even their
+    essential references will not fit, stop instead of silently dropping evidence.
+    """
+    import hashlib
+    if type(max_chars) is not int or max_chars < 256 or type(recent) is not int or recent < 1:
+        raise ValueError("invalid tool-context bounds")
     results = list(results or [])
     if not results:
         return []
-    projected = []
+
+    def encoded(value):
+        return json.dumps(value, sort_keys=True, default=str)
+
+    def reference(item):
+        result = item.get("result") or {}
+        serialized = encoded(result)
+        status = {key: result[key] for key in
+                  ("returncode", "timeout", "cancelled", "cancellation_confirmed")
+                  if isinstance(result, dict) and key in result}
+        ref = {
+            "call_id": item.get("call_id"), "tool": item.get("tool"),
+            "operation_ref": item.get("operation_ref"), "ok": item.get("ok"),
+            "error": item.get("error"), "result": status,
+            "result_hash": hashlib.sha256(serialized.encode()).hexdigest(),
+            "arguments_hash": hashlib.sha256(encoded(item.get("arguments")).encode()).hexdigest(),
+            "truncated": True, "original_chars": len(encoded(item)),
+        }
+        if len(encoded(item.get("arguments"))) <= 1000:
+            ref["arguments"] = item.get("arguments")
+        return ref
+
     older, latest = results[:-recent], results[-recent:]
-    if older:
-        projected.append({
-            "compacted": True,
-            "count": len(older),
-            "evidence": [
-                {
-                    "call_id": item.get("call_id"),
-                    "tool": item.get("tool"),
-                    "arguments": item.get("arguments"),
-                    "ok": item.get("ok"),
-                    "result_hash": (item.get("result") or {}).get("sha256")
-                        or (item.get("result") or {}).get("result_hash"),
-                    "error": item.get("error"),
-                }
-                for item in older
-            ],
-        })
+    projected = ([{"compacted": True, "count": len(older),
+                   "evidence": [reference(item) for item in older]}] if older else [])
     projected.extend(latest)
-    while len(json.dumps(projected, sort_keys=True, default=str)) > max_chars and len(projected) > 1:
-        projected.pop(1 if projected[0].get("compacted") else 0)
+    if len(encoded(projected)) <= max_chars:
+        return projected
+    # Reduce observations, never their receipt identity or execution outcome.
+    offset = 1 if older else 0
+    for index in range(offset, len(projected)):
+        projected[index] = reference(projected[index])
+        if len(encoded(projected)) <= max_chars:
+            return projected
+    # Arguments are convenient context, not essential receipt metadata.
+    for item in projected:
+        for ref in item.get("evidence", []) if item.get("compacted") else [item]:
+            ref.pop("arguments", None)
+    if len(encoded(projected)) > max_chars:
+        raise ValueError("tool receipt context cannot fit; stop or split task")
     return projected
 
 def estimate_tokens(prompt, packet, max_output_tokens, tool_results=None):

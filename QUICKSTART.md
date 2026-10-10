@@ -168,3 +168,8 @@ Optional automatic retention: create a version-1 memory-binding JSON with sessio
 Create Daily and Shared stores separately; do not reuse a Project UUID. Record raw-run retention explicitly at initialization (days or none). This choice does not silently purge separate execution history. Consistent backups may retain deleted content. Actual personal files and Keychain are untouched by the offline test suite. Personal show and --dry-run operations are non-mutating; confirmed career changes retain visible diff review. ANX-6 dashboard memory, caching and handoffs remain backlog.
 
 Review corrections: search refuses overrides above eight records/4,000 token units; opaque source IDs round-trip; recognized modern provider tokens and encoded credential fields are rejected; imports retain stale/conflicted restrictions; Shared promotion requires matching current dependency fingerprints via --fingerprints when dependencies exist. Confirmed personal mutations serialize across processes, while previews create no lock or store files.
+
+
+## General-purpose roadmap
+
+See the [approved execution plan](docs/superpowers/plans/2026-10-10-general-purpose-orchestration.md) and [recorded mock baseline](docs/ide-agents/orchestration-baseline.json). Mock execution verifies harness transitions and accounting only. Codex-only execution, project profiles and hosted Daily task execution must pass their own release gates before use is advertised.

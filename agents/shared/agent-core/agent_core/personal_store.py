@@ -139,7 +139,12 @@ def _accomplishments(root: Path) -> dict[str, dict]:
     path = _safe(root / "accomplishments.jsonl")
     if not path.exists():
         return result
-    for line in path.read_text().splitlines():
+    return _parse_accomplishments(path.read_text())
+
+
+def _parse_accomplishments(text: str) -> dict[str, dict]:
+    result = {}
+    for line in text.splitlines():
         if line.strip():
             record = json.loads(line)
             _validate(record, "accomplishment")
@@ -377,19 +382,27 @@ def import_personal_files(root: Path, store, access, selected_files: list[str], 
     for name in selected_files:
         path = _safe(root / name)
         access.effective_grant.authorize("tools", "memory.import", path)
-        text = path.read_text()
-        fingerprint = hashlib.sha256(text.encode()).hexdigest()
+        with path.open("rb") as snapshot:
+            metadata = os.fstat(snapshot.fileno())
+            raw = snapshot.read()
+            after = os.fstat(snapshot.fileno())
+        if (metadata.st_size, metadata.st_mtime_ns) != (after.st_size, after.st_mtime_ns):
+            raise ValueError("personal source changed during snapshot read")
+        text = raw.decode("utf-8")
+        fingerprint = hashlib.sha256(raw).hexdigest()
         if name == "profile.yaml":
-            records = [("profile", _load_yaml(path))]
+            value = yaml.safe_load(text)
+            _validate(value, "career-profile")
+            records = [("profile", value)]
         else:
-            records = list(_accomplishments(root).items())
+            records = list(_parse_accomplishments(text).items())
         for source_id, value in records:
             sensitivity = "restricted" if value.get("confidentiality") == "employer_confidential" else "private"
             _class(access, sensitivity)
             payloads.append({"namespace": namespace, "kind": "note", "title": f"Personal {source_id}",
                 "body": json.dumps(value, sort_keys=True, ensure_ascii=False), "sensitivity": sensitivity,
                 "record_id": str(uuid.uuid5(uuid.UUID(store.store_id), str(path) + ":" + source_id + ":" + fingerprint)),
-                "sources": [{"locator": path.as_uri(), "retrieved_at": path.stat().st_mtime,
+                "sources": [{"locator": path.as_uri(), "retrieved_at": metadata.st_mtime,
                              "content_hash": fingerprint, "retrieval_status": "provided", "synthetic": False}],
                 "dependencies": {path.as_uri(): fingerprint}})
     print(json.dumps({"selected_files": selected_files, "proposed_drafts": len(payloads), "originals_retained": True}))

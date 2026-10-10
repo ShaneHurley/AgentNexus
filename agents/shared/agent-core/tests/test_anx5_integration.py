@@ -98,3 +98,48 @@ def test_research_sources_are_qualified_across_runs(tmp_path):
     second=ingest_checkpoint(row,result('second text'))
     assert first['records']!=second['records']
     assert len(store.search('text',access,include_drafts=True))==2
+
+
+@pytest.mark.parametrize('engine',['research-forge','daily-coder'])
+def test_checkpoint_replay_preserves_confirmed_deletion(tmp_path,engine):
+    from agent_core.memory_portability import delete_record
+    store,access,row,spec=setup_binding(tmp_path,engine)
+    result={'status':'SIMULATED','phase':'done','state':{'run_id':'legacy1','selected_urls':['https://example.org/source'],'sources':{'s1':{'canonical_url':'https://example.org/source','canonical_title':'Evidence'}},'reads':{'s1':{'text':'authorized evidence text'}}}}
+    first=ingest_checkpoint(row,result)
+    record=store.inspect(first['records'][0],access)
+    delete_record(store,access,record['id'],expected_hash=record['content_hash'],confirmed=True)
+    replay=ingest_checkpoint(row,result)
+    assert replay['records']==[] and replay['skipped_deleted']==1
+    assert store.search('evidence OR Coding',access,include_drafts=True)==[]
+    assert store.inspect(record['id'],access,include_deleted=True)['deleted_at'] is not None
+
+
+@pytest.mark.parametrize('engine',['research-forge','daily-coder'])
+def test_supervisor_reconciles_deleted_memory_without_replay_or_exposure(tmp_path,engine):
+    from agent_core.supervisor import Supervisor
+    from agent_core.memory_portability import delete_record
+    class Adapter:
+        def snapshot(self,*args,**kwargs):return {'provider':'mock'}
+        def inspect(self,row):
+            return {'status':'SIMULATED','phase':'done','state':{'run_id':'legacy1','selected_urls':['https://example.org/source'],'sources':{'s1':{'canonical_url':'https://example.org/source','canonical_title':'Evidence'}},'reads':{'s1':{'text':'authorized evidence text'}}},'usage':{'tokens':0,'usd':0},'artifacts':[]}
+        def execute(self,*args):raise AssertionError('recovery must not redispatch')
+    store,access,fixture,spec=setup_binding(tmp_path,engine)
+    adapter=Adapter();supervisor=Supervisor(tmp_path/'execution',adapters={engine:adapter})
+    session=supervisor.new_session('owner',tmp_path);spec['run_id']=session['session_id']
+    binding=tmp_path/'supervisor-binding.json';binding.write_text(json.dumps({'version':1,'session_id':session['session_id'],'store':str(store.path),'grant':spec}))
+    request={'topic':'test'} if engine=='research-forge' else 'test'
+    run=supervisor.create_run(session['session_id'],engine,request,tmp_path,memory_binding=binding)
+    supervisor.store.set_alias(run['run_id'],'legacy1')
+    row=supervisor.store.get_run(run['run_id'])
+    supervisor.store.begin_call(row['run_id'],str(uuid.uuid4()),100,1)
+    supervisor.store.update(row['run_id'],'RUNNING')
+    native=adapter.inspect(row)
+    retained=ingest_checkpoint(row,native)
+    record=store.inspect(retained['records'][0],access)
+    delete_record(store,access,record['id'],expected_hash=record['content_hash'],confirmed=True)
+    reconciled=supervisor.execute(row['run_id'])
+    assert reconciled['status']=='SIMULATED'
+    assert reconciled['memory']['skipped_deleted']==1 and reconciled['memory']['records']==[]
+    assert reconciled['accounting']['reserved_usd']==0
+    assert reconciled['accounting']['reserved_tokens']==0
+    assert not supervisor.store.pending_calls(row['run_id'])

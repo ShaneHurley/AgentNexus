@@ -49,7 +49,7 @@ def ingest_checkpoint(row,result):
     grant["run_id"]=row["run_id"]
     access=evaluate_memory_access(grant,workspace=row["workspace"],store_id=store.store_id,kind=store.kind)
     namespace=binding.get("namespace","default");sensitivity=binding.get("sensitivity","private")
-    records=[];skipped=0
+    records=[];skipped=0;skipped_deleted=0
     payloads=[]
     if row["engine"]=="research-forge":
         state=result.get("state",{})
@@ -72,11 +72,14 @@ def ingest_checkpoint(row,result):
         record_id=str(uuid.uuid5(uuid.UUID(row["run_id"]),namespace+":"+source["locator"]+":"+source["content_hash"]))
         # Repeat recovery does not reinsert changed timestamps/provenance.
         try:
-            existing=store.inspect(record_id,access)
+            existing=store.inspect(record_id,access,include_deleted=True)
         except KeyError:existing=None
         if existing is not None:
+            if existing["deleted_at"] is not None:
+                skipped_deleted+=1
+                continue
             if existing["body"]!=body:raise ContractDenied("ingestion idempotency collision")
             records.append(record_id);continue
         record=store.add_draft(access,namespace=namespace,kind="evidence",title=title,body=body,sources=[source],sensitivity=sensitivity,record_id=record_id)
         records.append(record["id"])
-    return {"records":records,"skipped_unavailable":skipped,"verification_state":"draft"}
+    return {"records":records,"skipped_unavailable":skipped,"skipped_deleted":skipped_deleted,"verification_state":"draft"}

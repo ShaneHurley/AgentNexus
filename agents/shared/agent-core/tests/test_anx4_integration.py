@@ -44,3 +44,17 @@ def test_unknown_catalog_price_does_not_inherit_native_price(tmp_path):
     pin["model_catalog_hash"]=digest(pin["model_catalog"])
     engine=adapter._engine({"snapshot":pin,"run_id":"unknown-price","live":False,"workspace":str(tmp_path),"limit_tokens":80000,"limit_usd":1,"deadline":None})
     with pytest.raises(BudgetExceeded):engine.budget.validate_model_pricing("mock")
+
+
+def test_supervised_rf_search_retains_reviewed_tool_identity(tmp_path,monkeypatch):
+    from agent_core.engine_adapters import ResearchForgeAdapter
+    from agent_core.routing_runtime import load_model_settings
+    import agent_core.secret_broker as broker_module
+    import research_forge.wave1.orchestrator as wave_module
+    monkeypatch.setattr(broker_module,"SecretBroker",lambda path:object())
+    class Capture:
+        def __init__(self,*args,**kwargs):self.search=kwargs['search_adapter']
+    monkeypatch.setattr(wave_module,"Wave1Orchestrator",Capture)
+    adapter=ResearchForgeAdapter(ROOT/'agents/research/research-forge')
+    engine=adapter._engine({'live':True,'run_id':'rf-identity','workspace':str(tmp_path),'snapshot':load_model_settings(ROOT),'limit_tokens':1000,'limit_usd':1,'deadline':None})
+    assert engine.search.adapter_id=='public_search_v1'

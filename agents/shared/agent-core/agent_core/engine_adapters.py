@@ -112,6 +112,7 @@ class ResearchForgeAdapter:
             broker=SecretBroker(self.root.parents[2]/".agentnexus/secret-references.sqlite")
             authority=SupervisedProvider(None,row["snapshot"],provider_name="brave",run_id=row["run_id"],workspace=row["workspace"],namespace="rf",broker=broker)
             class AuthorizedSearch:
+                adapter_id="public_search_v1"
                 def search(self,query,**kwargs):
                     request=type("Search",(),dict(run_id=row["run_id"],role="orchestrator",credential_ref="provider/brave",deadline=row["deadline"]))()
                     grant=authority.secret_grant(request)

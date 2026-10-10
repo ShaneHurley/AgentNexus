@@ -1,6 +1,7 @@
 """Durable orchestration facade. Engines retain policy and workflow authority."""
 from __future__ import annotations
 from pathlib import Path
+import sqlite3
 import uuid
 from .contracts import ContractDenied
 from .lifecycle import RunLock, RunBusy, ReconciliationRequired
@@ -24,7 +25,7 @@ class Supervisor:
     def runs(self,engine=None,session_id=None,limit=50):
         return [self.status(r["run_id"]) for r in self.store.runs(engine,session_id,limit)]
 
-    def create_run(self,session_id,engine,request,workspace,live=False, *, parent_id=None,idempotency_key=None,provider="mock",limit_usd=5.0,limit_tokens=80000,deadline=None,_imported=False):
+    def create_run(self,session_id,engine,request,workspace,live=False, *, parent_id=None,idempotency_key=None,provider="mock",limit_usd=5.0,limit_tokens=80000,deadline=None,_imported=False,memory_binding=None):
         if engine not in self.adapters: raise ContractDenied("unknown or unavailable execution engine")
         workspace=Path(workspace).resolve()
         if not workspace.is_dir(): raise ValueError("workspace must exist")
@@ -37,6 +38,9 @@ class Supervisor:
         if live and provider == "mock" and engine == "daily-coder": raise ContractDenied("live coding requires an explicit provider")
         snapshot=self.adapters[engine].snapshot(workspace,live,provider)
         snapshot["provider"]=provider if engine == "daily-coder" else ("live" if live else "mock")
+        if memory_binding is not None:
+            from .memory_runtime import pin_binding
+            snapshot.update(pin_binding(memory_binding,session,workspace,engine))
         registry=runtime_snapshot().snapshot_id
         row=self.store.create_run(session_id,engine,request,workspace,snapshot,registry,parent_id=parent_id,task_key=idempotency_key,limit_usd=limit_usd,limit_tokens=limit_tokens,deadline=deadline,live=live,imported=_imported)
         return self.status(row["run_id"])
@@ -49,6 +53,10 @@ class Supervisor:
         from .routing_runtime import PIN_FIELDS,load_model_settings
         if PIN_FIELDS <= set(row["snapshot"]):
             snapshot.update(load_model_settings(self.repository,pinned=row["snapshot"]))
+        from .memory_runtime import check_binding
+        check_binding(row["snapshot"])
+        for field in ("memory_binding","memory_binding_path","memory_binding_hash","memory_store_id"):
+            if field in row["snapshot"]:snapshot[field]=row["snapshot"][field]
         return snapshot,runtime_snapshot().snapshot_id
 
     def status(self,key):
@@ -64,9 +72,19 @@ class Supervisor:
             row["phase"]=checkpoint.get("phase")
             row["pending_approvals"]=checkpoint.get("pending_approvals",[])
             row["result"]=checkpoint.get("result")
+            row["memory"]=checkpoint.get("memory")
         return row
 
+    def _record_memory(self,row,result):
+        if not row["snapshot"].get("memory_binding"):return result
+        from .memory_runtime import ingest_checkpoint
+        try:return {**result,"memory":ingest_checkpoint(row,result)}
+        except (ContractDenied,ValueError,KeyError,OSError,sqlite3.Error) as exc:
+            # Settle known provider usage, but do not claim successful retention.
+            return {**result,"status":"BLOCKED","memory":{"error":type(exc).__name__,"detail":"authorized draft ingestion failed; retry memory explicitly"}}
+
     def _settle(self,row,call_id,result):
+        result=self._record_memory(row,result)
         usage=result.get("usage") or {}
         if usage.get("unknown") or usage.get("usd") is None or usage.get("tokens") is None or result.get("status") == "RECONCILIATION_REQUIRED":
             self.store.finish_call(call_id,"unknown")
@@ -125,6 +143,7 @@ class Supervisor:
             if row["status"] == "RUNNING" and row["legacy_id"]:
                 result=adapter.inspect(row)
                 if result.get("status") in TERMINAL | {"WAITING_HUMAN"} and not (result.get("usage") or {}).get("unknown"):
+                    result=self._record_memory(row,result)
                     self.store.checkpoint(key,result,result.get("artifacts",()))
                     self.store.update(key,result["status"])
                     return self.status(key)

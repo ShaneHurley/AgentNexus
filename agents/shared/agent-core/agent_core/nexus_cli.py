@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import sys
 import time
+import sqlite3
 from .contracts import ContractDenied
 from .lifecycle import RunBusy
 from .supervisor import Supervisor
@@ -35,6 +36,7 @@ def main(argv=None):
     source.add_argument("--request")
     source.add_argument("--request-file",type=Path)
     run.add_argument("--workspace",type=Path,default=Path.cwd())
+    run.add_argument("--memory-binding",type=Path,help="Explicit session-scoped memory binding; automatic drafts only")
     run.add_argument("--live",action="store_true")
     run.add_argument("--provider",default="mock")
     run.add_argument("--idempotency-key")
@@ -56,8 +58,14 @@ def main(argv=None):
     register(commands)
     from . import efficiency_commands
     efficiency_commands.register(commands)
+    from . import memory_cli
+    memory_cli.register(commands)
     args=parser.parse_args(argv)
     try:
+        if args.command == "memory":
+            result=memory_cli.execute(args)
+            print(json.dumps(result,indent=2,allow_nan=False,default=str))
+            return 0
         if args.command in HANDLED_COMMANDS | efficiency_commands.HANDLED_COMMANDS:
             from .runtime_authority import repository_root
             result=(efficiency_commands.execute if args.command=="tools" else execute)(args,args.repository or repository_root())
@@ -77,7 +85,7 @@ def main(argv=None):
                 try: request=json.loads(request)
                 except json.JSONDecodeError: request={"topic":request,"objective":request}
             deadline=time.time()+args.deadline_seconds if args.deadline_seconds is not None else None
-            row=supervisor.create_run(args.session,args.engine,request,args.workspace,args.live,provider=args.provider,idempotency_key=args.idempotency_key,limit_usd=args.budget_usd,limit_tokens=args.token_limit,deadline=deadline)
+            row=supervisor.create_run(args.session,args.engine,request,args.workspace,args.live,provider=args.provider,idempotency_key=args.idempotency_key,limit_usd=args.budget_usd,limit_tokens=args.token_limit,deadline=deadline,memory_binding=args.memory_binding)
             result=supervisor.execute(row["run_id"]); code=exit_status(result)
         elif args.command == "resume":
             answers={}
@@ -88,7 +96,7 @@ def main(argv=None):
             result=supervisor.execute(args.run_id,answers=answers or None); code=exit_status(result)
         print(json.dumps(result,indent=2,allow_nan=False,default=str))
         return code
-    except (ContractDenied,RunBusy,ValueError,KeyError,OSError,ImportError) as exc:
+    except (ContractDenied,RunBusy,ValueError,KeyError,OSError,ImportError,sqlite3.Error) as exc:
         print(json.dumps({"ok":False,"error":type(exc).__name__,"detail":str(exc)}))
         return 3
 

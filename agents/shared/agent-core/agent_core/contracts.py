@@ -7,7 +7,7 @@ import math
 from typing import Any, Mapping
 
 LAYERS = ("user", "role", "profile", "parent", "runtime", "approval")
-ACTIONS = ("tools", "skills", "delegation", "memory_read", "memory_write", "secret_use")
+ACTIONS = ("tools", "skills", "delegation", "memory_read", "memory_write", "secret_use", "data_classes")
 
 
 class ContractDenied(PermissionError):
@@ -22,6 +22,7 @@ class Grant:
     memory_read: frozenset[str] = frozenset()
     memory_write: frozenset[str] = frozenset()
     secret_use: frozenset[str] = frozenset()
+    data_classes: frozenset[str] = frozenset()
     workspace_roots: tuple[str, ...] = ()
     write_roots: tuple[str, ...] = ()
     resources: Mapping[str, int | float] = field(default_factory=dict)
@@ -39,6 +40,8 @@ class Grant:
             if not isinstance(entries, (list, tuple, set, frozenset)) or any(not isinstance(x, str) or not x or x == "*" for x in entries):
                 raise ContractDenied(f"{key} requires explicit capability IDs")
             data[key] = frozenset(entries)
+        if data["data_classes"] - {"public", "private", "restricted"}:
+            raise ContractDenied("unknown memory data class")
         for key in ("workspace_roots", "write_roots"):
             entries = value.get(key, [])
             if not isinstance(entries, (list, tuple)) or any(not isinstance(x, str) or not Path(x).is_absolute() for x in entries):

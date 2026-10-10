@@ -147,3 +147,24 @@ uv run --locked agent-nexus eval --help
 ```
 
 Publication creates a candidate only. Activation requires the matching catalog and policy hash plus confirmation; existing runs keep their pins. Default supervised execution remains mock-only. For live execution, first configure reviewed routing and an existing macOS Keychain reference through SecretBroker. Missing/locked/unapproved credentials fail before dispatch. Never put credential values in model catalog, grant files, URLs or CLI arguments. API/provider cancellation and real Keychain access were not operationally tested; offline contracts were tested.
+
+## ANX-5 scoped memory setup
+
+Memory commands require an existing workspace and an explicit version-1 grant JSON containing identity, run_id, qualified role and all six layers (user/role/profile/parent/runtime/approval). Each layer declares exact store:UUID:default/meta memory_read/memory_write capabilities, data_classes, workspace_roots and needed typed tools. Role maxima in agent-core/config/memory-capabilities.yaml remain authoritative. Do not copy grants between projects or synthesize all-powerful layers.
+
+```sh
+uv run --locked agent-nexus memory --help
+uv run --locked agent-nexus memory init --store /absolute/project/knowledge.sqlite --workspace /absolute/project --grant-file /absolute/reviewed-memory-grant.json --store-id STORE_UUID --kind project --raw-run-retention none --confirm
+uv run --locked agent-nexus memory draft --store /absolute/project/knowledge.sqlite --workspace /absolute/project --grant-file /absolute/reviewed-memory-grant.json --input /absolute/project/authorized-note.json
+uv run --locked agent-nexus memory search --store /absolute/project/knowledge.sqlite --workspace /absolute/project --grant-file /absolute/reviewed-memory-grant.json --query "topic" --include-drafts
+uv run --locked agent-nexus memory accept --store /absolute/project/knowledge.sqlite --workspace /absolute/project --grant-file /absolute/reviewed-memory-grant.json --record RECORD_UUID --expected-hash CONTENT_HASH --confirm
+uv run --locked agent-nexus memory doctor --store /absolute/project/knowledge.sqlite --workspace /absolute/project --grant-file /absolute/reviewed-memory-grant.json
+```
+
+The draft input declares title, body and sources (locator, retrieved_at, content_hash, retrieval_status, synthetic); supplied human notes use provided status. Drafts are excluded from factual search unless explicitly requested. Synthetic evidence cannot be accepted. Use inspect for stable reference expansion, refresh with current dependency fingerprints, and revise with confirmation/hash to create a superseding draft. Mutating acceptance/promotion/import/export/backup/deletion commands require their documented confirmation and scopes. Inspect each subcommand's --help before use. Export/import/backup require typed memory.export/import/backup tool grants and contained non-symlink paths; existing outputs are never overwritten.
+
+Optional automatic retention: create a version-1 memory-binding JSON with session_id, store and grant; grant identity matches the session and grant.run_id equals session_id. Role is ide:deep-research for Research or ide:daily-coder/ide:use-master for coding. Add --memory-binding /absolute/binding.json to agent-nexus run. The store must already exist and grants explicitly authorize draft writes. Research binds Research; coding binds Project or Daily; no automatic Shared writes. Changes to binding or store identity block resume. This records drafts only and defaults off without a binding.
+
+Create Daily and Shared stores separately; do not reuse a Project UUID. Record raw-run retention explicitly at initialization (days or none). This choice does not silently purge separate execution history. Consistent backups may retain deleted content. Actual personal files and Keychain are untouched by the offline test suite. Personal show and --dry-run operations are non-mutating; confirmed career changes retain visible diff review. ANX-6 dashboard memory, caching and handoffs remain backlog.
+
+Review corrections: search refuses overrides above eight records/4,000 token units; opaque source IDs round-trip; recognized modern provider tokens and encoded credential fields are rejected; imports retain stale/conflicted restrictions; Shared promotion requires matching current dependency fingerprints via --fingerprints when dependencies exist. Confirmed personal mutations serialize across processes, while previews create no lock or store files.

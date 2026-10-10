@@ -176,3 +176,58 @@ def test_cross_process_writer_lock_has_bounded_busy_failure(tmp_path):
     assert child.returncode==1 and "writer busy" in child.stderr
     assert (root/"accomplishments.jsonl").read_text()==""
     assert p.append_accomplishment(root,proposed,True)==0
+
+
+
+@pytest.mark.parametrize("filename", ["profile.yaml", "accomplishments.jsonl"])
+def test_personal_import_parses_the_hashed_snapshot(tmp_path,monkeypatch,filename):
+    import hashlib,os
+    from tests.test_anx5_portability import setup
+    m,port,access,store,_=setup(tmp_path)
+    root=tmp_path/"career"
+    p.ensure_layout(root)
+    assert p.append_accomplishment(root,draft(tmp_path),True)==0
+    path=root/filename
+    original=path.read_bytes()
+    original_mtime=path.stat().st_mtime
+    original_open=Path.open
+    original_validate=p._validate_store
+    ready=False
+    replaced=False
+    def validate_first(*args):
+        nonlocal ready
+        original_validate(*args)
+        ready=True
+    class Snapshot:
+        def __init__(self,stream):self.stream=stream
+        def __enter__(self):self.stream.__enter__();return self
+        def __exit__(self,*args):return self.stream.__exit__(*args)
+        def fileno(self):return self.stream.fileno()
+        def read(self,*args):
+            nonlocal replaced
+            value=self.stream.read(*args)
+            if not replaced:
+                replacement=path.with_name(path.name+'.replacement')
+                if filename=='profile.yaml':data="version: '1'\nidentity: {name: changed}\n"
+                else:
+                    record=json.loads(original.decode());record['action']='changed';data=json.dumps(record)+'\n'
+                with original_open(replacement,'w') as out:out.write(data)
+                os.utime(replacement,(original_mtime+100,original_mtime+100))
+                os.replace(replacement,path)
+                replaced=True
+            return value
+    def snapshot_open(self,mode='r',*args,**kwargs):
+        stream=original_open(self,mode,*args,**kwargs)
+        if self==path and ready and mode in {'r','rb'}:return Snapshot(stream)
+        return stream
+    monkeypatch.setattr(p,'_validate_store',validate_first)
+    monkeypatch.setattr(Path,'open',snapshot_open)
+    result=p.import_personal_files(root,store,access,[filename],confirmed=True)
+    record=store.inspect(result['record_ids'][0],access)
+    expected=hashlib.sha256(original).hexdigest()
+    assert replaced
+    assert record['sources'][0]['content_hash']==expected
+    assert record['sources'][0]['retrieved_at']==original_mtime
+    assert record['dependencies'][path.as_uri()]==expected
+    if filename=='profile.yaml':assert json.loads(record['body'])['identity'].get('name')!='changed'
+    else:assert json.loads(record['body'])['action']=='built'

@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "source_base": "3ee7858078d6ea984ffba2676364f45653152449",
+  "evidence_kind": "mock-harness",
+  "request": "Inspect this fixture repository\u2019s tool-result context handling. Identify any case that exceeds its configured bound, cite the relevant source locations, and propose the smallest correction with acceptance tests. Do not modify files.",
+  "original": [
+    {
+      "engine": "daily-coder",
+      "exit_code": 3,
+      "status": "RECONCILIATION_REQUIRED",
+      "phase": "NEW"
+    },
+    {
+      "engine": "research-forge",
+      "exit_code": 1,
+      "status": "SIMULATED",
+      "phase": "done"
+    }
+  ],
+  "after_immediate_corrections": [
+    {
+      "engine": "daily-coder",
+      "exit_code": 1,
+      "status": "SIMULATED",
+      "phase": "COMPLETE",
+      "accounting": {
+        "reserved_usd": 0.0,
+        "reserved_tokens": 0,
+        "estimated_usd": 0.0,
+        "reported_usd": 0.0,
+        "reconciled_usd": 0.0,
+        "tokens": 900,
+        "usage_status": "recorded"
+      }
+    },
+    {
+      "engine": "research-forge",
+      "exit_code": 1,
+      "status": "SIMULATED",
+      "phase": "done",
+      "accounting": {
+        "reserved_usd": 0.0,
+        "reserved_tokens": 0,
+        "estimated_usd": 0.05,
+        "reported_usd": 0.0,
+        "reconciled_usd": 0.0,
+        "tokens": 0,
+        "usage_status": "recorded"
+      }
+    }
+  ],
+  "limitations": [
+    "No live model quality or token savings established.",
+    "Codex adapter operational validation pending.",
+    "Real isolated Docker execution smoke pending."
+  ]
+}

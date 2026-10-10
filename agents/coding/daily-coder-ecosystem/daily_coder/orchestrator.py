@@ -681,7 +681,8 @@ class Orchestrator:
                     outcome = gateway.safe_execute(run_id, role, phase, call.name, call.arguments,
                                                    plan_allowlist=plan_allowlist, plan_hash=plan_hash,operation_id=f"{idem_key}:tool:{call_index}")
                     tool_results.append({"call_id": call.call_id, "tool": call.name,
-                                         "arguments": call.arguments, "turn": turn, **outcome})
+                                         "arguments": call.arguments, "turn": turn,
+                                         "operation_ref": f"{idem_key}:tool:{call_index}", **outcome})
                 continue
             max_retries = min(1,int(cfg.get("max_retries", 0)))
             schema_attempts = 0
@@ -951,8 +952,7 @@ class Orchestrator:
             resolve_github_token,
         )
 
-        token = resolve_github_token(self.secrets)
-
+        # Registering a capability is not authorization to acquire a secret.
         def meta(args):
             try:
                 owner = args.get("owner")
@@ -961,7 +961,7 @@ class Orchestrator:
                     owner, repo, _ = parse_github_https_url(args["url"])
                 if not owner or not repo:
                     return {"error": "missing_owner_or_repo"}
-                return repo_metadata(owner, repo, token=token)
+                return repo_metadata(owner, repo, token=resolve_github_token(self.secrets))
             except GitHubRemoteError as exc:
                 return {"error": "github_denied", "message": str(exc)}
 
@@ -977,7 +977,7 @@ class Orchestrator:
                     owner,
                     repo,
                     state=args.get("state") or "open",
-                    token=token,
+                    token=resolve_github_token(self.secrets),
                     per_page=int(args.get("per_page") or 20),
                 )
             except GitHubRemoteError as exc:

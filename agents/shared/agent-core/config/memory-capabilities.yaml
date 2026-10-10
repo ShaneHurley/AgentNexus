@@ -1,0 +1,430 @@
+version: 1
+refs:
+- project:default
+- project:meta
+- research:default
+- research:meta
+- daily:default
+- daily:meta
+- shared:default
+- shared:meta
+roles:
+  dc:test_author:
+    memory_read:
+    - project:default
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  dc:plan_reviewer:
+    memory_read:
+    - project:default
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  dc:code_reviewer:
+    memory_read:
+    - project:default
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  dc:test_designer:
+    memory_read:
+    - project:default
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  dc:documenter:
+    memory_read:
+    - project:default
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  dc:test_executor:
+    memory_read:
+    - project:default
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  dc:planner:
+    memory_read:
+    - project:default
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  dc:implementer:
+    memory_read:
+    - project:default
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  dc:sizer:
+    memory_read:
+    - project:default
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  dc:alignment_checker:
+    memory_read:
+    - project:default
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  dc:failure_diagnostician:
+    memory_read:
+    - project:default
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  dc:skill_curator:
+    memory_read:
+    - project:default
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  dc:master:
+    memory_read:
+    - project:default
+    - research:default
+    - shared:default
+    - project:meta
+    - shared:meta
+    memory_write:
+    - project:default
+    - project:meta
+    - shared:default
+    - shared:meta
+    data_classes:
+    - public
+    - private
+    - restricted
+  dc:frontier_advisor:
+    memory_read:
+    - project:default
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  dc:researcher:
+    memory_read:
+    - project:default
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  dc:brainstormer:
+    memory_read:
+    - project:default
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  rf:principal_research_director:
+    memory_read:
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  rf:ideator:
+    memory_read:
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  rf:contradiction_mapper:
+    memory_read:
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  rf:portfolio_fusion:
+    memory_read:
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  rf:evidence_extractor:
+    memory_read:
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  rf:source_scout:
+    memory_read:
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  rf:landscape_mapper:
+    memory_read:
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  rf:source_curator:
+    memory_read:
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  rf:followup_coordinator:
+    memory_read:
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  rf:experiment_architect:
+    memory_read:
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  rf:charter_planner:
+    memory_read:
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  rf:falsification_designer:
+    memory_read:
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  rf:methods_reviewer:
+    memory_read:
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  rf:adversarial_skeptic:
+    memory_read:
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  rf:research_auditor:
+    memory_read:
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  rf:intake_clarifier:
+    memory_read:
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  rf:report_composer:
+    memory_read:
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  rf:citation_verifier:
+    memory_read:
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  rf:orchestrator:
+    memory_read:
+    - project:default
+    - research:default
+    - shared:default
+    - research:meta
+    memory_write:
+    - research:default
+    - research:meta
+    data_classes:
+    - public
+    - private
+    - restricted
+  ide:daily-coder:
+    memory_read:
+    - project:default
+    - research:default
+    - daily:default
+    - shared:default
+    - project:meta
+    - daily:meta
+    - shared:meta
+    memory_write:
+    - project:default
+    - project:meta
+    - daily:default
+    - daily:meta
+    - shared:default
+    - shared:meta
+    data_classes:
+    - public
+    - private
+    - restricted
+  ide:use-master:
+    memory_read:
+    - project:default
+    - research:default
+    - shared:default
+    - project:meta
+    - shared:meta
+    memory_write:
+    - project:default
+    - project:meta
+    - shared:default
+    - shared:meta
+    data_classes:
+    - public
+    - private
+    - restricted
+  ide:deep-research:
+    memory_read:
+    - project:default
+    - research:default
+    - shared:default
+    - research:meta
+    memory_write:
+    - research:default
+    - research:meta
+    data_classes:
+    - public
+    - private
+    - restricted
+  ide:research-messenger:
+    memory_read:
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  ide:plan-prep:
+    memory_read:
+    - project:default
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted
+  ide:researcher:
+    memory_read:
+    - project:default
+    - research:default
+    - shared:default
+    memory_write: []
+    data_classes:
+    - public
+    - private
+    - restricted

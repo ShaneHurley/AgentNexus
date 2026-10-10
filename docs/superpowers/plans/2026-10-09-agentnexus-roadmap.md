@@ -46,3 +46,6 @@ Focused negative tests, DC unittest/validation, canonical/projection checks, cle
 - [ANX-5: Isolated memory and personal data](https://github.com/ShaneHurley/AgentNexus/issues/9)
 - [ANX-6: Handoffs, context and dashboard](https://github.com/ShaneHurley/AgentNexus/issues/12)
 - [ANX-7: Measured efficiency and capability governance](https://github.com/ShaneHurley/AgentNexus/issues/15)
+
+## Implementation status (2026-10-10)
+ANX-0 merged PR #18. ANX-4 merged PR #19 after independent review and updated Linux/macOS CI, including the supervised RF search adapter identity regression. ANX-5 implementation and verification use the [frozen contract](2026-10-10-anx5-memory.md). ANX-6/7 remain backlog; no paid calls or automatic model/skill activation.

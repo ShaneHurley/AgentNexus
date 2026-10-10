@@ -25,7 +25,7 @@ def runtime_snapshot():
         baseline=compiled.data["roles"].get(key)
         if baseline is None or (row["active"] and not baseline["active"]): raise ContractDenied("active registry broadens installed authority")
         if set(row["callers"]) - set(baseline["callers"]): raise ContractDenied("active registry broadens callers")
-        for action in ("tools","skills","delegation","memory_read","memory_write","secret_use"):
+        for action in ("tools","skills","delegation","memory_read","memory_write","secret_use","data_classes"):
             if set(row["grant"].get(action,[])) - set(baseline["grant"].get(action,[])): raise ContractDenied("active registry broadens capability grants")
     return reviewed
 
@@ -50,7 +50,7 @@ class RuntimeAuthority:
         # workspace. Explicit configured layers can narrow any of these bounds.
         layers={name:baseline for name in LAYERS}
         # Installed secret capabilities never imply task authorization.
-        user=baseline.as_mapping(); user["secret_use"]=[]
+        user=baseline.as_mapping(); user["secret_use"]=[]; user["memory_read"]=[]; user["memory_write"]=[]; user["data_classes"]=[]
         layers["user"]=Grant.from_mapping(user)
         if self.task_layers is not None:
             if set(self.task_layers) != set(LAYERS): raise ContractDenied("incomplete task authority")

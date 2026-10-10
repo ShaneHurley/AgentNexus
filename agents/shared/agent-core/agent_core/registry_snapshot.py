@@ -120,8 +120,8 @@ def validate_snapshot(data: dict[str, Any]) -> None:
                 raise ContractDenied(f"unresolved {action} for {row['id']}")
         if grant.secret_use - set(data.get("secret_refs", {})):
             raise ContractDenied("unresolved secret capability")
-        if grant.memory_read or grant.memory_write:
-            raise ContractDenied("memory service is unavailable in Phase 2")
+        if (grant.memory_read | grant.memory_write) - set(data.get("memory_refs", {})):
+            raise ContractDenied("unresolved memory capability")
         for schema in (row.get("input_schema"), row.get("output_schema")):
             if schema is not None and schema not in data.get("schemas", {}):
                 raise ContractDenied(f"unresolved schema: {schema}")
@@ -316,6 +316,25 @@ def compile_repository(repo_root: str | Path) -> RegistrySnapshot:
         data["roles"][f"ide:{name}"]["grant"]["delegation"] = sorted(k for k in data["roles"] if k.startswith("dc:"))
     data["roles"]["ide:deep-research"]["grant"]["delegation"] = sorted(k for k in data["roles"] if k.startswith("rf:") and data["roles"][k]["active"])
     data["roles"]["rf:orchestrator"]["grant"]["delegation"] = sorted(k for k in data["roles"] if k.startswith("rf:") and k != "rf:orchestrator" and data["roles"][k]["active"])
+    memory_config=read(shared_package / "config/memory-capabilities.yaml")
+    if memory_config.get("version") != 1 or set(memory_config) != {"version", "refs", "roles"}:
+        raise ContractDenied("invalid memory capability source")
+    refs=memory_config["refs"]
+    if not isinstance(refs,list) or len(refs)!=len(set(refs)) or any(ref not in {kind+":"+ns for kind in ("project","research","daily","shared") for ns in ("default","meta")} for ref in refs):
+        raise ContractDenied("invalid memory capability references")
+    data["memory_refs"]={ref:{"id":ref} for ref in refs}
+    for tool in ("memory.export", "memory.import", "memory.backup"):
+        rf_tool(tool)
+    for key, rule in memory_config["roles"].items():
+        if key not in data["roles"] or set(rule)!={"memory_read","memory_write","data_classes"}:
+            raise ContractDenied("unknown memory role or rule")
+        for action in ("memory_read","memory_write"):
+            if not isinstance(rule[action],list) or set(rule[action])-set(refs):
+                raise ContractDenied("undeclared memory scope")
+        Grant.from_mapping(rule)
+        data["roles"][key]["grant"].update(rule)
+        if rule["memory_write"]:
+            data["roles"][key]["grant"]["tools"]=sorted(set(data["roles"][key]["grant"]["tools"]) | {"memory.export","memory.import","memory.backup"})
     # IDE-only roles without runtime schema/tool contracts remain discoverable, not generic executable capabilities.
     data["warnings"].append("Legacy IDE prompt-only roles have no inferred tool grants; Daily personal skills require explicit task grants.")
     for row in data["roles"].values():

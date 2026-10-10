@@ -1,0 +1,21 @@
+schema_version: 1
+models:
+  offline-mock:
+    provider: mock
+    model: mock
+    context_tokens: 128000
+    output_tokens: 16000
+    risks:
+    - low
+    - high
+    privacy:
+    - local
+    - private
+    features:
+    - tools
+    - json_schema
+    credential_ref: null
+    pricing:
+      input_per_million: 0
+      output_per_million: 0
+    latency_ms: 0

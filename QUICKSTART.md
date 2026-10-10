@@ -134,3 +134,16 @@ When `RECONCILIATION_REQUIRED` appears, preserve state and artifacts and stop re
 Cancellation intent blocks new dispatch immediately. `CANCEL_REQUESTED` means termination is pending; only `CANCELLED` acknowledges it. A provider without confirmed cancellation retains unknown remote exposure. The supervisor serializes native execution within each root and requires remaining parent headroom to cover the native run's remaining resource grant before dispatch.
 
 Supervised GUI live starts require explicit confirmation and carry the selected provider in the individual request. `--no-mark-simulated` remains a legacy wrapper option; supervised mock runs always retain `SIMULATED` status. RF live text retrieval permits public HTTP(S) endpoints on standard web ports and rejects private DNS addresses, URL credentials, unsafe redirects and oversized bodies. Retrieval failures remain explicit; no synthetic fallback is enabled.
+
+## ANX-4 offline model inspection
+
+```sh
+uv run --locked agent-nexus models inspect
+uv run --locked agent-nexus models explain --role dc:researcher --requirements '{"risk":"low","privacy":"local"}'
+uv run --locked agent-nexus models publish --catalog candidate-catalog.yaml
+uv run --locked agent-nexus models activate --catalog-hash HASH --policy reviewed-policy.yaml --policy-hash FULL_POLICY_HASH --confirm
+uv run --locked agent-nexus usage-report --records sanitized-usage.json
+uv run --locked agent-nexus eval --help
+```
+
+Publication creates a candidate only. Activation requires the matching catalog and policy hash plus confirmation; existing runs keep their pins. Default supervised execution remains mock-only. For live execution, first configure reviewed routing and an existing macOS Keychain reference through SecretBroker. Missing/locked/unapproved credentials fail before dispatch. Never put credential values in model catalog, grant files, URLs or CLI arguments. API/provider cancellation and real Keychain access were not operationally tested; offline contracts were tested.

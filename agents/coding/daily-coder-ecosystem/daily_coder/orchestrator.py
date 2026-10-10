@@ -548,8 +548,17 @@ class Orchestrator:
 
     def _settle_response(self, run_id, estimate, result, key):
         try:
+            usage=getattr(result,"usage",None)
+            evidence={"idempotency_key":key,"model":result.model,"provider_request_id":getattr(result,"provider_request_id",None),
+                      "finish_reason":getattr(result,"finish_reason",None),"input_tokens":result.input_tokens,"output_tokens":result.output_tokens,
+                      "cost_usd":getattr(usage,"cost_usd",None),"cached_tokens":getattr(usage,"cached_tokens",None),
+                      "reasoning_tokens":getattr(usage,"reasoning_tokens",None),"cache_creation_tokens":getattr(usage,"cache_creation_tokens",None),
+                      "selection":getattr(self.provider,"call_decisions",{}).get(key),"evidence_status":getattr(usage,"evidence_status","unknown")}
+            self.artifacts.put(run_id,"provider_usage","runtime",evidence)
+            if result.input_tokens is None or result.output_tokens is None:
+                raise ValueError("missing usage retains reservation")
             return self.budget.settle(run_id, estimate, result.model, result.input_tokens,
-                                      result.output_tokens, key)
+                                      result.output_tokens, key,reported_usd=getattr(usage,"cost_usd",None))
         except Exception as exc:
             if self.live:
                 self.state.set_status(run_id, RunStatus.RECONCILIATION_REQUIRED)
@@ -589,13 +598,17 @@ class Orchestrator:
             schema = json.loads((self.root / f"schemas/{schema_name}.schema.json").read_text(encoding="utf-8"))
             self._role_cache[role] = (cfg, prompt, schema)
         cfg, prompt, schema = self._role_cache[role]
-        model = self._model_for(cfg["model_tier"])
-        self.budget.validate_model_pricing(model)
         schema_name = cfg["output_schema"]
         sliced = ctx.build_packet(role, packet, extra)
         allowed_tools = [t for t in self.tools_config["role_allowlists"].get(role, []) if t in authority.effective(role).capabilities("tools")]
         # Tools are advertised only when a gateway can actually authorize and record them.
         tool_specs = schemas_for(allowed_tools) if (self.live and gateway is not None) else []
+        if hasattr(self.provider,"resolve_for_role"):
+            model=self.provider.resolve_for_role(role,cfg["model_tier"],cfg["max_output_tokens"],
+                max(0,ctx.estimate_tokens(prompt,sliced,0,[])),self.resource_limits.get("deadline"),
+                features=("tools",) if tool_specs else ())
+        else: model=self._model_for(cfg["model_tier"])
+        self.budget.validate_model_pricing(model)
         tool_results: list = []
         role_turns = self.config.get("role_tool_turns", {})
         max_turns = int(cfg.get("max_tool_turns", role_turns.get(role, self.config.get("max_tool_turns", 6))))
@@ -632,18 +645,20 @@ class Orchestrator:
             request = Invocation(run_id, role, prompt, sliced, cfg["model_tier"], cfg["max_output_tokens"],
                                  idem_key, model=model,
                                  tools=tuple(tool_specs), tool_results=tuple(tool_context), turn=turn,
-                                 reasoning=bool(cfg.get("reasoning", False)), output_schema=schema)
+                                 reasoning=bool(cfg.get("reasoning", False)), output_schema=schema,
+                                 deadline=min(self.resource_limits.get("deadline") or float("inf"),time.time()+max(0,wall_time-(time.monotonic()-invocation_started))),max_transport_retries=2)
             started = time.time()
             try:
                 result = self.provider.invoke(request)
             except Exception as exc:
-                if not self.live:
+                uncertain=self.live and getattr(exc,"remote_acceptance","unknown") != "rejected"
+                if not uncertain:
                     self.budget.release(run_id, estimate, idem_key)
                 self.state.record_invocation(run_id, role, phase, lane, turn, cfg["model_tier"], model,
                                              0, 0, 0.0, int((time.time() - started) * 1000),
-                                             "remote_outcome_unknown" if self.live else "error",
+                                             "remote_outcome_unknown" if uncertain else "error",
                                              type(exc).__name__, f"{idem_key}:err")
-                if self.live:
+                if uncertain:
                     self.state.set_status(run_id, RunStatus.RECONCILIATION_REQUIRED)
                     raise ReconciliationRequired("provider outcome unknown; reservation retained") from exc
                 raise
@@ -668,7 +683,7 @@ class Orchestrator:
                     tool_results.append({"call_id": call.call_id, "tool": call.name,
                                          "arguments": call.arguments, "turn": turn, **outcome})
                 continue
-            max_retries = int(cfg.get("max_retries", 0))
+            max_retries = min(1,int(cfg.get("max_retries", 0)))
             schema_attempts = 0
             while True:
                 if time.monotonic()-invocation_started >= wall_time:
@@ -691,19 +706,21 @@ class Orchestrator:
                         run_id, role, prompt, sliced, cfg["model_tier"], cfg["max_output_tokens"],
                         retry_key, model=model,
                         tools=tuple(tool_specs), tool_results=tuple(tool_context), turn=turn,
-                        reasoning=bool(cfg.get("reasoning", False)), output_schema=schema)
+                        reasoning=bool(cfg.get("reasoning", False)), output_schema=schema,
+                                 deadline=min(self.resource_limits.get("deadline") or float("inf"),time.time()+max(0,wall_time-(time.monotonic()-invocation_started))),max_transport_retries=2)
                     started = time.time()
                     try:
                         result = self.provider.invoke(request)
                     except Exception as exc:
-                        if not self.live:
+                        uncertain=self.live and getattr(exc,"remote_acceptance","unknown") != "rejected"
+                        if not uncertain:
                             self.budget.release(run_id, estimate, retry_key)
                         self.state.record_invocation(
                             run_id, role, phase, lane, turn, cfg["model_tier"], model,
                             0, 0, 0.0, int((time.time() - started) * 1000),
-                            "remote_outcome_unknown" if self.live else "error",
+                            "remote_outcome_unknown" if uncertain else "error",
                             type(exc).__name__, f"{retry_key}:err")
-                        if self.live:
+                        if uncertain:
                             self.state.set_status(run_id, RunStatus.RECONCILIATION_REQUIRED)
                             raise ReconciliationRequired("provider retry outcome unknown; reservation retained") from exc
                         raise

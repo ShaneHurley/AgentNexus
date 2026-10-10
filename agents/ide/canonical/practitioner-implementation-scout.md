@@ -27,7 +27,7 @@ Read-only; no nested agents; no majority vote.
 
 ## Model policy
 
-Opus high; Sol xhigh for code- or benchmark-dominant assignments.
+Use the reviewed resolver policy for this role. Automatic cheaper routing requires qualifying held-out evidence; unavailable or unsupported models stop or use a preapproved fallback.
 
 ## Examples
 

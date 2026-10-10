@@ -28,7 +28,7 @@ class GeminiProvider(Provider):
                 {"name": t["name"], "description": t.get("description", ""),
                  "parameters": t.get("parameters", {"type": "object"})} for t in request.tools]}]
         url = f"{self.base_url}/models/{model}:generateContent"
-        data = post_json(url, payload, {"x-goog-api-key": self.api_key or ""}, self.timeout)
+        data = post_json(url, payload, {"x-goog-api-key": self.api_key or ""}, self.timeout, deadline=request.deadline, retries=request.max_transport_retries)
         candidate = (data.get("candidates") or [{}])[0]
         usage = data.get("usageMetadata") or {}
         calls, text = [], []
@@ -40,6 +40,6 @@ class GeminiProvider(Provider):
                 text.append(part["text"])
         output = None if calls else extract_json("".join(text))
         return InvocationResult(output=output, tool_calls=calls,
-                                input_tokens=int(usage.get("promptTokenCount", 0)),
-                                output_tokens=int(usage.get("candidatesTokenCount", 0)),
+                                input_tokens=usage.get("promptTokenCount"),
+                                output_tokens=usage.get("candidatesTokenCount"),
                                 model=model)

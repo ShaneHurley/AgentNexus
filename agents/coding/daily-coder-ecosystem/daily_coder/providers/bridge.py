@@ -26,10 +26,10 @@ class HttpBridgeProvider(Provider):
                    "tool_results": list(request.tool_results), "turn": request.turn,
                    "output_schema": request.output_schema}
         headers = {"Authorization": f"Bearer {self.token}"} if self.token else {}
-        data = post_json(self.endpoint, payload, headers, self.timeout, retries=2)
+        data = post_json(self.endpoint, payload, headers, self.timeout, retries=request.max_transport_retries, deadline=request.deadline)
         calls = [ToolCall(name=c["name"], arguments=c.get("arguments") or {}, call_id=c.get("call_id", ""))
                  for c in (data.get("tool_calls") or [])]
         return InvocationResult(output=data.get("output") if not calls else None, tool_calls=calls,
-                                input_tokens=int(data.get("input_tokens", 0)),
-                                output_tokens=int(data.get("output_tokens", 0)),
+                                input_tokens=data.get("input_tokens"),
+                                output_tokens=data.get("output_tokens"),
                                 model=data.get("model", "http-bridge"))

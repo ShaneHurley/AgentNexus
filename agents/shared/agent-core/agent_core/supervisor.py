@@ -42,8 +42,13 @@ class Supervisor:
         return self.status(row["run_id"])
 
     def _current(self,row):
-        snapshot=self.adapters[row["engine"]].snapshot(row["workspace"],row["live"],row["snapshot"]["provider"])
+        from .routing_runtime import PIN_FIELDS
+        options={"pinned":row["snapshot"]} if PIN_FIELDS <= set(row["snapshot"]) else {}
+        snapshot=self.adapters[row["engine"]].snapshot(row["workspace"],row["live"],row["snapshot"]["provider"],**options)
         snapshot["provider"]=row["snapshot"]["provider"]
+        from .routing_runtime import PIN_FIELDS,load_model_settings
+        if PIN_FIELDS <= set(row["snapshot"]):
+            snapshot.update(load_model_settings(self.repository,pinned=row["snapshot"]))
         return snapshot,runtime_snapshot().snapshot_id
 
     def status(self,key):
@@ -63,7 +68,7 @@ class Supervisor:
 
     def _settle(self,row,call_id,result):
         usage=result.get("usage") or {}
-        if usage.get("unknown") or result.get("status") == "RECONCILIATION_REQUIRED":
+        if usage.get("unknown") or usage.get("usd") is None or usage.get("tokens") is None or result.get("status") == "RECONCILIATION_REQUIRED":
             self.store.finish_call(call_id,"unknown")
             self.store.checkpoint(row["run_id"],result,result.get("artifacts",()))
             return self.status(row["run_id"])

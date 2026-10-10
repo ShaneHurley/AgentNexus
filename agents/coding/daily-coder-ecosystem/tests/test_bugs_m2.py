@@ -141,7 +141,7 @@ class TestBugA_IdempotencyCycles(BugM2TestBase):
                         "recommended_action": "repair",
                         "target_phase": "PLAN",
                         "rationale": "retry planning phase"
-                    }, model="mock")
+                    }, input_tokens=0,output_tokens=0,model="mock")
                 return self.delegate.invoke(request)
 
         orch = Orchestrator(self.package, self.store, FailThenPass(), live=False)

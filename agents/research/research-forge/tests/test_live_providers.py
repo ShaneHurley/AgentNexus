@@ -73,7 +73,7 @@ class TestLiveModel(unittest.TestCase):
     def test_env_api_key_loading(self) -> None:
         with patch.dict(os.environ, {"OPENROUTER_API_KEY": "test-env-key-123"}):
             model = LiveModel()
-            self.assertEqual(model.api_key, "test-env-key-123")
+            self.assertIsNone(model.api_key)  # Supervised credentials never come from ambient environment.
 
 
 class TestLiveSearchAdapter(unittest.TestCase):

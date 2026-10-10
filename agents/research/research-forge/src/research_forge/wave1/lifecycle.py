@@ -107,7 +107,7 @@ class LifecycleJournal:
             self.event(db,"call_started",row)
         return row
     def complete(self,row,result,budget):
-        row.update(status="completed",accounting="estimated",result=result,budget=asdict(budget.state))
+        row.update(status="completed",accounting=row.get("accounting") if row.get("accounting") != "unknown" else "estimated",result=result,budget=asdict(budget.state))
         with self.connect() as db:
             db.execute("UPDATE calls SET payload=? WHERE key=?",(json.dumps(row,sort_keys=True),row["key"]))
             self.event(db,"call_completed",row)

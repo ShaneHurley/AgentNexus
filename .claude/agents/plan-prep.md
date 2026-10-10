@@ -121,7 +121,7 @@ Read/search/fetch and Glean MCP when present. Deny Write, StrReplace, Delete, Ed
 
 ## Model policy
 
-Prefer newest Opus at highest reasoning tier for synthesis and stakeholder relevance; newest Sol at high tier for repo-wide code search when Glean `code_search` is unavailable.
+Use the reviewed resolver policy for this role. Automatic cheaper routing requires qualifying held-out evidence; unavailable or unsupported models stop or use a preapproved fallback.
 
 ## STOP
 

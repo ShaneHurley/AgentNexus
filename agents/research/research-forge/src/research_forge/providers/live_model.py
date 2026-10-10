@@ -4,13 +4,11 @@ from __future__ import annotations
 
 import hashlib
 import json
-import os
 from typing import Any
 
 from agent_core.providers.base import Invocation, Provider
 from agent_core.providers.http import extract_json
 from agent_core.providers.openai_compat import OpenAICompatibleProvider
-from agent_core.providers.registry import build_provider
 
 
 class LiveModel:
@@ -28,11 +26,7 @@ class LiveModel:
         **kwargs: Any,
     ) -> None:
         self.config = dict(config or {})
-        self.api_key = (
-            api_key
-            or (self.config.get("providers") or {}).get("openrouter", {}).get("api_key")
-            or os.environ.get("OPENROUTER_API_KEY", "")
-        )
+        self.api_key = api_key
         self.model = model or default_model
         self.model_tier = self.model
         self.timeout = timeout
@@ -40,22 +34,9 @@ class LiveModel:
 
         if provider is not None:
             self.provider = provider
-        elif self.api_key:
-            self.provider = build_provider(
-                "openrouter",
-                config=self.config,
-                secrets={"OPENROUTER_API_KEY": self.api_key},
-                timeout=self.timeout,
-                **kwargs,
-            )
         else:
-            # Fall back gracefully to OpenAICompatibleProvider with empty key (or local if configured)
-            self.provider = OpenAICompatibleProvider(
-                api_key="",
-                base_url="https://openrouter.ai/api/v1",
-                default_model=self.model,
-                timeout=self.timeout,
-            )
+            pc=(self.config.get("providers") or {}).get("openrouter",{})
+            self.provider = OpenAICompatibleProvider(api_key=self.api_key,base_url=pc.get("base_url","https://openrouter.ai/api/v1"),default_model=self.model,timeout=self.timeout,name="openrouter")
 
     def complete(self, prompt: str, task_id: str = "default", **kwargs: Any) -> dict[str, Any]:
         """Invoke provider and return standard response dictionary."""
@@ -91,14 +72,18 @@ class LiveModel:
         prompt_tokens = res.input_tokens
         completion_tokens = res.output_tokens
         if res.usage:
-            prompt_tokens = prompt_tokens or res.usage.input_tokens
-            completion_tokens = completion_tokens or res.usage.output_tokens
+            prompt_tokens = res.usage.input_tokens if prompt_tokens is None else prompt_tokens
+            completion_tokens = res.usage.output_tokens if completion_tokens is None else completion_tokens
 
         return {
             "text": text,
             "usage": {
                 "prompt_tokens": prompt_tokens,
                 "completion_tokens": completion_tokens,
+                "cost_usd": res.usage.cost_usd if res.usage else None,
+                "evidence_status": res.usage.evidence_status if res.usage else "unknown",
+                "cached_tokens": res.usage.cached_tokens if res.usage else None,
+                "provider_request_id": res.provider_request_id,
             },
             "model_tier": res.model or self.model,
             "output": res.output,

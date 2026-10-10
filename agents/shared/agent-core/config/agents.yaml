@@ -1,0 +1,138 @@
+schema_version: 1
+roles:
+  dc:test_author:
+    allowed_models:
+    - offline-mock
+    default: offline-mock
+    fallback: null
+    reviewed_baseline: true
+    evaluation_class: offline-harness
+    qualifications: {}
+  dc:plan_reviewer:
+    allowed_models:
+    - offline-mock
+    default: offline-mock
+    fallback: null
+    reviewed_baseline: true
+    evaluation_class: offline-harness
+    qualifications: {}
+  dc:code_reviewer:
+    allowed_models:
+    - offline-mock
+    default: offline-mock
+    fallback: null
+    reviewed_baseline: true
+    evaluation_class: offline-harness
+    qualifications: {}
+  dc:test_designer:
+    allowed_models:
+    - offline-mock
+    default: offline-mock
+    fallback: null
+    reviewed_baseline: true
+    evaluation_class: offline-harness
+    qualifications: {}
+  dc:documenter:
+    allowed_models:
+    - offline-mock
+    default: offline-mock
+    fallback: null
+    reviewed_baseline: true
+    evaluation_class: offline-harness
+    qualifications: {}
+  dc:test_executor:
+    allowed_models:
+    - offline-mock
+    default: offline-mock
+    fallback: null
+    reviewed_baseline: true
+    evaluation_class: offline-harness
+    qualifications: {}
+  dc:planner:
+    allowed_models:
+    - offline-mock
+    default: offline-mock
+    fallback: null
+    reviewed_baseline: true
+    evaluation_class: offline-harness
+    qualifications: {}
+  dc:implementer:
+    allowed_models:
+    - offline-mock
+    default: offline-mock
+    fallback: null
+    reviewed_baseline: true
+    evaluation_class: offline-harness
+    qualifications: {}
+  dc:sizer:
+    allowed_models:
+    - offline-mock
+    default: offline-mock
+    fallback: null
+    reviewed_baseline: true
+    evaluation_class: offline-harness
+    qualifications: {}
+  dc:alignment_checker:
+    allowed_models:
+    - offline-mock
+    default: offline-mock
+    fallback: null
+    reviewed_baseline: true
+    evaluation_class: offline-harness
+    qualifications: {}
+  dc:failure_diagnostician:
+    allowed_models:
+    - offline-mock
+    default: offline-mock
+    fallback: null
+    reviewed_baseline: true
+    evaluation_class: offline-harness
+    qualifications: {}
+  dc:skill_curator:
+    allowed_models:
+    - offline-mock
+    default: offline-mock
+    fallback: null
+    reviewed_baseline: true
+    evaluation_class: offline-harness
+    qualifications: {}
+  dc:master:
+    allowed_models:
+    - offline-mock
+    default: offline-mock
+    fallback: null
+    reviewed_baseline: true
+    evaluation_class: offline-harness
+    qualifications: {}
+  dc:frontier_advisor:
+    allowed_models:
+    - offline-mock
+    default: offline-mock
+    fallback: null
+    reviewed_baseline: true
+    evaluation_class: offline-harness
+    qualifications: {}
+  dc:researcher:
+    allowed_models:
+    - offline-mock
+    default: offline-mock
+    fallback: null
+    reviewed_baseline: true
+    evaluation_class: offline-harness
+    qualifications: {}
+  dc:brainstormer:
+    allowed_models:
+    - offline-mock
+    default: offline-mock
+    fallback: null
+    reviewed_baseline: true
+    evaluation_class: offline-harness
+    qualifications: {}
+  rf:assistant:
+    allowed_models:
+    - offline-mock
+    default: offline-mock
+    fallback: null
+    reviewed_baseline: true
+    evaluation_class: offline-harness
+    qualifications: {}

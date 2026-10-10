@@ -136,8 +136,8 @@ class TestAgentCoreProviders(unittest.TestCase):
 
         with patch("urllib.request.urlopen", side_effect=mock_urlopen):
             with self.assertRaises(ProviderError) as exc_info:
-                post_json("https://api.test.com/v1", {"bad": "data"}, retries=3)
-            self.assertIn("HTTP 400", str(exc_info.exception))
+                post_json("https://api.test.com/v1", {"bad": "data"}, retries=2)
+            self.assertEqual(exc_info.exception.remote_acceptance, "rejected")
 
     def test_get_json_and_get_text(self) -> None:
         def mock_urlopen_json(req, timeout=None):
@@ -287,13 +287,13 @@ class TestAgentCoreProviders(unittest.TestCase):
         with patch.dict("os.environ", {"OPENAI_API_KEY": "sk-openai"}):
             p_openai = build_provider("openai")
             self.assertIsInstance(p_openai, OpenAICompatibleProvider)
-            self.assertEqual(p_openai.api_key, "sk-openai")
+            self.assertIsNone(p_openai.api_key)
             self.assertTrue(is_live("openai"))
 
         with patch.dict("os.environ", {"OPENROUTER_API_KEY": "sk-or-v1-test"}):
             p_openrouter = build_provider("openrouter")
             self.assertIsInstance(p_openrouter, OpenAICompatibleProvider)
-            self.assertEqual(p_openrouter.api_key, "sk-or-v1-test")
+            self.assertIsNone(p_openrouter.api_key)
             self.assertEqual(p_openrouter.base_url, "https://openrouter.ai/api/v1")
             self.assertTrue(is_live("openrouter"))
 

@@ -52,8 +52,17 @@ def main(argv=None):
     runs.add_argument("--session")
     backup=commands.add_parser("backup",help="Consistent SQLite execution backup")
     backup.add_argument("destination",type=Path)
+    from .model_commands import register,HANDLED_COMMANDS,execute
+    register(commands)
+    from . import efficiency_commands
+    efficiency_commands.register(commands)
     args=parser.parse_args(argv)
     try:
+        if args.command in HANDLED_COMMANDS | efficiency_commands.HANDLED_COMMANDS:
+            from .runtime_authority import repository_root
+            result=(efficiency_commands.execute if args.command=="tools" else execute)(args,args.repository or repository_root())
+            print(json.dumps(result,indent=2,allow_nan=False,default=str))
+            return 0
         supervisor=Supervisor(args.state_dir,args.repository)
         code=0
         if args.command == "new": result=supervisor.new_session(args.identity,args.project,args.profile)

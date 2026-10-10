@@ -17,75 +17,90 @@ from typing import Any, Iterator
 
 
 class ProviderError(RuntimeError):
-    """Raised when an upstream provider or HTTP call fails."""
-    pass
-
+    """Sanitized transport failure; acceptance uncertainty forbids replay."""
+    def __init__(self, message="provider request failed", *, category="transport", remote_acceptance="unknown", retryable=False, provider_request_id=None):
+        super().__init__(message)
+        self.category=category
+        self.remote_acceptance=remote_acceptance
+        self.retryable=retryable
+        self.provider_request_id=provider_request_id
 
 RETRYABLE = {408, 409, 425, 429, 500, 502, 503, 504}
 TOOL_RESULT_MAX_CHARS = 12000
 
+def _close_at_deadline(response,deadline):
+    """Interrupt slow incremental bodies at the original deadline."""
+    def close():
+        import socket
+        sock=getattr(getattr(getattr(response,"fp",None),"raw",None),"_sock",None)
+        if sock is not None:
+            try: sock.shutdown(socket.SHUT_RDWR)
+            except OSError: pass
+        try: response.close()
+        except Exception: pass
+    timer=threading.Timer(max(0,deadline-time.time()),close)
+    timer.daemon=True;timer.start()
+    return timer
 
-def post_json(
-    url: str,
-    payload: dict[str, Any],
-    headers: dict[str, str] | None = None,
-    timeout: float = 180.0,
-    retries: int = 3,
-    backoff_factor: float = 1.0,
-) -> dict[str, Any]:
-    """Execute a resilient POST request with JSON payload."""
-    body = json.dumps(payload).encode("utf-8")
-    req_headers = {"Content-Type": "application/json", **(headers or {})}
-    last: Exception | None = None
-
-    for attempt in range(retries):
-        request = urllib.request.Request(url, data=body, method="POST", headers=req_headers)
+def post_json(url, payload, headers=None, timeout=180.0, retries=0, backoff_factor=1.0, *, deadline=None):
+    """One retry owner. Only explicit rejected throttling is replayable."""
+    import math
+    if not math.isfinite(timeout) or timeout <= 0 or retries not in (0,1,2) or (deadline is not None and not math.isfinite(deadline)):
+        raise ValueError("invalid transport budget")
+    stop=min(deadline if deadline is not None else time.time()+timeout, time.time()+timeout)
+    body=json.dumps(payload).encode()
+    for attempt in range(retries+1):
+        remaining=stop-time.time()
+        if remaining<=0:
+            raise ProviderError("provider deadline exhausted",category="deadline",remote_acceptance="rejected")
+        request=urllib.request.Request(url,data=body,method="POST",headers={"Content-Type":"application/json",**(headers or {})})
         try:
-            with urllib.request.urlopen(request, timeout=timeout) as response:
-                raw = response.read().decode("utf-8")
-                return json.loads(raw)
+            with urllib.request.urlopen(request,timeout=remaining) as response:
+                timer=_close_at_deadline(response,stop)
+                try:
+                    data=json.loads(response.read().decode())
+                    if time.time()>=stop: raise ProviderError("provider deadline exhausted",category="deadline")
+                    return data
+                finally: timer.cancel()
         except urllib.error.HTTPError as exc:
-            detail = exc.read().decode("utf-8", errors="replace")[:1000]
-            last = ProviderError(f"HTTP {exc.code}: {detail}")
-            if exc.code not in RETRYABLE:
-                raise last
-        except OSError as exc:
-            last = ProviderError(str(exc))
-        sleep_s = min(backoff_factor * (2 ** attempt), 8.0)
-        time.sleep(sleep_s)
+            rejected=exc.code in {400,401,403,404,409,422,425,429}
+            transient=exc.code in {425,429}
+            error=ProviderError("provider HTTP failure",category="http",remote_acceptance="rejected" if rejected else "unknown",retryable=transient)
+            if not transient or attempt==retries:
+                raise error from None
+            pause=min(backoff_factor*2**attempt,8)
+            if time.time()+pause>=stop:
+                raise error from None
+            time.sleep(pause)
+        except (OSError,ValueError):
+            raise ProviderError("provider transport or response failure") from None
 
-    raise last or ProviderError("request failed")
 
-
-def post_stream(
-    url: str,
-    payload: dict[str, Any],
-    headers: dict[str, str] | None = None,
-    timeout: float = 180.0,
-) -> Iterator[str]:
-    """Execute a POST request and stream SSE response lines."""
-    body = json.dumps(payload).encode("utf-8")
-    req_headers = {
-        "Content-Type": "application/json",
-        "Accept": "text/event-stream",
-        **(headers or {}),
-    }
-    request = urllib.request.Request(url, data=body, method="POST", headers=req_headers)
+def post_stream(url,payload,headers=None,timeout=180.0,*,deadline=None):
+    """SSE transport; never replay a partially accepted request."""
+    import math
+    if not math.isfinite(timeout) or timeout<=0 or (deadline is not None and not math.isfinite(deadline)):
+        raise ValueError("invalid streaming budget")
+    stop=min(deadline if deadline is not None else time.time()+timeout,time.time()+timeout)
+    remaining=stop-time.time()
+    if remaining<=0: raise ProviderError("provider deadline exhausted",category="deadline",remote_acceptance="rejected")
+    body=json.dumps(payload).encode()
+    request=urllib.request.Request(url,data=body,method="POST",headers={"Content-Type":"application/json","Accept":"text/event-stream",**(headers or {})})
     try:
-        with urllib.request.urlopen(request, timeout=timeout) as response:
-            for raw_line in response:
-                line = raw_line.decode("utf-8", errors="replace").strip()
-                if not line:
-                    continue
-                if line.startswith("data: "):
-                    data_str = line[6:].strip()
-                    if data_str == "[DONE]":
-                        break
-                    yield data_str
-                else:
-                    yield line
-    except (urllib.error.HTTPError, OSError) as exc:
-        raise ProviderError(f"stream failed: {exc}") from exc
+        with urllib.request.urlopen(request,timeout=remaining) as response:
+            timer=_close_at_deadline(response,stop)
+            try:
+                for raw_line in response:
+                    if time.time()>=stop: raise ProviderError("provider streaming deadline exhausted",category="deadline")
+                    line=raw_line.decode("utf-8",errors="replace").strip()
+                    if line.startswith("data:"):
+                        data=line[5:].strip()
+                        if data=="[DONE]": break
+                        yield data
+                if time.time()>=stop: raise ProviderError("provider streaming deadline exhausted",category="deadline")
+            finally: timer.cancel()
+    except (urllib.error.HTTPError,OSError):
+        raise ProviderError("provider stream failed") from None
 
 
 def get_json(
@@ -107,11 +122,11 @@ def get_json(
                 return json.loads(raw)
         except urllib.error.HTTPError as exc:
             detail = exc.read().decode("utf-8", errors="replace")[:1000]
-            last = ProviderError(f"HTTP {exc.code}: {detail}")
+            last = ProviderError("provider GET HTTP failure", category="http")
             if exc.code not in RETRYABLE:
                 raise last
         except OSError as exc:
-            last = ProviderError(str(exc))
+            last = ProviderError("provider GET transport failure")
         sleep_s = min(backoff_factor * (2 ** attempt), 8.0)
         time.sleep(sleep_s)
 
@@ -139,11 +154,11 @@ def get_text(
                 return response.read().decode("utf-8", errors="replace")
         except urllib.error.HTTPError as exc:
             detail = exc.read().decode("utf-8", errors="replace")[:1000]
-            last = ProviderError(f"HTTP {exc.code}: {detail}")
+            last = ProviderError("provider GET HTTP failure", category="http")
             if exc.code not in RETRYABLE:
                 raise last
         except OSError as exc:
-            last = ProviderError(str(exc))
+            last = ProviderError("provider GET transport failure")
         sleep_s = min(backoff_factor * (2 ** attempt), 8.0)
         time.sleep(sleep_s)
 
@@ -195,7 +210,7 @@ def extract_json(text: str) -> dict[str, Any]:
                     except ValueError:
                         break
         start = stripped.find("{", start + 1)
-    raise ProviderError(f"model did not return JSON: {text[:300]}")
+    raise ProviderError("model did not return JSON", category="response")
 
 
 def json_instruction(schema: dict[str, Any] | None) -> str:

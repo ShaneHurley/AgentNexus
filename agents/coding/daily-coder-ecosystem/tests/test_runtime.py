@@ -186,10 +186,10 @@ class TestOpenAIWire(unittest.TestCase):
         self.assertIn("required", text)
 
     def test_tool_roles_and_json_object(self):
-        provider = OpenAICompatibleProvider(supports_json_response_format=True)
+        provider = OpenAICompatibleProvider(api_key="offline-fixture", supports_json_response_format=True)
         captured = {}
 
-        def fake_post(url, payload, headers, timeout=180, retries=3):
+        def fake_post(url, payload, headers, timeout=180, retries=2, **kwargs):
             captured["payload"] = payload
             return {
                 "choices": [{"message": {"content": '{"verdict":"pass"}'}}],
@@ -197,7 +197,7 @@ class TestOpenAIWire(unittest.TestCase):
                 "model": "gpt-4o-mini",
             }
 
-        import daily_coder.providers.openai_compat as mod
+        import agent_core.providers.openai_compat as mod
         original = mod.post_json
         mod.post_json = fake_post
         try:
@@ -222,14 +222,14 @@ class TestOpenAIWire(unittest.TestCase):
             mod.post_json = original
 
     def test_missing_call_id_falls_back_to_user_tool_result(self):
-        provider = OpenAICompatibleProvider()
+        provider = OpenAICompatibleProvider(api_key="offline-fixture")
         captured = {}
 
-        def fake_post(url, payload, headers, timeout=180, retries=3):
+        def fake_post(url, payload, headers, timeout=180, retries=2, **kwargs):
             captured["payload"] = payload
             return {"choices": [{"message": {"content": "{}"}}], "usage": {}, "model": "m"}
 
-        import daily_coder.providers.openai_compat as mod
+        import agent_core.providers.openai_compat as mod
         original = mod.post_json
         mod.post_json = fake_post
         try:
@@ -329,7 +329,7 @@ class TestFrontierLastChance(unittest.TestCase):
                         "recommended_action": "repair",
                         "target_phase": "DECIDE",
                         "rationale": "retry",
-                    }, model="mock")
+                    }, input_tokens=0,output_tokens=0,model="mock")
                 if request.role == "master":
                     raise RuntimeError("always")
                 return self.delegate.invoke(request)
@@ -775,7 +775,7 @@ class TestApprovalResume(unittest.TestCase):
                 if request.role == "failure_diagnostician":
                     return InvocationResult(output={"failure_class":"orchestration","first_failing_signal":"transient",
                         "evidence":[{"claim":"provider failed once","locator":"invocation:error","label":"VERIFIED"}],
-                        "recommended_action":"repair","target_phase":"DECIDE","rationale":"retry the failed phase"},model="mock")
+                        "recommended_action":"repair","target_phase":"DECIDE","rationale":"retry the failed phase"},input_tokens=0,output_tokens=0,model="mock")
                 return self.delegate.invoke(request)
         with tempfile.TemporaryDirectory() as d:
             package = Path(d) / "package"; package.mkdir()

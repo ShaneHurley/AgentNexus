@@ -17,8 +17,12 @@ LIVE_PROVIDERS = {"openai", "anthropic", "gemini", "openrouter", "local", "comma
 def is_live(name: str) -> bool:
     return name in LIVE_PROVIDERS
 
-def build_provider(name, *, config=None, secrets=None, command=None, endpoint=None, timeout=180):
+def build_provider(name, *, config=None, secrets=None, command=None, endpoint=None, timeout=180, secret_broker=None, secret_grant_factory=None, credential_ref=None):
     config = config or {}
+    if secret_broker is not None and name in {"openai","openrouter","anthropic","local"}:
+        from agent_core.providers.registry import build_provider as shared_build
+        return shared_build(name,config=config,timeout=timeout,secret_broker=secret_broker,
+                            secret_grant_factory=secret_grant_factory,credential_ref=credential_ref)
     entry = (config.get("providers") or {}).get(name, {})
 
     def key(env_name):

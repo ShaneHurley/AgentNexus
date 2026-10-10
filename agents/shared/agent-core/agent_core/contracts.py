@@ -7,7 +7,7 @@ import math
 from typing import Any, Mapping
 
 LAYERS = ("user", "role", "profile", "parent", "runtime", "approval")
-ACTIONS = ("tools", "skills", "delegation", "memory_read", "memory_write")
+ACTIONS = ("tools", "skills", "delegation", "memory_read", "memory_write", "secret_use")
 
 
 class ContractDenied(PermissionError):
@@ -21,6 +21,7 @@ class Grant:
     delegation: frozenset[str] = frozenset()
     memory_read: frozenset[str] = frozenset()
     memory_write: frozenset[str] = frozenset()
+    secret_use: frozenset[str] = frozenset()
     workspace_roots: tuple[str, ...] = ()
     write_roots: tuple[str, ...] = ()
     resources: Mapping[str, int | float] = field(default_factory=dict)

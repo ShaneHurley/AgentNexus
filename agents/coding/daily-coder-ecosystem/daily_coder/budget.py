@@ -139,8 +139,9 @@ class BudgetManager:
             if calls: self._reserved_calls[run_id]=calls
             else: self._reserved_calls.pop(run_id,None)
 
-    def settle(self,run_id,estimated_tokens,model,input_tokens,output_tokens,reservation_id=None):
-        usd=self.price(model,input_tokens,output_tokens)
+    def settle(self,run_id,estimated_tokens,model,input_tokens,output_tokens,reservation_id=None,*,reported_usd=None):
+        usd=self.price(model,input_tokens,output_tokens) if reported_usd is None else float(reported_usd)
+        if not math.isfinite(usd) or usd<0: raise ValueError("invalid reported usage")
         if reservation_id is None:
             ids=self._reservation_ids.get((run_id,estimated_tokens),[])
             reservation_id=ids[0] if ids else None

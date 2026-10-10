@@ -44,7 +44,7 @@ Permanently read-only. Never search broadly, invoke subagents, send messages, ap
 
 ## Model policy
 
-When invoked as subagent: prefer newest Sol at xhigh/very high for normalization and schema work; Opus high only if qualitative synthesis dominates.
+Use the reviewed resolver policy for this role. Automatic cheaper routing requires qualifying held-out evidence; unavailable or unsupported models stop or use a preapproved fallback.
 
 ## Workflow (outline)
 

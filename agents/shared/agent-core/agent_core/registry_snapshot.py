@@ -118,6 +118,8 @@ def validate_snapshot(data: dict[str, Any]) -> None:
         for action, group in (("tools", "tools"), ("skills", "skills"), ("delegation", "roles")):
             if getattr(grant, action) - set(data[group]):
                 raise ContractDenied(f"unresolved {action} for {row['id']}")
+        if grant.secret_use - set(data.get("secret_refs", {})):
+            raise ContractDenied("unresolved secret capability")
         if grant.memory_read or grant.memory_write:
             raise ContractDenied("memory service is unavailable in Phase 2")
         for schema in (row.get("input_schema"), row.get("output_schema")):
@@ -272,6 +274,18 @@ def compile_repository(repo_root: str | Path) -> RegistrySnapshot:
              source=source.relative_to(root).as_posix())
         # Installing the shared library is not activation. Explicit opt-in remains required.
         data["roles"]["shared:" + row["id"]]["active"] = False
+    secrets_path = shared_package / "config/secret-capabilities.yaml"
+    if secrets_path.is_file():
+        secret_config=read(secrets_path)
+        if secret_config.get("version") != 1 or set(secret_config) != {"version","refs"}:
+            raise ContractDenied("invalid secret capability source")
+        data["secret_refs"]={}
+        for ref, rule in secret_config["refs"].items():
+            if not isinstance(ref,str) or not ref or ref == "*" or set(rule) != {"namespaces"} or not set(rule["namespaces"]) <= {"dc","rf"}:
+                raise ContractDenied("invalid secret capability rule")
+            data["secret_refs"][ref]={"id":ref,"namespaces":rule["namespaces"]}
+        for key, role_row in data["roles"].items():
+            role_row["grant"]["secret_use"]=[ref for ref, rule in data["secret_refs"].items() if key.split(":",1)[0] in rule["namespaces"]]
     dc_skills = []
     for path in sorted((root / dc / "skills").glob("*/SKILL.md")):
         resolved = path.resolve()

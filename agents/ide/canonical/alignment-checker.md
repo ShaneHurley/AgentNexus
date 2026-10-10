@@ -62,7 +62,7 @@ When **this agent** is invoked, read the full runtime instructions from SSOT (no
 | Agent directory | `daily-coder-ecosystem/agents/alignment_checker` |
 | `prompt.md` sha256 | `51aa5ad14b343ca75675a88f2d9b7d4edc63de37aa6bc67112b4c3c7112d9822` |
 | `agent.json` sha256 | `0684a85fd7eae0ce18ceee678778d6327ac264aa24b7bd8b860e60a4b052ac6d` |
-| Regenerate | `python ide-agents/scripts/import_daily_coder_agents.py` |
+| Regenerate | `python agents/ide/scripts/import_daily_coder_agents.py` |
 
 ## Tool intent (runtime allowlist reference)
 

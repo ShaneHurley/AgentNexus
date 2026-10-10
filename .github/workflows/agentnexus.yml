@@ -35,6 +35,8 @@ jobs:
           uv run --locked python agents/ide/scripts/import_daily_coder_agents.py --check
           uv run --locked python agents/ide/scripts/import_rf_agents.py --check
           uv run --locked python agents/ide/scripts/sync_ide_agents.py --check
+      - name: Audit IDE and browser capability surfaces
+        run: uv run --locked agent-nexus --repository . agents audit --check
       - name: Offline regression and repository suites
         env:
           PYTHONDONTWRITEBYTECODE: "1"

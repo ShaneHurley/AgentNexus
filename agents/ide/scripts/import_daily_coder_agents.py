@@ -5,8 +5,8 @@ Reads daily-coder-ecosystem/agents/*/prompt.md + agent.json (16 roles).
 Writes ide-agents/canonical/<kebab-id>.md and updates MANIFEST DC agent entries.
 
 Usage (repository root):
-  python ide-agents/scripts/import_daily_coder_agents.py
-  python ide-agents/scripts/import_daily_coder_agents.py --check
+  python agents/ide/scripts/import_daily_coder_agents.py
+  python agents/ide/scripts/import_daily_coder_agents.py --check
 """
 
 from __future__ import annotations
@@ -182,7 +182,7 @@ When **this agent** is invoked, read the full runtime instructions from SSOT (no
 | Agent directory | `{rel_agent}` |
 | `prompt.md` sha256 | `{prompt_sha}` |
 | `agent.json` sha256 | `{json_sha}` |
-| Regenerate | `python ide-agents/scripts/import_daily_coder_agents.py` |
+| Regenerate | `python agents/ide/scripts/import_daily_coder_agents.py` |
 
 ## Tool intent (runtime allowlist reference)
 
@@ -283,7 +283,7 @@ def _merge_manifest_dc_entries(dc_entries: list[dict[str, Any]]) -> None:
     if "daily_coder_import" not in data:
         data["daily_coder_import"] = {}
     data["daily_coder_import"]["role_count"] = len(dc_entries)
-    data["daily_coder_import"]["script"] = "ide-agents/scripts/import_daily_coder_agents.py"
+    data["daily_coder_import"]["script"] = "agents/ide/scripts/import_daily_coder_agents.py"
     body = yaml.safe_dump(data, sort_keys=False, allow_unicode=True, default_flow_style=False)
     MANIFEST_PATH.write_text(preamble + body, encoding="utf-8")
 

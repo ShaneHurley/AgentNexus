@@ -8,7 +8,7 @@ Independent **adversarial** review of a supplied code diff or patch. Output is a
 
 | Rule | Meaning |
 |------|---------|
-| **Browser ≠ IDE PolicyGateway** | Chat review is PROPOSED. Repo-native review, CI context, and audited paths use IDE `/code-reviewer` or **ide-bridge** with visible output. |
+| **Browser ≠ IDE PolicyGateway** | Chat review is PROPOSED. Repo-native review, CI context, and audited paths use IDE `/daily-coder` or `/use-master` delegating `code-reviewer` through **ide-bridge** with visible output. |
 | **Does not replace code-crafter SELF_REVIEW** | The author must still emit `SELF_REVIEW` in the craft chat. This family is the hostile second opinion. |
 | **New chat after craft** | Run `code-crafter` first; then open a **new chat** and paste this family. Do not paste reviewer + implementer together. |
 | **No fixes** | Reviewer must not rewrite the patch as the author or claim fixes were applied. |
@@ -66,4 +66,4 @@ Set `browser_variant` in the packet to match the paste you use.
 
 ## IDE counterpart
 
-Slug matches IDE `/code-reviewer` for naming only. Prefer IDE when the host has repository diff tools, CI, and read-only delegate review. Browser pack is **paste-only** — see `_shared/AUTHORITY.md`.
+Slug matches IDE delegate `code-reviewer` for naming only. Prefer IDE when the host has repository diff tools, CI, and read-only delegate review. Browser pack is **paste-only** — see `_shared/AUTHORITY.md`.

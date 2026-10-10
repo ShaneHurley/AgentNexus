@@ -2,9 +2,9 @@
 """Project ide-agents/canonical/*.md into IDE-specific agent files.
 
 Usage (from repository root):
-  python ide-agents/scripts/sync_ide_agents.py
-  python ide-agents/scripts/sync_ide_agents.py --check
-  python ide-agents/scripts/sync_ide_agents.py --verbose
+  python agents/ide/scripts/sync_ide_agents.py
+  python agents/ide/scripts/sync_ide_agents.py --check
+  python agents/ide/scripts/sync_ide_agents.py --verbose
 
 Edit canonical/ only; never hand-edit generated projections.
 """

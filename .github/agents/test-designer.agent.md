@@ -53,7 +53,7 @@ When **this agent** is invoked, read the full runtime instructions from SSOT (no
 | Agent directory | `daily-coder-ecosystem/agents/test_designer` |
 | `prompt.md` sha256 | `98a5603a6e9d569ad7a53b453ecbd9291a5c7be2313175cd1376af722eb2b789` |
 | `agent.json` sha256 | `3ff433d0654f24086fbf69d2ac30fc9bd70dfc3db44e2c8b29e44e066be52d9c` |
-| Regenerate | `python ide-agents/scripts/import_daily_coder_agents.py` |
+| Regenerate | `python agents/ide/scripts/import_daily_coder_agents.py` |
 
 ## Tool intent (runtime allowlist reference)
 

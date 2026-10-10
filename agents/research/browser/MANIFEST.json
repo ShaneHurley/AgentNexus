@@ -2,16 +2,7 @@
   "package": "browser-agent-pack",
   "version": "3.0.0-federated",
   "families": [
-    "plans-and-places",
-    "kitchen-cooking",
-    "learning-coach",
-    "writing-studio",
-    "research-desk",
-    "code-crafter",
-    "code-reviewer",
-    "document-reviewer",
-    "mission-control",
-    "thinking-lab"
+    "research-desk"
   ],
   "agent_count": 13,
   "default_paste": [

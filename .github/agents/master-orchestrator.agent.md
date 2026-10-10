@@ -44,7 +44,7 @@ Permanently **read-only**. No nested agents, no Task/subagent invocation, no `id
 
 ## Master plan JSON contract (required output)
 
-Return **one** fenced JSON block (and optional brief preamble ≤3 lines). Schema:
+Return **one raw JSON object**, without Markdown fences or a prose preamble. The following fenced example illustrates the schema; do not emit its fences:
 
 ```json
 {
@@ -59,7 +59,7 @@ Return **one** fenced JSON block (and optional brief preamble ≤3 lines). Schem
   "task_dag": [
     {
       "id": "T1",
-      "role": "Planner|Worker|Reviewer|Test|Tester|Question|Idea|Debug|Integration|CARLA|Scenario|HMI|Performance|ROS2|Environment|GUI",
+      "role": "researcher|sizer|master|brainstormer|planner|plan-reviewer|test-designer|implementer|test-author|test-executor|code-reviewer|alignment-checker|failure-diagnostician|documenter|skill-curator|frontier-advisor",
       "objective": "...",
       "dependencies": [],
       "safe_to_parallelize": false,
@@ -78,6 +78,8 @@ Return **one** fenced JSON block (and optional brief preamble ≤3 lines). Schem
   "stop_conditions": []
 }
 ```
+
+Use canonical specialist identifiers in `role`; do not invent domain agents or legacy aliases. A missing capability is a decision question or blocker. The parent must validate each role and grant before dispatch.
 
 Each task must include `acceptance_criteria` and, when parallelization is false, a concrete `serial_reason`.
 

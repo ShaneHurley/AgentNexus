@@ -173,3 +173,15 @@ Review corrections: search refuses overrides above eight records/4,000 token uni
 ## General-purpose roadmap
 
 See the [approved execution plan](docs/superpowers/plans/2026-10-10-general-purpose-orchestration.md) and [recorded mock baseline](docs/ide-agents/orchestration-baseline.json). Mock execution verifies harness transitions and accounting only. Codex-only execution, project profiles and hosted Daily task execution must pass their own release gates before use is advertised.
+
+
+## Agent audit and Codex prerequisite
+
+```sh
+uv run --locked agent-nexus --repository . agents audit --check
+uv run --locked agent-nexus --repository . agents audit --select ide:researcher --select browser:code-crafter
+```
+
+The audit reads the existing manifests and contracts without creating sessions or granting capabilities. It checks all 41 IDE agents, 96 browser pastes and ten families, projections, source pins, local guide links and literal generator commands. Selected prompt sizes are estimates and exclude runtime history/tools/provider overhead. The default 32,000-byte per-prompt ceiling reports oversized instructions; it never truncates them.
+
+The version-pinned Codex adapter has passed offline contracts and one live, inference-only structured smoke test using ChatGPT login. It is not yet selectable in supervised run/resume. Do not substitute the legacy command provider: shared routing, subscription accounting and run pins still require integration. See [transport evidence](docs/ide-agents/codex-adapter-smoke.json). Full paired Research/Code evaluations, project instances and the real isolated-runner gate remain pending.

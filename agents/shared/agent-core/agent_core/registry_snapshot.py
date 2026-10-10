@@ -137,12 +137,16 @@ def compile_repository(repo_root: str | Path) -> RegistrySnapshot:
     root = Path(repo_root).resolve()
     data: dict[str, Any] = {"version": FORMAT_VERSION, "roles": {}, "tools": {}, "skills": {}, "schemas": {}, "sources": {}, "warnings": []}
 
-    def read(path):
+    def source_bytes(path):
         path = path.resolve()
         if root not in path.parents or not path.is_file():
             raise ContractDenied(f"missing or escaped metadata: {path.name}")
         raw = path.read_bytes()
         data["sources"][path.relative_to(root).as_posix()] = hashlib.sha256(raw).hexdigest()
+        return raw
+
+    def read(path):
+        raw = source_bytes(path)
         return json.loads(raw) if path.suffix == ".json" else yaml.safe_load(raw)
 
     def add(group, row):
@@ -199,7 +203,7 @@ def compile_repository(repo_root: str | Path) -> RegistrySnapshot:
         if allowed is None or set(row["tools"]) != set(allowed):
             raise ContractDenied(f"contradictory DC tool metadata: {row['id']}")
         prompt = path.parent / "prompt.md"
-        data["sources"][prompt.relative_to(root).as_posix()] = hashlib.sha256(prompt.read_bytes()).hexdigest()
+        source_bytes(prompt)
         # Runtime dispatcher owns delegation; even master is a bounded leaf worker.
         role(f"dc:{row['id']}", "1", row["job"], allowed, callers=("ide:daily-coder", "ide:use-master"),
              write=row.get("write_scope") in {"implementer", "test_author", "documenter"}, output_schema=schema(dc, row.get("output_schema")), source=path.relative_to(root).as_posix())
@@ -241,7 +245,7 @@ def compile_repository(repo_root: str | Path) -> RegistrySnapshot:
         read_skill = skill_path.resolve()
         if catalog_path.parent.resolve() not in read_skill.parents or not read_skill.is_file():
             raise ContractDenied("unresolved or escaped skill path")
-        data["sources"][read_skill.relative_to(root).as_posix()] = hashlib.sha256(read_skill.read_bytes()).hexdigest()
+        source_bytes(read_skill)
         add("skills", {"id": f"skill:{row['id']}", "version": str(catalog["version"]), "summary": row['id'], "installed": True,
                        "active": row.get("status") == "active", "permissions": row.get("permissions", []),
                        "side_effects": row.get("side_effects"), "path": read_skill.relative_to(root).as_posix(), "dependencies": ["skill:" + name for name in row.get("calls", [])]})
@@ -256,8 +260,7 @@ def compile_repository(repo_root: str | Path) -> RegistrySnapshot:
         ref = row["contract"]
         if ref.startswith("services/"):
             source = shared_package / "agent_core" / (ref.split("/")[-1] + ".py")
-            read_bytes = source.read_bytes()
-            data["sources"][source.relative_to(root).as_posix()] = hashlib.sha256(read_bytes).hexdigest()
+            source_bytes(source)
             ins = outs = None
         else:
             source = shared_package / ref
@@ -291,9 +294,8 @@ def compile_repository(repo_root: str | Path) -> RegistrySnapshot:
         resolved = path.resolve()
         if (root / dc / "skills").resolve() not in resolved.parents:
             raise ContractDenied("escaped skill path")
-        text = resolved.read_text(); front = yaml.safe_load(text.split("---", 2)[1])
+        text = source_bytes(resolved).decode("utf-8"); front = yaml.safe_load(text.split("---", 2)[1])
         key = "skill:dc:" + front["name"]; dc_skills.append(key)
-        data["sources"][resolved.relative_to(root).as_posix()] = hashlib.sha256(resolved.read_bytes()).hexdigest()
         add("skills", {"id":key, "version":str(front.get("version", "0")), "summary":front.get("description",key),
                        "installed":True, "active":front.get("status") == "active", "path":resolved.relative_to(root).as_posix(), "dependencies":[]})
     for name in ("planner", "implementer"):
@@ -309,7 +311,7 @@ def compile_repository(repo_root: str | Path) -> RegistrySnapshot:
         source = root / "agents/ide/canonical" / f"{name}.md"
         if not source.is_file():
             raise ContractDenied(f"missing canonical role {name}")
-        data["sources"][source.relative_to(root).as_posix()] = hashlib.sha256(source.read_bytes()).hexdigest()
+        source_bytes(source)
         role(f"ide:{name}", manifest["contract_version"], name, leaf=name not in ORCHESTRATORS,
              invocable=name in ORCHESTRATORS, callers=(f"ide:{row['parent']}",) if row.get("parent") else (), source=source.relative_to(root).as_posix())
     for name in ("daily-coder", "use-master"):

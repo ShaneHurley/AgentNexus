@@ -80,4 +80,4 @@ NEW CHAT document-reviewer                 →  APPROVE | REVISE | BLOCK | INSUF
 
 ## IDE / AUTHORITY
 
-Browser Document Reviewer is **browser-first** — there is no default IDE agent counterpart. Do not assume PolicyGateway or ide-bridge. For code, use IDE `/code-reviewer` when repo-native review is available.
+Browser Document Reviewer is **browser-first** — there is no default IDE agent counterpart. Do not assume PolicyGateway or ide-bridge. For code, use IDE `/daily-coder` or `/use-master` delegating `code-reviewer` when repo-native review is available.

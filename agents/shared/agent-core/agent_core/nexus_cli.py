@@ -29,6 +29,11 @@ def main(argv=None):
     new.add_argument("--project",type=Path)
     new.add_argument("--profile",default="default")
     commands.add_parser("sessions",help="List sessions")
+    agents=commands.add_parser("agents",help="Read-only audit of existing IDE and browser capabilities")
+    audit=agents.add_subparsers(dest="agents_command",required=True).add_parser("audit")
+    audit.add_argument("--select",action="append",default=[])
+    audit.add_argument("--max-prompt-bytes",type=int,default=32000)
+    audit.add_argument("--check",action="store_true",help="Return blocked status when audit errors exist")
     run=commands.add_parser("run",help="Execute supported workflow in a session")
     run.add_argument("--session",required=True)
     run.add_argument("--engine",choices=("daily-coder","research-forge"),required=True)
@@ -62,6 +67,12 @@ def main(argv=None):
     memory_cli.register(commands)
     args=parser.parse_args(argv)
     try:
+        if args.command == "agents":
+            from .agent_inventory import build_inventory
+            from .runtime_authority import repository_root
+            result=build_inventory(args.repository or repository_root(),selected=args.select,max_prompt_bytes=args.max_prompt_bytes)
+            print(json.dumps(result,indent=2,allow_nan=False,default=str))
+            return 3 if args.check and any(f["severity"]=="error" for f in result["findings"]) else 0
         if args.command == "memory":
             result=memory_cli.execute(args)
             print(json.dumps(result,indent=2,allow_nan=False,default=str))

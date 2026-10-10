@@ -37,7 +37,7 @@ Pick **`browser_family`**, then the narrowest **`browser_variant`** (or omit for
 |---|----------------|-----------------|
 | **Job** | Propose patch + **SELF_REVIEW** | Walk diff; try to disprove |
 | **Chat** | Same thread as implement draft | **Separate chat** after crafter output |
-| **IDE** | `/daily-coder` + ide-bridge for writes | `/code-reviewer` when repo tools exist |
+| **IDE** | `/daily-coder` + ide-bridge for writes | `/daily-coder` or `/use-master` delegates `code-reviewer` when repo tools exist |
 
 Crafter **must** emit SELF_REVIEW before claiming ship-ready; reviewer **must not** rewrite the whole patch as author.
 
@@ -46,7 +46,7 @@ Crafter **must** emit SELF_REVIEW before claiming ship-ready; reviewer **must no
 | Browser family | IDE | When |
 |----------------|-----|------|
 | `code-crafter` | `/daily-coder` + ide-bridge | Audited writes, real tests |
-| `code-reviewer` | `/code-reviewer` | Repo-native diff review |
+| `code-reviewer` | `/daily-coder` or `/use-master` delegates `code-reviewer` | Repo-native diff review |
 | `mission-control` | `/use-master` | Full DAG + bridge |
 | `research-desk` (depth) | `/deep-research` | Multi-lane research |
 | `research-desk` / assemble | — | Supplied files in any host |
@@ -60,4 +60,4 @@ Run families **sequentially** with handoff packets (`prior_artifact_ref`). Do no
 
 ## Legacy v2 everyday (13)
 
-v2 genre roles are archived under [`../_deprecated/v2-everyday/`](../_deprecated/v2-everyday/README.md) (stub [`../everyday/README.md`](../everyday/README.md) redirects). Use the archive redirect tables or [`AUTHORITY.md`](./AUTHORITY.md) legacy `browser_idea` map to pick v3 `browser_family` + `browser_variant`.
+The historical v2 genre archive and redirect stub are not shipped in this checkout. Use [`AUTHORITY.md`](./AUTHORITY.md) legacy `browser_idea` map to pick v3 `browser_family` + `browser_variant`.

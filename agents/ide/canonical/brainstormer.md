@@ -58,7 +58,7 @@ When **this agent** is invoked, read the full runtime instructions from SSOT (no
 | Agent directory | `daily-coder-ecosystem/agents/brainstormer` |
 | `prompt.md` sha256 | `c4b6fc0ec364cef70b48fa1060175641873986e5d7fdcab095cb6a50d2a28b15` |
 | `agent.json` sha256 | `8cd904cdb4680b1afa815148d4e4ce601de3fd16559df8c8b4f2df34468232c4` |
-| Regenerate | `python ide-agents/scripts/import_daily_coder_agents.py` |
+| Regenerate | `python agents/ide/scripts/import_daily_coder_agents.py` |
 
 ## Tool intent (runtime allowlist reference)
 

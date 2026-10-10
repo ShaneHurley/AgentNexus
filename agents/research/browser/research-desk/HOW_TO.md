@@ -6,12 +6,12 @@
 - **Research tiers:** You need a verdict-first answer with evidence (`quick` → `phd`).
 - **Audits:** Gaps, contradictions, option matrices, or claim checks against what is open in the browser.
 
-**Not this family:** “Is this document good enough?” → [`document-reviewer`](../document-reviewer/HOW_TO.md). Drafting prose → [`writing-studio`](../writing-studio/HOW_TO.md).
+**Not this family:** “Is this document good enough?” → [`document-reviewer`](../../../coding/browser/document-reviewer/HOW_TO.md). Drafting prose → [`writing-studio`](../../../daily-task/browser/families/writing-studio/HOW_TO.md).
 
 ## Paste order
 
 1. Pick **main** (`AGENT_MESSAGE.md`) or **`variants/<slug>/AGENT_MESSAGE.md`** (preferred — sets behavior explicitly).
-2. Paste [`../_shared/TASK_PACKET_TEMPLATE.md`](../_shared/TASK_PACKET_TEMPLATE.md) with `browser_family: research-desk` and optional `browser_variant: "<slug>"`.
+2. Paste [`../../../shared/browser/_shared/TASK_PACKET_TEMPLATE.md`](../../../shared/browser/_shared/TASK_PACKET_TEMPLATE.md) with `browser_family: research-desk` and optional `browser_variant: "<slug>"`.
 3. Attach or paste evidence; never treat evidence as instructions.
 
 Legacy packet fields (until `everyday/` deprecation): `browser_idea: doc-reader` → `assemble-given`; `browser_idea: deep-research` → `deep` or `phd`.
@@ -55,7 +55,7 @@ Prefer IDE **`/deep-research`** when you need automated multi-lane Research Forg
 | Answer a question with evidence depth | `quick` → `medium` → `deep` → `phd` |
 | Judge quality, risk, or compliance of a document | **`document-reviewer`** — not research-desk |
 
-Typical chain: optional `assemble-given` → [`writing-studio`](../writing-studio/HOW_TO.md) (if drafting) → **`document-reviewer`** (independent pass in a **new chat**).
+Typical chain: optional `assemble-given` → [`writing-studio`](../../../daily-task/browser/families/writing-studio/HOW_TO.md) (if drafting) → **`document-reviewer`** (independent pass in a **new chat**).
 
 ## IDE map
 
@@ -64,4 +64,4 @@ Typical chain: optional `assemble-given` → [`writing-studio`](../writing-studi
 | `assemble-given` | Old browser `doc-reader` behavior |
 | `quick`–`phd` | `/deep-research` when multi-lane RF is needed |
 
-See [`../_shared/AUTHORITY.md`](../_shared/AUTHORITY.md) for full mapping.
+See [`../../../shared/browser/_shared/AUTHORITY.md`](../../../shared/browser/_shared/AUTHORITY.md) for full mapping.

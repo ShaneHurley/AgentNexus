@@ -2,9 +2,9 @@
 """Generate delegate-only canonical IDE agents from research-forge/agents/*/manifest.yaml.
 
 Usage (from repository root):
-  python ide-agents/scripts/import_rf_agents.py
-  python ide-agents/scripts/import_rf_agents.py --check
-  python ide-agents/scripts/import_rf_agents.py --verbose
+  python agents/ide/scripts/import_rf_agents.py
+  python agents/ide/scripts/import_rf_agents.py --check
+  python agents/ide/scripts/import_rf_agents.py --verbose
 
 SSOT for role contracts remains research-forge/; this script only projects thin IDE bodies.
 """
@@ -256,7 +256,7 @@ def _merge_manifest_agents(doc: dict[str, Any], sources: list[RfAgentSource]) ->
             "source_sha256": src.manifest_sha256,
             "rf_role_id": role_id,
             "rf_wave": WAVE_BY_ROLE_ID.get(role_id),
-            "import_script": "ide-agents/scripts/import_rf_agents.py",
+            "import_script": "agents/ide/scripts/import_rf_agents.py",
         }
 
     doc["agents"] = sorted(by_name.values(), key=lambda x: str(x.get("name", "")))
@@ -265,7 +265,7 @@ def _merge_manifest_agents(doc: dict[str, Any], sources: list[RfAgentSource]) ->
     if not isinstance(imports, dict):
         imports = {}
     imports["research_forge"] = {
-        "script": "ide-agents/scripts/import_rf_agents.py",
+        "script": "agents/ide/scripts/import_rf_agents.py",
         "agent_count": len(sources),
         "required_stems": [s[0] for s in REQUIRED_PROJECTIONS],
     }

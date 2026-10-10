@@ -41,7 +41,7 @@ agents:
   source_sha256: 4e62c96e8aa988acd04c72b11f702c38382c3d27367b65ae7985002b76ba0118
   rf_role_id: adversarial_skeptic
   rf_wave: 3
-  import_script: ide-agents/scripts/import_rf_agents.py
+  import_script: agents/ide/scripts/import_rf_agents.py
 - name: alignment-checker
   authority: read-only
   user_invocable: false
@@ -77,7 +77,7 @@ agents:
   source_sha256: e6a5708fe9ddb701b2c0854afb6ad38c15cb2486ed9e0b29b9ceffafd8bba477
   rf_role_id: charter_planner
   rf_wave: 1
-  import_script: ide-agents/scripts/import_rf_agents.py
+  import_script: agents/ide/scripts/import_rf_agents.py
 - name: citation-verifier
   authority: read-only
   user_invocable: false
@@ -86,7 +86,7 @@ agents:
   source_sha256: 1874aa3df843f48ba708a5f3d53802893fe783e41a07983b8d80b61bf7fd6952
   rf_role_id: citation_verifier
   rf_wave: 1
-  import_script: ide-agents/scripts/import_rf_agents.py
+  import_script: agents/ide/scripts/import_rf_agents.py
 - name: code-reviewer
   authority: read-only
   user_invocable: false
@@ -131,7 +131,7 @@ agents:
   source_sha256: 5336fa59b7a7de3c9f7b9704b162cada7009d7dd359b464dae78661c457e20c7
   rf_role_id: evidence_extractor
   rf_wave: 1
-  import_script: ide-agents/scripts/import_rf_agents.py
+  import_script: agents/ide/scripts/import_rf_agents.py
 - name: evidence-integrator
   group: research-stack
   authority: read-only
@@ -184,7 +184,7 @@ agents:
   source_sha256: 5393d3cce5b5682f1a3a6bf7d3b95cc9a9408714f629671d67aa89cf64de7180
   rf_role_id: intake_clarifier
   rf_wave: 1
-  import_script: ide-agents/scripts/import_rf_agents.py
+  import_script: agents/ide/scripts/import_rf_agents.py
 - name: internal-authority-scout
   group: research-stack
   authority: read-only
@@ -257,7 +257,7 @@ agents:
   source_sha256: 6e5b2f62a43f1e19e01a5975a0524355d017bef3cfaaf4182633db2154246da6
   rf_role_id: principal_research_director
   rf_wave: 5
-  import_script: ide-agents/scripts/import_rf_agents.py
+  import_script: agents/ide/scripts/import_rf_agents.py
 - name: recommendation-scorer
   group: research-stack
   authority: read-only
@@ -273,7 +273,7 @@ agents:
   source_sha256: 437a99cbdbb4e62e6ec4b06696ddcdc52d588ad4df67f4033de569c8e19203b5
   rf_role_id: report_composer
   rf_wave: 1
-  import_script: ide-agents/scripts/import_rf_agents.py
+  import_script: agents/ide/scripts/import_rf_agents.py
 - name: research-messenger
   group: research-stack
   authority: read-only
@@ -293,7 +293,7 @@ agents:
   projection:
     engine: daily-coder
     source_agent: daily-coder-ecosystem/agents/researcher
-    prompt_sha256: 727c40745543ebdd2ef3c5d6d598aeed20093aa4879766d0900da1dc34f35acc
+    prompt_sha256: 5970b33aac3f682298351415a3e01aa355832011363579e36b75d882d4af914b
     agent_json_sha256: c8c2f85e3da122b2bd76bac5b18c01a48b62b09a94d13d586404f2def3ea2e08
 - name: sizer
   authority: read-only
@@ -323,7 +323,7 @@ agents:
   source_sha256: d8591c846b20c5c139f11d786e3bf35eeb68332c5e05c475b4c015104f36d8a7
   rf_role_id: source_scout
   rf_wave: 2
-  import_script: ide-agents/scripts/import_rf_agents.py
+  import_script: agents/ide/scripts/import_rf_agents.py
 - name: targeted-gap-researcher
   group: research-stack
   authority: read-only
@@ -372,10 +372,10 @@ agents:
   - master-orchestrator
 daily_coder_import:
   role_count: 16
-  script: ide-agents/scripts/import_daily_coder_agents.py
+  script: agents/ide/scripts/import_daily_coder_agents.py
 imports:
   research_forge:
-    script: ide-agents/scripts/import_rf_agents.py
+    script: agents/ide/scripts/import_rf_agents.py
     agent_count: 8
     required_stems:
     - intake-clarifier

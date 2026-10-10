@@ -27,4 +27,4 @@
 
 Compare one representative task with and without the harness. Revise one component at a time. Record host, model, date, packet (`browser_family`, `browser_variant`), output, failures, and correction. The harness passes only when observable behavior—not tone—improves.
 
-Portfolio script (when published): [`../DEMO.md`](../DEMO.md).
+No portfolio demo script is shipped. Record the comparison artifacts explicitly; do not treat a future demo as an executable validation gate.

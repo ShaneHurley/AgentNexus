@@ -7,7 +7,7 @@ Describe an outcome once; select existing capabilities, perform authorized work,
 - [x] Reproduce and test complete serialized tool-output bound; preserve execution status and durable receipt references; stop if mandatory context cannot fit.
 - [x] Repair eager optional GitHub credential acquisition discovered by public mock baseline; preserve invocation authorization.
 - [x] Capture original and corrected public mock DC/RF baselines; label simulation accurately.
-- [ ] Publish immediate correction after independent review and exact-head Linux/macOS CI.
+- [x] Publish immediate correction after independent review and exact-head Linux/macOS CI (PR #22; main e9b71ab).
 - [ ] Implement Codex adapter with enforced native-tool disablement, executable/version/model/config pins, structured envelopes, typed events/usage/errors, bounded deadlines, cancellation and authentication probe. Concurrency one; no API credentials or dollar-cost assumptions.
 - [ ] Capture post-adapter baseline with optimizations disabled; never label it untouched.
 - [ ] Audit every IDE entry point/specialist, ten browser families/variants, packets, skills, hooks and manifests: parent, input, output, grant, actual execution path, estimated resident size and implementation status. Repair links and unsupported claims; preserve independent review and self-review. Add automated invariant checks.
@@ -21,3 +21,8 @@ Public eval command launches supervised real tasks, stores sanitized artifacts a
 
 ## Delivery
 One epic active; shared contracts integrated serially; independent source review, exact-head Linux/macOS CI and public orchestration as final gate. Preserve older dirty checkout and private state. This plan records the complete user-approved scope; unchecked steps are remaining work, not implemented features.
+
+
+## Current prerequisite evidence
+
+The Codex inference-only adapter, surface inventory and instruction/link repairs are implemented. Exact executable/catalog/settings pins, offline subprocess/usage/schema/permission tests and a guarded live synthetic transport call have evidence. The transport call reported 6,735 tokens; cost is unknown. Original failed remote outcomes remain unknown. Complete supervised Codex dispatch, subscription accounting, public paired baselines and all ANX-6/ANX-7 operational gates remain unchecked. The inventory resolves all currently reported errors across 41 IDE agents and 96 browser pastes. It does not prove model behavior for every capability. Default execution remains mock-only until the separate integration gate passes.

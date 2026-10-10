@@ -6,12 +6,8 @@
     "kitchen-cooking",
     "learning-coach",
     "writing-studio",
-    "research-desk",
-    "code-crafter",
-    "code-reviewer",
-    "document-reviewer",
-    "mission-control",
-    "thinking-lab"
+    "thinking-lab",
+    "mission-control"
   ],
   "agent_count": 62,
   "default_paste": [

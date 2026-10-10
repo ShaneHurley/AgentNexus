@@ -46,7 +46,7 @@ Prefer IDE agents when the host has bridge, repo access, or multi-lane research 
 
 | `code-crafter` | `/daily-coder` + **ide-bridge** | Audited writes, real test/lint runs, PolicyGateway path |
 
-| `code-reviewer` | `/code-reviewer` (or Bugbot-style review) | Repo-native diff review, CI context |
+| `code-reviewer` | `/daily-coder` or `/use-master` delegating `code-reviewer` | Repo-native diff review, CI context |
 
 | `document-reviewer` | *(none — browser-first)* | Word/PDF/wiki adversarial review in browser tabs |
 
@@ -66,11 +66,11 @@ Prefer IDE agents when the host has bridge, repo access, or multi-lane research 
 
 | `writing-studio` | personal skills / style profiles | Long-form automation with `agent-core/profiles` |
 
-| `plans-and-places`, `kitchen-cooking`, `learning-coach`, `thinking-lab` | everyday runtime Compass/Atlas/Prism *(legacy labels)* | v2 archive [`_deprecated/v2-everyday/`](../_deprecated/v2-everyday/README.md); prefer v3 families — legacy table below |
+| `plans-and-places`, `kitchen-cooking`, `learning-coach`, `thinking-lab` | everyday runtime Compass/Atlas/Prism *(legacy labels)* | historical v2 archive (not shipped in this checkout); prefer v3 families — legacy table below |
 
 
 
-**Slug alignment:** Browser `code-reviewer` matches IDE `/code-reviewer` by name; behavior differs — browser = paste harness only.
+**Slug alignment:** Browser `code-reviewer` matches IDE delegate `code-reviewer` by name; behavior differs — browser = paste harness only.
 
 
 

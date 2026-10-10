@@ -1,0 +1,46 @@
+{
+  "api_spending": false,
+  "authenticated_route": "Codex CLI ChatGPT subscription",
+  "before_optimization": true,
+  "catalog_sha256": "1c08c9aeff1f5cb899ab4ed5cdd1859dd7c0a4d56644c666663f73ccecebe834",
+  "cli_version": "codex-cli 0.162.0-alpha.2",
+  "evidence_kind": "live-adapter-transport-smoke",
+  "executable_sha256": "cb4e4994627e770800a940b42969c77855a3fc09a6e60b02aa6319f670d6b6ab",
+  "limitations": [
+    "One direct adapter invocation is not complete supervised workflow acceptance.",
+    "Unknown prior remote outcomes are not zero usage.",
+    "No token reduction or model quality qualification is established.",
+    "Supervisor integration must preserve subscription token accounting separately from unknown dollar cost."
+  ],
+  "model": "gpt-6-astra",
+  "outcome": "structured synthetic result accepted",
+  "prior_failures": [
+    {
+      "automatic_retry": false,
+      "category": "transport",
+      "remote_acceptance": "unknown",
+      "usage": "unknown"
+    },
+    {
+      "automatic_retry": false,
+      "category": "configuration",
+      "remote_acceptance": "unknown",
+      "usage": "unknown"
+    }
+  ],
+  "public_supervisor_execution": false,
+  "reasoning_effort": "medium",
+  "remote_output_token_ceiling": "unsupported; local deadline and byte ceiling only",
+  "schema_version": 1,
+  "seconds": 6.667,
+  "security_config_sha256": "024c5b32a386c9fc71664734ab64ed43065b78a09200971d2da490489966a75c",
+  "usage": {
+    "cached_tokens": 0,
+    "cost_usd": null,
+    "evidence_status": "reported",
+    "input_tokens": 6704,
+    "output_tokens": 31,
+    "reasoning_tokens": 0,
+    "total_tokens": 6735
+  }
+}

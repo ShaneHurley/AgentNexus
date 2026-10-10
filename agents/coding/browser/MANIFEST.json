@@ -2,16 +2,9 @@
   "package": "browser-agent-pack",
   "version": "3.0.0-federated",
   "families": [
-    "plans-and-places",
-    "kitchen-cooking",
-    "learning-coach",
-    "writing-studio",
-    "research-desk",
     "code-crafter",
     "code-reviewer",
-    "document-reviewer",
-    "mission-control",
-    "thinking-lab"
+    "document-reviewer"
   ],
   "agent_count": 21,
   "default_paste": [
@@ -92,7 +85,7 @@
       "display_name": "Code Reviewer",
       "path": "code-reviewer",
       "carousel": true,
-      "ide_counterpart": "/code-reviewer",
+      "ide_counterpart": "/daily-coder or /use-master delegates code-reviewer",
       "deprecated_aliases": []
     },
     {
@@ -101,7 +94,7 @@
       "display_name": "Code Reviewer \u2014 Diff Adversarial",
       "path": "code-reviewer/variants/diff-adversarial",
       "carousel": false,
-      "ide_counterpart": "/code-reviewer",
+      "ide_counterpart": "/daily-coder or /use-master delegates code-reviewer",
       "deprecated_aliases": []
     },
     {
@@ -110,7 +103,7 @@
       "display_name": "Code Reviewer \u2014 Pr Checklist",
       "path": "code-reviewer/variants/pr-checklist",
       "carousel": false,
-      "ide_counterpart": "/code-reviewer",
+      "ide_counterpart": "/daily-coder or /use-master delegates code-reviewer",
       "deprecated_aliases": []
     },
     {
@@ -119,7 +112,7 @@
       "display_name": "Code Reviewer \u2014 Regression Hunt",
       "path": "code-reviewer/variants/regression-hunt",
       "carousel": false,
-      "ide_counterpart": "/code-reviewer",
+      "ide_counterpart": "/daily-coder or /use-master delegates code-reviewer",
       "deprecated_aliases": []
     },
     {
@@ -128,7 +121,7 @@
       "display_name": "Code Reviewer \u2014 Security Focus",
       "path": "code-reviewer/variants/security-focus",
       "carousel": false,
-      "ide_counterpart": "/code-reviewer",
+      "ide_counterpart": "/daily-coder or /use-master delegates code-reviewer",
       "deprecated_aliases": []
     },
     {
@@ -137,7 +130,7 @@
       "display_name": "Code Reviewer \u2014 Test Gap",
       "path": "code-reviewer/variants/test-gap",
       "carousel": false,
-      "ide_counterpart": "/code-reviewer",
+      "ide_counterpart": "/daily-coder or /use-master delegates code-reviewer",
       "deprecated_aliases": []
     },
     {

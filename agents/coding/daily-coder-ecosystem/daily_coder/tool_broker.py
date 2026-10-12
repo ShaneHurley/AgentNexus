@@ -79,6 +79,9 @@ class ToolBroker:
             target=self.safe_path(args.get("path","."),tool in {"filesystem.write","patch.apply"},plan_allowlist)
             try: self.authority.tool(role,tool,target=target,write=tool in {"filesystem.write","patch.apply"})
             except ContractDenied as exc: raise ToolDenied(str(exc)) from exc
+        if tool=="filesystem.read" and args.get("view")=="outline":
+            from agent_core.efficiency_tools import repo_outline
+            return repo_outline(target,self.authority.effective(role))
         if tool in self._extra:
             if tool.startswith(("filesystem.","patch.","repository.")):
                 raise ToolDenied("typed built-in operations cannot be replaced by plugin callbacks")
@@ -99,8 +102,10 @@ class ToolBroker:
         p=self.safe_path(a["path"]); text=p.read_text(encoding="utf-8",errors="replace"); lines=text.splitlines()
         start=max(1,int(a.get("start",1))); end=min(len(lines),int(a.get("end",start+399)))
         body="\n".join(f"{i}\t{lines[i-1]}" for i in range(start,end+1)) if lines else ""
+        clean=redact(body)
         return {"path":a["path"],"start":start,"end":end,"total_lines":len(lines),"sha256":file_sha(p),
-                "content":redact(body)[:MAX_OUTPUT_CHARS]}
+                "content":clean[:MAX_OUTPUT_CHARS],"truncated":len(clean)>MAX_OUTPUT_CHARS,
+                "expansion":{"path":a["path"],"start":start,"end":end,"sha256":file_sha(p),"instruction":"Request smaller line ranges when truncated; each read is reauthorized."} if len(clean)>MAX_OUTPUT_CHARS else None}
     def _t_filesystem_list(self,a,_allow=None):
         p=self.safe_path(a.get("path","."))
         return {"path":a.get("path","."),"entries":[{"name":c.name,"dir":c.is_dir()} for c in sorted(p.iterdir())[:500]]}

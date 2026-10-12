@@ -8,7 +8,7 @@ import unittest
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-from daily_coder.budget import BudgetExceeded, BudgetManager, DEFAULT_THRESHOLDS
+from daily_coder.budget import BudgetExceeded, BudgetManager, DailyCapExceeded, DEFAULT_THRESHOLDS
 from daily_coder.orchestrator import Orchestrator
 from daily_coder.providers.mock import MockProvider
 from daily_coder.state_store import StateStore
@@ -30,6 +30,118 @@ def _profile_config(total_tokens: int = 100, max_calls: int = 20) -> dict:
         "profiles": {"S": {"total_tokens": total_tokens, "max_calls": max_calls, "frontier_calls": 0}},
         "thresholds": dict(DEFAULT_THRESHOLDS),
     }
+
+
+class TestSubscriptionAccounting(unittest.TestCase):
+    MODEL = "codex/reviewed-model"
+
+    def test_exact_trusted_membership_is_required_and_api_pricing_stays_strict(self):
+        budget = BudgetManager(_profile_config(), _StaticUsageStore(), subscription_models=[self.MODEL])
+        accounting = budget.validate_model_accounting(self.MODEL)
+        self.assertEqual(accounting["accounting_mode"], "subscription")
+        self.assertEqual(accounting["known_api_cash_usd"], 0.0)
+        self.assertIsNone(accounting["total_cost_usd"])
+        with self.assertRaises(BudgetExceeded):
+            budget.validate_model_pricing(self.MODEL)
+        with self.assertRaises(BudgetExceeded):
+            budget.price(self.MODEL, 1, 1)
+        for model in ("codex/other-model", "codex/reviewed-model-extra", "reviewed-model"):
+            with self.subTest(model=model), self.assertRaises(BudgetExceeded):
+                budget.validate_model_accounting(model)
+        with self.assertRaises(BudgetExceeded):
+            BudgetManager(_profile_config(), _StaticUsageStore()).validate_model_accounting(self.MODEL)
+
+    def test_malformed_trusted_allowlists_fail_closed(self):
+        for models in (None, self.MODEL, {self.MODEL: True}, [None], [""], [" model"], ["codex/*"], [42], [True]):
+            with self.subTest(models=models), self.assertRaises(ValueError):
+                BudgetManager(_profile_config(), _StaticUsageStore(), subscription_models=models)
+
+    def test_pricing_mode_metadata_cannot_grant_subscription(self):
+        budget = BudgetManager(_profile_config(), _StaticUsageStore(), pricing={self.MODEL: {"accounting_mode": "subscription"}})
+        with self.assertRaises(BudgetExceeded):
+            budget.validate_model_accounting(self.MODEL)
+        with self.assertRaises(BudgetExceeded):
+            budget.reserve("r", "S", 1, model=self.MODEL, estimated_usd=0)
+        with self.assertRaises(BudgetExceeded):
+            budget.settle("r", 1, self.MODEL, 1, 0, reported_usd=0)
+
+    def test_subscription_reserves_tokens_and_retains_token_caps(self):
+        budget = BudgetManager(_profile_config(), _StaticUsageStore(), subscription_models=[self.MODEL])
+        result = budget.reserve("r", "S", 60, model=self.MODEL)
+        self.assertEqual(result["reserved"], 60)
+        self.assertEqual(result["known_api_cash_usd"], 0)
+        self.assertIsNone(result["total_cost_usd"])
+        self.assertEqual(result["total_cost_status"], "unknown")
+        with self.assertRaises(BudgetExceeded):
+            budget.reserve("r", "S", 31, model=self.MODEL)
+        self.assertEqual(budget._used("r")["tokens"], 60)
+
+    def test_subscription_persistent_cash_is_zero_total_dollar_value_unknown(self):
+        with tempfile.TemporaryDirectory() as temp:
+            store = StateStore(Path(temp) / "state.sqlite")
+            store.create("r", "task", temp, "cfg", "create", live=True)
+            store.set_profile("r", "S")
+            budget = BudgetManager(_profile_config(), store, limits={"max_tokens_per_day": 1000, "max_spend_usd": 0.0}, subscription_models=[self.MODEL])
+            reservation = budget.reserve("r", "S", 30, model=self.MODEL, reservation_id="subscription")
+            self.assertEqual(store.active_budget_reservations("r")["tokens"], 30)
+            self.assertEqual(reservation["known_api_cash_usd"], 0)
+            result = budget.settle("r", 30, self.MODEL, 10, 5, "subscription")
+            self.assertEqual(result["known_api_cash_usd"], 0)
+            self.assertIsNone(result["total_cost_usd"])
+            self.assertEqual(result["accounting_mode"], "subscription")
+            self.assertEqual(store.spend(__import__("datetime").date.today().isoformat())["tokens"], 15)
+            self.assertEqual(store.spend(__import__("datetime").date.today().isoformat())["est_usd"], 0)
+            # Until its invocation receipt is committed, settlement itself is authoritative usage.
+            report = budget.report("r", "S")
+            self.assertEqual(report["tokens"], 15)
+            self.assertEqual(report["known_api_cash_usd"], 0)
+            self.assertIsNone(report["est_usd"])
+            self.assertIsNone(report["total_cost_usd"])
+            self.assertIsNone(report["cost_per_verified_pass"])
+            self.assertIsNone(report["today"]["est_usd"])
+            self.assertEqual(report["total_cost_status"], "unknown")
+
+    def test_subscription_nonzero_or_malformed_cash_cannot_be_silently_discarded(self):
+        budget = BudgetManager(_profile_config(), _StaticUsageStore(), subscription_models=[self.MODEL])
+        for amount in (1.0, -1, float("inf"), float("nan"), "unknown"):
+            with self.subTest(amount=amount), self.assertRaises((BudgetExceeded, ValueError)):
+                budget.reserve("r", "S", 10, model=self.MODEL, estimated_usd=amount)
+        reservation = budget.reserve("r", "S", 10, model=self.MODEL)
+        for amount in (1.0, -1, float("inf"), float("nan"), "unknown"):
+            with self.subTest(amount=amount), self.assertRaises((BudgetExceeded, ValueError)):
+                budget.settle("r", 10, self.MODEL, 1, 0, reservation["reservation_id"], reported_usd=amount)
+        self.assertEqual(budget._used("r")["tokens"], 10)
+
+    def test_zero_daily_cash_cap_allows_trusted_subscription_startup_only(self):
+        with tempfile.TemporaryDirectory() as temp:
+            store = StateStore(Path(temp) / "state.sqlite")
+            limits = {"max_spend_usd": 0.0}
+            subscription = BudgetManager(_profile_config(), store, limits=limits, subscription_models=[self.MODEL])
+            self.assertEqual(subscription.check_daily()["est_usd"], 0)
+            with self.assertRaises(DailyCapExceeded):
+                BudgetManager(_profile_config(), store, limits=limits).check_daily()
+            store.add_spend(__import__("datetime").date.today().isoformat(), 1, 0.01)
+            with self.assertRaises(DailyCapExceeded):
+                subscription.check_daily()
+
+    def test_trusted_membership_is_snapshotted_before_caller_changes_allowlist(self):
+        models = [self.MODEL]
+        budget = BudgetManager(_profile_config(), _StaticUsageStore(), subscription_models=models)
+        models.append("codex/unreviewed")
+        with self.assertRaises(BudgetExceeded):
+            budget.validate_model_accounting("codex/unreviewed")
+
+    def test_api_accounting_retains_float_settlement_and_cash_report(self):
+        with tempfile.TemporaryDirectory() as temp:
+            store = StateStore(Path(temp) / "state.sqlite")
+            store.create("r", "task", temp, "cfg", "create", live=True)
+            store.set_profile("r", "S")
+            budget = BudgetManager(_profile_config(), store, pricing={"api/model": {"input_per_1k": 2, "output_per_1k": 3}})
+            accounting = budget.validate_model_accounting("api/model")
+            self.assertEqual(accounting["accounting_mode"], "api")
+            budget.reserve("r", "S", 30, model="api/model", reservation_id="api")
+            self.assertEqual(budget.settle("r", 30, "api/model", 10, 5, "api"), 0.035)
+            self.assertIsInstance(budget.report("r", "S")["est_usd"], float)
 
 
 class TestBudgetThresholds(unittest.TestCase):

@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "full_tests": 1049,
+  "subtests": 45,
+  "replay_cases": 12,
+  "review": "measurement/frozen-input findings repaired and independently rechecked; final schema/turn repairs reviewed",
+  "optimization_activated": false,
+  "api_spending_usd": 0,
+  "subscription_dollar_cost": null,
+  "operational_baseline": "not_complete",
+  "release_ci": "not_run",
+  "game_implementation": "not_started",
+  "next_live_action": "requires_owner_budget_decision"
+}

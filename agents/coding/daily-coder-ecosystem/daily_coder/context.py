@@ -7,7 +7,7 @@ from __future__ import annotations
 import json
 
 # Pinned slots are never compacted away: rules, permissions, acceptance criteria, anchor.
-PINNED = ("ORIGINAL_REQUEST", "task_anchor", "constraints", "acceptance_criteria", "file_allowlist", "permissions", "profile", "repo")
+PINNED = ("ORIGINAL_REQUEST", "task_anchor", "constraints", "acceptance_criteria", "file_allowlist", "permissions", "profile", "repo", "plan_hash", "approval_hash", "budget", "pending_calls")
 
 ROLE_INPUTS: dict[str, tuple[str, ...]] = {
     "sizer": ("request",),
@@ -209,11 +209,20 @@ def project_tool_results(results, max_chars=MAX_TOOL_CONTEXT_CHARS, recent=RECEN
         for ref in item.get("evidence", []) if item.get("compacted") else [item]:
             ref.pop("arguments", None)
     if len(encoded(projected)) > max_chars:
+        # Receipt identities, outcomes and content hashes remain mandatory.
+        # Duplicate argument hashes and size diagnostics are optional here.
+        for item in projected:
+            for ref in item.get("evidence", []) if item.get("compacted") else [item]:
+                ref.pop("arguments_hash", None)
+                ref.pop("original_chars", None)
+    if len(encoded(projected)) > max_chars:
         raise ValueError("tool receipt context cannot fit; stop or split task")
     return projected
 
-def estimate_tokens(prompt, packet, max_output_tokens, tool_results=None):
+def estimate_tokens(prompt, packet, max_output_tokens, tool_results=None, *, tools=None, output_schema=None):
     """Conservative pre-call estimate matching the provider packet shape."""
     chars = len(prompt) + len(json.dumps(packet, sort_keys=True, default=str))
     chars += len(json.dumps(tool_results or [], sort_keys=True, default=str))
-    return int(chars / 4) + int(max_output_tokens)
+    if tools is not None:chars+=len(json.dumps(tools,sort_keys=True,default=str))
+    if output_schema is not None:chars+=len(json.dumps(output_schema,sort_keys=True,default=str))
+    return (chars+3)//4 + int(max_output_tokens)

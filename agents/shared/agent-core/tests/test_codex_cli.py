@@ -1,4 +1,6 @@
 import json
+import pwd
+from types import SimpleNamespace
 import sys
 import time
 import pytest
@@ -6,10 +8,14 @@ from agent_core.providers.base import Invocation
 from agent_core.providers.http import ProviderError
 from agent_core.providers.codex_cli import CodexCLIProvider,parse_codex_jsonl,CLI_VERSION,ENVELOPE_VERSION
 
+@pytest.fixture(autouse=True)
+def isolate_dispatch_state(tmp_path,monkeypatch):
+    monkeypatch.setattr(pwd,"getpwuid",lambda uid:SimpleNamespace(pw_dir=str(tmp_path.resolve())))
+
 def request(**kwargs):
     return Invocation("run","role","prompt",{},"strong",128,"idem",model="pinned-model",**kwargs)
 def events(usage=None):
-    result=[{"type":"thread.started","thread_id":"thread-1"},{"type":"item.completed","item":{"type":"agent_message","text":json.dumps({"version":ENVELOPE_VERSION,"output":{"ok":True},"tool_calls":[]})}},{"type":"turn.completed"}]
+    result=[{"type":"thread.started","thread_id":"thread-1"},{"type":"item.completed","item":{"type":"agent_message","text":json.dumps({"version":ENVELOPE_VERSION,"output_json":json.dumps({"ok":True}),"tool_calls":[]})}},{"type":"turn.completed"}]
     if usage is not None: result[-1]["usage"]=usage
     return [json.dumps(item) for item in result]
 def test_completed_and_known_zero():
@@ -25,7 +31,7 @@ def test_native_execution_events_denied(kind):
     rows=events(); rows.insert(0,json.dumps({"type":"item.started","item":{"type":kind}}))
     with pytest.raises(ProviderError): parse_codex_jsonl(rows,request(),model="pinned-model")
 def test_tool_envelope_only_returns_requests():
-    rows=events();rows[1]=json.dumps({"type":"item.completed","item":{"type":"agent_message","text":json.dumps({"version":ENVELOPE_VERSION,"output":None,"tool_calls":[{"name":"filesystem.read","arguments":{"path":"a"},"call_id":"call-1"}]})}})
+    rows=events();rows[1]=json.dumps({"type":"item.completed","item":{"type":"agent_message","text":json.dumps({"version":ENVELOPE_VERSION,"output_json":None,"tool_calls":[{"name":"filesystem.read","arguments_json":json.dumps({"path":"a"}),"call_id":"call-1"}]})}})
     result=parse_codex_jsonl(rows,request(tools=({"name":"filesystem.read"},)),model="pinned-model")
     assert result.tool_calls[0].call_id=="call-1" and result.output is None
     with pytest.raises(ProviderError): parse_codex_jsonl(rows,request(),model="pinned-model")

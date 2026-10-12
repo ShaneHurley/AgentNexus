@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python '/Users/shurley/Documents/AgentNexus/.codex/hooks/enforce-agent-authority.py'"
+            "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-agent-authority.py\""
           }
         ]
       }
@@ -15,7 +15,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python '/Users/shurley/Documents/AgentNexus/.codex/hooks/deny-mutating-for-readonly.py'"
+            "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/deny-mutating-for-readonly.py\""
           }
         ]
       }
@@ -25,7 +25,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python '/Users/shurley/Documents/AgentNexus/.codex/hooks/session-audit.py'"
+            "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/session-audit.py\""
           }
         ]
       }

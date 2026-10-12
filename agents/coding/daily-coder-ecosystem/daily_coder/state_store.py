@@ -402,7 +402,7 @@ class StateStore:
             if run_usd_limit is not None:
                 known=c.execute("SELECT COALESCE(SUM(est_usd),0) FROM invocations WHERE run_id=?",(run_id,)).fetchone()[0]
                 reserved_usd=c.execute("SELECT COALESCE(SUM(estimated_usd),0) FROM budget_reservations WHERE run_id=? AND state='reserved'",(run_id,)).fetchone()[0]
-                if run_usd_limit<=0 or float(known)+float(orphan[2])+float(reserved_usd)+estimated_usd>run_usd_limit:
+                if run_usd_limit<0 or float(known)+float(orphan[2])+float(reserved_usd)+estimated_usd>run_usd_limit:
                     raise ValueError("run spend reservation exceeds configured limit")
             run_reserved=c.execute("SELECT COALESCE(SUM(estimated_tokens),0),COUNT(*) FROM budget_reservations "
                                    "WHERE run_id=? AND state='reserved'",(run_id,)).fetchone()

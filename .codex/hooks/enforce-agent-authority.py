@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""subagentStart: block readonly subagents from write-capable delegation; inject contract reminder."""
+"""SubagentStart: inject the Codex authority reminder; never grant writes."""
 
 from __future__ import annotations
 
@@ -26,23 +26,10 @@ def main() -> int:
     name = agent_name_from_payload(payload)
     auth = agent_authority_class(name)
 
-    # Allow Cursor platform Task types and unnamed parent flows.
-    # Readonly ide-agents agents may start (with reminder); mutation hooks still deny writes.
-    # Unknown *named* custom agents: allow start but mutation hooks fail-closed on writes.
-    if auth == "readonly":
-        emit(
-            {
-                "permission": "allow",
-                "user_message": REMINDER,
-                "agent_message": (
-                    f"Subagent '{name}' is read-only: no writes or mutating shell; "
-                    "use ide-bridge for audited side effects."
-                ),
-            }
-        )
-        return 0
-
-    allow()
+    # Codex SubagentStart supports context injection, not blocking decisions.
+    emit({"hookSpecificOutput": {"hookEventName": "SubagentStart",
+         "additionalContext": REMINDER if auth != "allowlisted" else
+         "Audited writes require ide-bridge and PolicyGateway approval; this hook grants no authority."}})
     return 0
 
 

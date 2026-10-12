@@ -6,8 +6,8 @@ role cannot discover a capability it may not use.
 from __future__ import annotations
 
 TOOL_SCHEMAS: dict[str, dict] = {
-    "filesystem.read": {"name": "filesystem.read", "description": "Read a file with line numbers. Returns sha256 for later writes.",
-        "parameters": {"type": "object", "properties": {"path": {"type": "string"}, "start": {"type": "integer"}, "end": {"type": "integer"}}, "required": ["path"]}},
+    "filesystem.read": {"name": "filesystem.read", "description": "Read source lines or a Python AST outline. Returns sha256. Expand a prior same-role read receipt using operation_ref with offset/limit; expansion is reauthorized.",
+        "parameters": {"type": "object", "properties": {"path": {"type": "string"}, "view": {"type": "string", "enum": ["lines", "outline"]}, "start": {"type": "integer"}, "end": {"type": "integer"}, "operation_ref": {"type": "string"}, "offset": {"type": "integer"}, "limit": {"type": "integer"}}, "anyOf": [{"required": ["path"]}, {"required": ["operation_ref"]}]}},
     "filesystem.list": {"name": "filesystem.list", "description": "List directory entries.",
         "parameters": {"type": "object", "properties": {"path": {"type": "string"}}, "required": []}},
     "filesystem.search": {"name": "filesystem.search", "description": "Case-insensitive text search returning file and line citations.",

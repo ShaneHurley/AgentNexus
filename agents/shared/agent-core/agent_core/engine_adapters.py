@@ -28,10 +28,18 @@ class DailyCoderAdapter:
     def __init__(self, root): self.root=Path(root)
     def snapshot(self, workspace, live, provider, *, pinned=None):
         from daily_coder.providers.registry import is_live, PROVIDERS
-        if provider not in PROVIDERS: raise ContractDenied("unknown provider")
-        if is_live(provider) != bool(live): raise ContractDenied("provider and explicit live authorization differ")
+        if provider not in (*PROVIDERS,"codex_cli"): raise ContractDenied("unknown provider")
+        if (is_live(provider) or provider=="codex_cli") != bool(live): raise ContractDenied("provider and explicit live authorization differ")
         from .routing_runtime import load_model_settings
-        return {**source_snapshot(self.root,"daily-coder",live,provider,workspace),**load_model_settings(self.root.parents[2],pinned=pinned)}
+        snapshot=source_snapshot(self.root,"daily-coder",live,provider,workspace)
+        if provider=="codex_cli":
+            from .codex_settings import load_settings,routing_pins
+            settings=load_settings(self.root.parents[2],pinned=pinned)
+            snapshot.update(settings)
+            snapshot["codex_budget_translation"]={"schema_version":1,"input_overhead_tokens":8192,"strategy":"parent-bounded-cli-overhead"}
+            snapshot.update(load_model_settings(self.root.parents[2],pinned=pinned) if pinned else routing_pins(self.root.parents[2],settings))
+        else:snapshot.update(load_model_settings(self.root.parents[2],pinned=pinned))
+        return snapshot
     def _engine(self, row):
         from daily_coder.state_store import StateStore
         from daily_coder.orchestrator import Orchestrator
@@ -40,18 +48,30 @@ class DailyCoderAdapter:
         from .routing_runtime import SupervisedProvider,load_model_settings
         from .secret_broker import SecretBroker
         name=row["snapshot"]["provider"]
-        if name not in {"mock","openrouter","openai","anthropic","local"}:
+        if name not in {"mock","openrouter","openai","anthropic","local","codex_cli"}:
             raise ContractDenied("provider lacks reviewed supervised adapter; legacy native interface remains available")
         config=json.loads((self.root/"config/default.json").read_text())
         pins=load_model_settings(self.root.parents[2],pinned=row["snapshot"])
-        broker=SecretBroker(self.root.parents[2]/".agentnexus/secret-references.sqlite") if name not in {"mock","local"} else None
+        broker=SecretBroker(self.root.parents[2]/".agentnexus/secret-references.sqlite") if name not in {"mock","local","codex_cli"} else None
         wrapper=SupervisedProvider(None,pins,provider_name=name,run_id=row["run_id"],workspace=row["workspace"],broker=broker)
-        wrapper.provider=MockProvider() if name=="mock" else build_provider(name,config=config,secret_broker=broker,secret_grant_factory=wrapper.secret_grant)
+        if name=="codex_cli":
+            from .codex_settings import build_provider as build_codex
+            wrapper.provider=build_codex(row["snapshot"]["codex_configuration"])
+            wrapper.billing_kind="chatgpt_subscription"
+            wrapper.subscription_models=(wrapper.provider.model,)
+            wrapper.max_parallelism=1
+            wrapper.max_transport_retries=0
+            wrapper.input_overhead_tokens=8192
+        else:wrapper.provider=MockProvider() if name=="mock" else build_provider(name,config=config,secret_broker=broker,secret_grant_factory=wrapper.secret_grant)
         wrapper.capabilities=getattr(wrapper.provider,"capabilities",None)
         class ReferencesOnly:
             def get(self,*args,**kwargs):raise ContractDenied("tool credential use requires SecretBroker authorization")
         engine=Orchestrator(self.root,StateStore(self.root/".daily-coder/state.sqlite"),wrapper,live=row["live"],secrets=ReferencesOnly(),
-                            resource_limits={"tokens":row["limit_tokens"],"usd":row["limit_usd"],"deadline":row["deadline"]})
+                            resource_limits={"tokens":row["limit_tokens"],"usd":row["limit_usd"],"deadline":row["deadline"]}, context_variant=row["snapshot"].get("context_policy",{}).get("variant","baseline"),reference_documents=row["snapshot"].get("reference_documents",()))
+        if name=="codex_cli":
+            from .codex_settings import translate_budgets
+            translated=translate_budgets(engine.budgets,row["limit_tokens"],wrapper.input_overhead_tokens)
+            engine.budgets.clear();engine.budgets.update(translated)
         # Shared routing prices are the authority; unknown catalog prices must
         # not inherit unrelated legacy estimates for the same model name.
         engine.pricing.clear()
@@ -76,7 +96,9 @@ class DailyCoderAdapter:
         status=native["status"]
         if (pending["calls"] or pending_tools) and status != "CANCEL_REQUESTED": status="RECONCILIATION_REQUIRED"
         return {"status":"RUNNING" if status == "ACTIVE" else status,"phase":native["phase"],"state":native,
-                "usage":{"tokens":report["tokens"],"usd":report["est_usd"],"usage_status":"estimated","unknown":bool(pending["calls"] or pending_tools or report.get("settled_unreceipted",{}).get("calls"))},
+                "usage":{"tokens":report["tokens"],"usd":report["est_usd"],"usage_status":"reported" if engine.provider.name=="codex_cli" else "estimated",
+                         **({"billing_kind":"chatgpt_subscription","known_api_cash_usd":report["known_api_cash_usd"]} if engine.provider.name=="codex_cli" else {}),
+                         "unknown":bool(pending["calls"] or pending_tools or report.get("settled_unreceipted",{}).get("calls"))},
                 "artifacts":[{"id":a["hash"],**a} for a in engine.state.artifacts(row["legacy_id"])],
                 "pending_approvals":[a for a in engine.state.pending_approvals() if a["run_id"]==row["legacy_id"]]}
     def cancel(self,row): return self._engine(row).request_cancel(row["legacy_id"])

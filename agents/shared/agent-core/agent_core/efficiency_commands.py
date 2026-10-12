@@ -13,6 +13,7 @@ def register(commands):
     for parser in (outline,reduce):
         parser.add_argument('--namespace',choices=('dc','rf'),required=True);parser.add_argument('--role',required=True);parser.add_argument('--workspace',type=Path,required=True);parser.add_argument('--grant-file',type=Path,required=True)
     context=sub.add_parser('context-pack');context.add_argument('--input',type=Path,required=True);context.add_argument('--evidence-tokens',type=int,default=4000);context.add_argument('--context-tokens',type=int,default=32000)
+    preview=sub.add_parser('context-preview');preview.add_argument('--input',type=Path,required=True);preview.add_argument('--context-tokens',type=int,default=32000)
     extract=sub.add_parser('extract');extract.add_argument('--html',type=Path,required=True);extract.add_argument('--provenance',type=Path,required=True)
     return HANDLED_COMMANDS
 
@@ -36,5 +37,9 @@ def execute(args,repository):
         return tool_result_reduce(json.loads(_read(args.input)),args.artifact_dir,max_chars=args.max_chars)
     if operation=='context-pack':
         payload=json.loads(_read(args.input));return context_pack(payload['protected'],payload['evidence'],evidence_tokens=args.evidence_tokens,max_context_tokens=args.context_tokens)
+    if operation=='context-preview':
+        from .context_runtime import preview
+        payload=json.loads(_read(args.input))
+        return preview(payload['protected'],payload['evidence'],prompt=payload.get('prompt',''),tools=payload.get('tools',()),output_schema=payload.get('output_schema'),provider_overhead_tokens=payload.get('provider_overhead_tokens',0),max_output_tokens=payload.get('max_output_tokens',0),max_context_tokens=args.context_tokens)
     if operation=='extract':return evidence_extract(_read(args.html,4*1024*1024),json.loads(_read(args.provenance)))
     raise ValueError('unknown utility')

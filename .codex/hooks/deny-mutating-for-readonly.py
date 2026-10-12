@@ -34,6 +34,9 @@ def is_mutating_shell(command: str) -> bool:
 
 def main() -> int:
     payload = read_stdin_json()
+    if payload.get("_parse_error"):
+        deny(MSG, "Malformed hook input; mutation authority unavailable.")
+        return 0
     event = hook_event_name(payload).lower()
     agent = agent_name_from_payload(payload)
 
@@ -57,7 +60,7 @@ def main() -> int:
             return 0
 
     # preToolUse for Shell tool without beforeShellExecution split
-    if tool == "Shell":
+    if tool in {"Shell", "Bash"}:
         cmd = shell_command_from_payload(payload)
         if is_mutating_shell(cmd):
             deny(MSG, f"Blocked Shell tool for agent {agent or 'unknown'}.")

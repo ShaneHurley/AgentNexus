@@ -5,6 +5,7 @@ Budgets are enforced by the runtime, never by the model. Every provider call mus
 """
 from __future__ import annotations
 import datetime, math, threading, time, uuid
+from collections.abc import Mapping
 from agent_core.rate_limiter import RateLimiter, RateLimiterConfig, RateLimitExceeded
 
 class BudgetExceeded(RuntimeError): pass
@@ -15,7 +16,18 @@ DEFAULT_THRESHOLDS={"warn_fraction":0.7,"checkpoint_fraction":0.8,"hard_stop_fra
 def _today()->str: return datetime.date.today().isoformat()
 
 class BudgetManager:
-    def __init__(self,config,state,pricing=None,limits=None):
+    def __init__(self,config,state,pricing=None,limits=None,*,subscription_models=()):
+        # Only trusted provider setup may supply this exact allowlist. Pricing
+        # metadata and role/model output cannot select an accounting mode.
+        if isinstance(subscription_models,(str,bytes,Mapping)) or subscription_models is None:
+            raise ValueError("subscription_models must be an iterable of exact model names")
+        try:
+            models=tuple(subscription_models)
+        except TypeError as exc:
+            raise ValueError("subscription_models must be an iterable of exact model names") from exc
+        if any(not isinstance(model,str) or not model or any(c.isspace() or c in "*?" for c in model) for model in models):
+            raise ValueError("subscription_models must contain nonempty exact model names without whitespace or wildcards")
+        self.subscription_models=frozenset(models)
         self.config=config; self.state=state; self.pricing=pricing or {}; self.limits=limits or {}
         self._lock=threading.RLock(); self._reserved={}; self._reserved_calls={}; self._reservation_ids={}; self.events=[]
         self.rate_limiter=RateLimiter(RateLimiterConfig.disabled())
@@ -46,6 +58,35 @@ class BudgetManager:
         if not math.isfinite(input_rate) or not math.isfinite(output_rate) or input_rate<0 or output_rate<0:
             raise BudgetExceeded({"reason":"invalid_model_price","model":model})
         return input_rate,output_rate
+    @staticmethod
+    def _subscription_accounting():
+        return {"accounting_mode":"subscription","known_api_cash_usd":0.0,
+                "total_cost_usd":None,"total_cost_status":"unknown"}
+
+    def validate_model_accounting(self,model):
+        """Validate API pricing or an exact model enabled by trusted setup.
+
+        Zero known API cash for a subscription is never its total dollar cost.
+        validate_model_pricing and price remain strict API pricing interfaces.
+        """
+        if not isinstance(model,str) or not model:
+            raise BudgetExceeded({"reason":"invalid_accounting_model","model":model})
+        if model in self.subscription_models:
+            return self._subscription_accounting()
+        input_rate,output_rate=self.validate_model_pricing(model)
+        return {"accounting_mode":"api","input_per_1k":input_rate,"output_per_1k":output_rate}
+
+    @staticmethod
+    def _validate_subscription_cash(value,model):
+        if value is None:
+            return
+        try:
+            cash=float(value)
+        except (TypeError,ValueError) as exc:
+            raise BudgetExceeded({"reason":"invalid_subscription_cash","model":model}) from exc
+        if not math.isfinite(cash) or cash!=0:
+            raise BudgetExceeded({"reason":"invalid_subscription_cash","model":model})
+
     def price(self,model,input_tokens,output_tokens):
         input_rate,output_rate=self.validate_model_pricing(model)
         return round(input_tokens/1000.0*input_rate+output_tokens/1000.0*output_rate,6)
@@ -73,7 +114,11 @@ class BudgetManager:
         day=_today(); spent=self.state.spend(day)
         mt=self.limits.get("max_tokens_per_day"); mu=self.limits.get("max_spend_usd")
         if mt is not None and spent["tokens"]>=mt: raise DailyCapExceeded({"day":day,"spent":spent,"max_tokens_per_day":mt})
-        if mu is not None and spent["est_usd"]>=mu: raise DailyCapExceeded({"day":day,"spent":spent,"max_spend_usd":mu})
+        # At an exact API cash ceiling a trusted subscription can still reserve
+        # zero additional cash. Per-call reservations enforce positive API cash.
+        at_cash_cap=mu is not None and spent["est_usd"]>=mu
+        if at_cash_cap and (not self.subscription_models or spent["est_usd"]>mu):
+            raise DailyCapExceeded({"day":day,"spent":spent,"max_spend_usd":mu})
         return spent
 
     def reserve(self,run_id,profile,estimated_tokens,*,model=None,estimated_usd=None,reservation_id=None):
@@ -85,10 +130,14 @@ class BudgetManager:
             self.state.request_cancel(run_id)
             raise ReconciliationRequired("supervised deadline reached before provider reservation")
         reservation_id=reservation_id or str(uuid.uuid4())
-        if model is not None:
-            input_rate,output_rate=self.validate_model_pricing(model)
-            if estimated_usd is None:
-                estimated_usd=max(input_rate,output_rate)*estimated_tokens/1000.0
+        accounting=self.validate_model_accounting(model) if model is not None else {}
+        subscription=accounting.get("accounting_mode")=="subscription"
+        if subscription:
+            self._validate_subscription_cash(estimated_usd,model)
+            estimated_usd=0.0  # Persist only known API cash exposure.
+        elif model is not None and estimated_usd is None:
+            estimated_usd=max(accounting["input_per_1k"],accounting["output_per_1k"])*estimated_tokens/1000.0
+        public_accounting={**accounting,"estimated_usd":None,"est_usd":None} if subscription else {}
         estimated_usd=float(estimated_usd or 0.0)
         if not math.isfinite(estimated_usd) or estimated_usd<0:
             raise BudgetExceeded({"reason":"invalid_estimated_price","model":model})
@@ -109,7 +158,7 @@ class BudgetManager:
             lvl=self.level(run_id,profile)
             if lvl!="ok": self.events.append({"run_id":run_id,"level":lvl,"used":self._used(run_id)})
             return {"reserved":estimated_tokens,"estimated_usd":estimated_usd,"level":lvl,
-                    "reservation_id":reservation_id,**reservation}
+                    "reservation_id":reservation_id,**reservation,**public_accounting}
         with self._lock:
             cap=self._cap(profile); used=self._used(run_id); usable=self.usable_tokens(profile)
             if used["calls"]+1>cap["max_calls"]: raise BudgetExceeded({"reason":"call_cap","used":used,"cap":cap})
@@ -119,7 +168,7 @@ class BudgetManager:
             self._reservation_ids.setdefault((run_id,estimated_tokens),[]).append(reservation_id)
             lvl=self.level(run_id,profile)
             if lvl!="ok": self.events.append({"run_id":run_id,"level":lvl,"used":self._used(run_id)})
-            return {"reserved":estimated_tokens,"level":lvl,"reservation_id":reservation_id}
+            return {"reserved":estimated_tokens,"level":lvl,"reservation_id":reservation_id,**public_accounting}
 
     def release(self,run_id,estimated_tokens,reservation_id=None):
         if reservation_id is None:
@@ -140,7 +189,15 @@ class BudgetManager:
             else: self._reserved_calls.pop(run_id,None)
 
     def settle(self,run_id,estimated_tokens,model,input_tokens,output_tokens,reservation_id=None,*,reported_usd=None):
-        usd=self.price(model,input_tokens,output_tokens) if reported_usd is None else float(reported_usd)
+        # Validate membership even when provider-reported dollars are supplied;
+        # reported_usd must never make an unpriced model implicitly acceptable.
+        accounting=self.validate_model_accounting(model)
+        subscription=accounting["accounting_mode"]=="subscription"
+        if subscription:
+            self._validate_subscription_cash(reported_usd,model)
+            usd=0.0
+        else:
+            usd=self.price(model,input_tokens,output_tokens) if reported_usd is None else float(reported_usd)
         if not math.isfinite(usd) or usd<0: raise ValueError("invalid reported usage")
         if reservation_id is None:
             ids=self._reservation_ids.get((run_id,estimated_tokens),[])
@@ -151,7 +208,7 @@ class BudgetManager:
         else:
             self.release(run_id,estimated_tokens,reservation_id)
             self.state.add_spend(_today(),input_tokens+output_tokens,usd)
-        return usd
+        return self._subscription_accounting() if subscription else usd
 
     def frontier_allowed(self,run_id,profile):
         cap=self._cap(profile); row=self.state.get(run_id)
@@ -164,8 +221,19 @@ class BudgetManager:
         verified=row.get("status")=="COMPLETE"
         exposure=self.state.active_budget_reservations(run_id) if hasattr(self.state,"active_budget_reservations") else {}
         unreceipted=self.state.unreceipted_settlements(run_id) if hasattr(self.state,"unreceipted_settlements") else {}
-        return {"run_id":run_id,"profile":profile,"settled_unreceipted":unreceipted,"tokens":used["tokens"],"calls":used["calls"],"est_usd":usd,
+        result={"run_id":run_id,"profile":profile,"settled_unreceipted":unreceipted,"tokens":used["tokens"],"calls":used["calls"],"est_usd":usd,
                 "reserved_exposure":exposure,"usage_status":"unknown" if exposure.get("calls") else ("reconciliation_required" if unreceipted.get("calls") else "recorded"),
                 "cap":cap,"level":self.level(run_id,profile),
                 "cost_per_verified_pass":usd if verified else None,"today":self.state.spend(_today()),
                 "rate_limiter":self.rate_limiter.report()}
+        if self.subscription_models:
+            # Conservative across restart/mixed runs: this constructor enables
+            # unknown subscription value; the cash ledger cannot establish it.
+            def labeled_cash(value):
+                return {**value,"known_api_cash_usd":float(value.get("est_usd") or 0.0),
+                        "est_usd":None,"total_cost_usd":None,"total_cost_status":"unknown"}
+            result.update({"accounting_mode":"subscription-enabled","known_api_cash_usd":usd,
+                           "est_usd":None,"total_cost_usd":None,"total_cost_status":"unknown",
+                           "cost_per_verified_pass":None,"today":labeled_cash(result["today"]),
+                           "reserved_exposure":labeled_cash(exposure),"settled_unreceipted":labeled_cash(unreceipted)})
+        return result

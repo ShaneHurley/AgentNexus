@@ -4,7 +4,7 @@ from __future__ import annotations
 import urllib.parse
 from http.server import BaseHTTPRequestHandler
 
-from . import agents, config_route, docs, home, meta, setup, terminal, usage_route, workspace
+from . import agents, config_route, docs, home, meta, setup, terminal, usage_route, workshop, workspace
 
 
 def _parts(path: str) -> list[str]:
@@ -19,6 +19,7 @@ def dispatch_get(handler: BaseHTTPRequestHandler, path: str, query: dict) -> boo
         setup,
         usage_route,
         home,
+        workshop,
         docs,
         config_route,
         workspace,

@@ -62,7 +62,6 @@ class TestRoleInputs(unittest.TestCase):
         for forbidden in (
             "plan",
             "plan_slice",
-            "plan_hash",
             "research_digest",
             "research",
             "implement",

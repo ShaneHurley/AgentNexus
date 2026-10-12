@@ -33,6 +33,7 @@ HUB_OPENAPI_PATHS: dict[str, dict[str, Any]] = {
     },
     "/api/usage": {"get": {"summary": "Usage events and normalized metrics"}},
     "/api/home/snapshot": {"get": {"summary": "Home dashboard snapshot"}},
+    "/api/workshop/snapshot": {"get": {"summary": "Workshop dashboard snapshot"}},
     "/api/docs": {"get": {"summary": "List documentation files"}},
     "/api/docs/{name}": {"get": {"summary": "Fetch documentation markdown"}},
     "/api/config/overlay": {

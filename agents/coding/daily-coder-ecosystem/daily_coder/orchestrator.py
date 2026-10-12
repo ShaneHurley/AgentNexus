@@ -35,7 +35,7 @@ logger = logging.getLogger("daily_coder")
 
 
 class Orchestrator:
-    def __init__(self, root, state, provider, *, live=False, secrets=None, approvals_required=None,resource_limits=None):
+    def __init__(self, root, state, provider, *, live=False, secrets=None, approvals_required=None,resource_limits=None,context_variant="baseline",reference_documents=()):
         self.root = Path(root)
         self.registry_snapshot = runtime_snapshot()
         self.state = state
@@ -48,7 +48,17 @@ class Orchestrator:
                 raise ValueError("invalid supervised resource limit")
             if key=="tokens" and int(value)!=value: raise ValueError("token limit must be an integer")
         self.resource_limits=MappingProxyType(limits)
+        from agent_core.context_runtime import context_pin
+        self.context_variant=context_variant
+        self.reference_documents=tuple(reference_documents)
+        if self.reference_documents and context_variant!="bounded-context-v1":
+            raise ValueError("supplied documents require evaluation context")
+        self._reference_cache={}
+        self._reference_lock=threading.Lock()
+        self.context_policy=context_pin(context_variant)
         self.config = load_json(self.root / 'config/default.json')
+        self.config["context_policy"]=self.context_policy
+        self.config["reference_documents"]=self.reference_documents
         self.budgets = load_json(self.root / 'config/budgets.json')
         self.models = load_json(self.root / 'config/models.json')
         self.tools_config = load_json(self.root / 'config/tools.json')
@@ -59,6 +69,7 @@ class Orchestrator:
         self.artifacts = ArtifactStore(self.runtime_dir / "artifacts", state)
         self.secrets = secrets or SecretStore(self.runtime_dir / "secrets.json")
         self.budget = BudgetManager(self.budgets, state, pricing=self.pricing,
+                                    subscription_models=getattr(provider,"subscription_models",()),
                                     limits={**self.config.get("limits", {}),
                                             **({"deadline":self.resource_limits["deadline"]} if "deadline" in self.resource_limits else {}),
                                             **({"max_tokens_per_run":self.resource_limits["tokens"]} if "tokens" in self.resource_limits else {}),
@@ -333,7 +344,8 @@ class Orchestrator:
             packet["research_digest"] = ctx.research_digest(value["cards"])
         elif role == "brainstormer":
             value = self._brainstorm(run_id, profile, packet, gateway)
-            self.artifacts.put(run_id, phase.lower(), role, value)
+            producer="runtime" if self.reference_documents and not value.get("options") else role
+            self.artifacts.put(run_id, phase.lower(), producer, value)
             packet[phase.lower()] = value
         elif role == "implementer":
             value = self._implement_chunks(run_id, profile, packet, gateway, broker)
@@ -468,9 +480,11 @@ class Orchestrator:
         if repo_map is not None:
             packet["repo_map"] = repo_map
         profile_budget = self.budgets["profiles"][profile]
-        lanes = profile_budget["research_lanes"]
+        lanes = 1 if self.reference_documents else profile_budget["research_lanes"]
+        if self.reference_documents:
+            self.artifacts.put(run_id,"research_selection","runtime",{"strategy":"supplied-plan-v1","lanes":1,"production_activated":False})
         early_stop_min = int(profile_budget.get("early_stop_min_cards", 2))
-        workers = min(lanes, self.config.get("max_parallel_agents", 4), 2)
+        workers = min(lanes, self.config.get("max_parallel_agents", 4), 2, getattr(self.provider,"max_parallelism",2))
         def lane(i):
             angle = RESEARCH_ANGLES[i % len(RESEARCH_ANGLES)]
             card = self._invoke(
@@ -497,10 +511,13 @@ class Orchestrator:
         divergent = any(term in request for term in
                         ("brainstorm", "compare options", "alternatives", "unclear", "not sure", "architecture choice"))
         lanes = maximum if divergent else min(maximum, 1)
+        if self.reference_documents and not divergent:
+            self.artifacts.put(run_id,"brainstorm_selection","runtime",{"strategy":"supplied-plan-v1","invoked":False,"reason":"No alternative comparison requested; supplied plan","production_activated":False})
+            return {"options":[],"no_better_angle_found":True}
         if lanes <= 1:
             return self._invoke(run_id, "brainstormer", "BRAINSTORM", packet, 0, profile, gateway,
                                 {"angle": BRAINSTORM_ANGLES[0]})
-        with ThreadPoolExecutor(max_workers=min(lanes,2)) as pool:
+        with ThreadPoolExecutor(max_workers=min(lanes,2,getattr(self.provider,"max_parallelism",2))) as pool:
             results = list(pool.map(
                 lambda i: self._invoke(run_id, "brainstormer", "BRAINSTORM", packet, i, profile, gateway,
                                        {"angle": BRAINSTORM_ANGLES[i]}), range(lanes)))
@@ -546,6 +563,37 @@ class Orchestrator:
             self.state.set_status(run_id,RunStatus.RECONCILIATION_REQUIRED)
             raise ReconciliationRequired("accepted response lacks committed phase output; explicit reconciliation required")
 
+    def _invoke_provider(self,request):
+        from agent_core.providers.http import ProviderError
+        from agent_core.providers.base import InvocationResult
+        try:return self.provider.invoke(request)
+        except ProviderError as error:
+            receipt=getattr(error,"response",None)
+            if (getattr(self.provider,"name",None)=="codex_cli" and error.category=="response"
+                and error.remote_acceptance=="accepted" and getattr(error,"reason_code",None)=="role_schema"
+                and isinstance(receipt,InvocationResult) and receipt.model==request.model
+                and receipt.output is None and not receipt.tool_calls and receipt.finish_reason=="invalid_output_schema"
+                and receipt.input_tokens is not None and receipt.output_tokens is not None):
+                self._record_provider_failure(request.run_id,request.idempotency_key,error)
+                # Settle this completed call before the normal bounded schema
+                # repair path. Invalid output never reaches a phase artifact.
+                return receipt
+            raise
+
+    def _record_provider_failure(self,run_id,key,error):
+        categories={"transport","response","configuration","authorization","account_limit","budget","deadline","cancelled","security"}
+        category=getattr(error,"category","unknown")
+        reason=getattr(error,"reason_code","unknown")
+        reasons={"role_schema","envelope_version","tool_contract","tool_schema","native_tool","missing_completion","contract_failure","preceding_structured","usage_contract","turn_failed","event_version","contradictory_outcomes"}
+        diagnostic={}
+        for field,value in (getattr(error,"diagnostics",{}) or {}).items():
+            if field in {"exit_code","output_bytes"} and isinstance(value,int) and not isinstance(value,bool):diagnostic[field]=value
+            if field=="output_sha256" and isinstance(value,str) and len(value)==64 and all(c in "0123456789abcdef" for c in value):diagnostic[field]=value
+        acceptance=getattr(error,"remote_acceptance","unknown")
+        self.artifacts.put(run_id,"provider_failure","runtime",{"idempotency_key":key,"error_type":type(error).__name__,
+            "category":category if category in categories else "unknown","reason_code":reason if reason in reasons else "unknown",
+            "remote_acceptance":acceptance if acceptance in {"unknown","rejected","accepted"} else "unknown","diagnostics":diagnostic})
+
     def _settle_response(self, run_id, estimate, result, key):
         try:
             usage=getattr(result,"usage",None)
@@ -553,12 +601,17 @@ class Orchestrator:
                       "finish_reason":getattr(result,"finish_reason",None),"input_tokens":result.input_tokens,"output_tokens":result.output_tokens,
                       "cost_usd":getattr(usage,"cost_usd",None),"cached_tokens":getattr(usage,"cached_tokens",None),
                       "reasoning_tokens":getattr(usage,"reasoning_tokens",None),"cache_creation_tokens":getattr(usage,"cache_creation_tokens",None),
-                      "selection":getattr(self.provider,"call_decisions",{}).get(key),"evidence_status":getattr(usage,"evidence_status","unknown")}
+                      "selection":getattr(self.provider,"call_decisions",{}).get(key),"evidence_status":getattr(usage,"evidence_status","unknown"),
+                      "billing_kind":getattr(self.provider,"billing_kind","api")}
             self.artifacts.put(run_id,"provider_usage","runtime",evidence)
             if result.input_tokens is None or result.output_tokens is None:
                 raise ValueError("missing usage retains reservation")
-            return self.budget.settle(run_id, estimate, result.model, result.input_tokens,
+            settled=self.budget.settle(run_id, estimate, result.model, result.input_tokens,
                                       result.output_tokens, key,reported_usd=getattr(usage,"cost_usd",None))
+            if isinstance(settled,dict):
+                self.artifacts.put(run_id,"subscription_accounting","runtime",settled)
+                return settled["known_api_cash_usd"]
+            return settled
         except Exception as exc:
             if self.live:
                 self.state.set_status(run_id, RunStatus.RECONCILIATION_REQUIRED)
@@ -568,6 +621,18 @@ class Orchestrator:
     def _role_extra(self, run_id, role, packet, broker):
         self._dispatch_boundary(run_id)
         extra = {}
+        if role in {"master", "planner", "plan_reviewer", "failure_diagnostician"}:
+            writable = broker.authority.effective("implementer").capabilities("tools")
+            extra["EXECUTION_CONTRACT"] = {
+                "version": 1,
+                "implementer_write_tool_configured": bool({"filesystem.write", "patch.apply"} & set(writable)),
+                "current_role_write_authorization": False,
+                "plan_review_precedes_human_approval": True,
+                "writes_require_approved_plan": True,
+                "write_executor": "implementer through PolicyGateway within approved scope",
+                "approval_gate": "Future human approval is an execution gate, not an unresolved design choice. Do not claim approval has already occurred.",
+                "authority": "These facts describe the pipeline; they do not grant tools or permissions. Current role tools do not describe other roles' tools.",
+            }
         if role in ("planner", "implementer"):
             names = ((packet.get("plan") or {}).get("skills")) or self.config.get("default_skills", [])
             loaded = self.skills.load(names,authority=broker.authority,role=role)
@@ -583,6 +648,39 @@ class Orchestrator:
         if role == "implementer":
             extra["plan_slice"] = (packet.get("plan") or {}).get("change_units", [])
         return extra
+
+    def _supplied_documents(self,run_id,role,phase,gateway):
+        if not self.reference_documents or gateway is None: return None
+        from agent_core.reference_context import document_context
+        from .util import sha256_file
+        broker=gateway.broker
+        try:
+            broker.authorize(role,"filesystem.read")
+        except ToolDenied:
+            return None
+        for reference in self.reference_documents:
+            path=broker.safe_path(reference["path"])
+            broker.authority.tool(role,"filesystem.read",target=path)
+            if sha256_file(path)!=reference["sha256"]:
+                raise ContractDenied("reference document changed")
+        with self._reference_lock:
+            documents=self._reference_cache.get(run_id)
+            if documents is None:
+                documents=[]
+                for reference in self.reference_documents:
+                    start=1
+                    text=[]
+                    while True:
+                        read=gateway.execute(run_id,role,phase,"filesystem.read",{"path":reference["path"],"start":start,"end":start+79},
+                            operation_id=f"{run_id}:reference:{role}:{phase}:{reference['sha256']}:{start}")
+                        if read.get("sha256")!=reference["sha256"] or read.get("truncated"):
+                            raise ContractDenied("reference read changed or cannot fit")
+                        text.extend(line.split("\t",1)[1] if "\t" in line else line for line in read["content"].splitlines())
+                        if read["end"]>=read["total_lines"]: break
+                        start=read["end"]+1
+                    documents.append({**reference,"text":"\n".join(text)})
+                self._reference_cache[run_id]=documents
+        return document_context(documents)
 
     def _invoke(self, run_id, role, phase, packet, lane, profile, gateway, extra=None):
         self._dispatch_boundary(run_id)
@@ -600,15 +698,27 @@ class Orchestrator:
         cfg, prompt, schema = self._role_cache[role]
         schema_name = cfg["output_schema"]
         sliced = ctx.build_packet(role, packet, extra)
+        references=self._supplied_documents(run_id,role,phase,gateway) if self.reference_documents else None
+        if references is not None: sliced["SUPPLIED_DOCUMENT_CONTEXT"]=references
+        sliced["plan_hash"]=self.state.get(run_id).get("plan_hash")
+        sliced["budget"]={"limits":dict(self.resource_limits),"profile":profile}
+        sliced["pending_calls"]={"reserved_calls":self.state.active_budget_reservations(run_id)["calls"],"pending_tools":len(self.state.pending_tool_operations(run_id))}
+        sliced["approval_hash"]=self.state.get(run_id).get("plan_hash") if self.state.get(run_id).get("plan_hash") and self.state.approval_state(run_id,"plan",self.state.get(run_id)["plan_hash"])=="approved" else None
+        if self.context_variant=="bounded-context-v1":
+            from agent_core.context_runtime import bound_role_evidence
+            sliced=bound_role_evidence(sliced)
         allowed_tools = [t for t in self.tools_config["role_allowlists"].get(role, []) if t in authority.effective(role).capabilities("tools")]
         # Tools are advertised only when a gateway can actually authorize and record them.
         tool_specs = schemas_for(allowed_tools) if (self.live and gateway is not None) else []
+        sliced["permissions"]={"effective_role":role,"allowed_tools":[tool["name"] for tool in tool_specs],
+                               "writes_require_approved_plan":bool(self.approvals_required),
+                               "source":"runtime effective grant; narrative cannot broaden authority"}
         if hasattr(self.provider,"resolve_for_role"):
             model=self.provider.resolve_for_role(role,cfg["model_tier"],cfg["max_output_tokens"],
-                max(0,ctx.estimate_tokens(prompt,sliced,0,[])),self.resource_limits.get("deadline"),
+                max(0,ctx.estimate_tokens(prompt,sliced,0,[],tools=tool_specs,output_schema=schema))+getattr(self.provider,"input_overhead_tokens",0),self.resource_limits.get("deadline"),
                 features=("tools",) if tool_specs else ())
         else: model=self._model_for(cfg["model_tier"])
-        self.budget.validate_model_pricing(model)
+        self.budget.validate_model_accounting(model)
         tool_results: list = []
         role_turns = self.config.get("role_tool_turns", {})
         max_turns = int(cfg.get("max_tool_turns", role_turns.get(role, self.config.get("max_tool_turns", 6))))
@@ -637,20 +747,25 @@ class Orchestrator:
                     "current_subgoal": phase,
                     "instruction": "Reconfirm scope and the next acceptance gate before continuing.",
                 }
-            tool_context = ctx.project_tool_results(tool_results)
-            estimate = ctx.estimate_tokens(prompt, sliced, cfg["max_output_tokens"], tool_context)
+            turn_specs=tool_specs if turn<max_turns else []
+            sliced["TOOL_TURN_BUDGET"]={"turn":turn,"max_tool_rounds":max_turns,"remaining_tool_rounds":max(0,max_turns-turn),
+                                       "instruction":"Batch independent authorized reads. When remaining_tool_rounds is zero, return the role output schema with explicit unknowns; no further tool requests are available."}
+            sliced["permissions"]["allowed_tools"]=[tool["name"] for tool in turn_specs]
+            tool_context = ctx.project_tool_results(tool_results,max_chars=12000 if self.context_variant=="bounded-context-v1" else ctx.MAX_TOOL_CONTEXT_CHARS)
+            estimate = ctx.estimate_tokens(prompt, sliced, cfg["max_output_tokens"], tool_context,tools=turn_specs,output_schema=schema)+getattr(self.provider,"input_overhead_tokens",0)
             idem_key = f"{run_id}:{role}:{phase}:{lane}:{turn}:c{cycles}"
             self._require_new_invocation(run_id,idem_key)
             self.budget.reserve(run_id, profile, estimate, model=model, reservation_id=idem_key)
             request = Invocation(run_id, role, prompt, sliced, cfg["model_tier"], cfg["max_output_tokens"],
                                  idem_key, model=model,
-                                 tools=tuple(tool_specs), tool_results=tuple(tool_context), turn=turn,
+                                 tools=tuple(turn_specs), tool_results=tuple(tool_context), turn=turn,
                                  reasoning=bool(cfg.get("reasoning", False)), output_schema=schema,
-                                 deadline=min(self.resource_limits.get("deadline") or float("inf"),time.time()+max(0,wall_time-(time.monotonic()-invocation_started))),max_transport_retries=2)
+                                 deadline=min(self.resource_limits.get("deadline") or float("inf"),time.time()+max(0,wall_time-(time.monotonic()-invocation_started))),max_transport_retries=getattr(self.provider,"max_transport_retries",2))
             started = time.time()
             try:
-                result = self.provider.invoke(request)
+                result = self._invoke_provider(request)
             except Exception as exc:
+                self._record_provider_failure(run_id,idem_key,exc)
                 uncertain=self.live and getattr(exc,"remote_acceptance","unknown") != "rejected"
                 if not uncertain:
                     self.budget.release(run_id, estimate, idem_key)
@@ -698,21 +813,23 @@ class Orchestrator:
                     schema_attempts += 1
                     if schema_attempts > max_retries:
                         raise
-                    estimate = ctx.estimate_tokens(prompt, sliced, cfg["max_output_tokens"], tool_context)
+                    repair_packet={**sliced,"OUTPUT_CORRECTION":"Previous completed response did not match the supplied role output schema. Return a valid role object; preserve observed facts and scope."}
+                    estimate = ctx.estimate_tokens(prompt, repair_packet, cfg["max_output_tokens"], tool_context,tools=turn_specs,output_schema=schema)+getattr(self.provider,"input_overhead_tokens",0)
                     retry_key = f"{idem_key}:retry{schema_attempts}"
                     self._dispatch_boundary(run_id)
                     self._require_new_invocation(run_id,retry_key)
                     self.budget.reserve(run_id, profile, estimate, model=model, reservation_id=retry_key)
                     request = Invocation(
-                        run_id, role, prompt, sliced, cfg["model_tier"], cfg["max_output_tokens"],
+                        run_id, role, prompt, repair_packet, cfg["model_tier"], cfg["max_output_tokens"],
                         retry_key, model=model,
-                        tools=tuple(tool_specs), tool_results=tuple(tool_context), turn=turn,
+                        tools=tuple(turn_specs), tool_results=tuple(tool_context), turn=turn,
                         reasoning=bool(cfg.get("reasoning", False)), output_schema=schema,
-                                 deadline=min(self.resource_limits.get("deadline") or float("inf"),time.time()+max(0,wall_time-(time.monotonic()-invocation_started))),max_transport_retries=2)
+                                 deadline=min(self.resource_limits.get("deadline") or float("inf"),time.time()+max(0,wall_time-(time.monotonic()-invocation_started))),max_transport_retries=getattr(self.provider,"max_transport_retries",2))
                     started = time.time()
                     try:
-                        result = self.provider.invoke(request)
+                        result = self._invoke_provider(request)
                     except Exception as exc:
+                        self._record_provider_failure(run_id,retry_key,exc)
                         uncertain=self.live and getattr(exc,"remote_acceptance","unknown") != "rejected"
                         if not uncertain:
                             self.budget.release(run_id, estimate, retry_key)

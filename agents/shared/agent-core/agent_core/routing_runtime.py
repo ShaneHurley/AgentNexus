@@ -102,6 +102,7 @@ class SupervisedProvider:
         if request.run_id!=self.run_id:raise ContractDenied('provider task binding denied')
         from .efficiency_tools import token_estimate
         estimate=token_estimate(request.prompt+json.dumps(request.input_packet,sort_keys=True)+json.dumps(request.tool_results,default=str))
+        estimate+=token_estimate(json.dumps(request.tools,default=str)+json.dumps(request.output_schema,default=str))+getattr(self,"input_overhead_tokens",0)
         features=['tools'] if request.tools else []
         selection=self._explain(request.role,request.max_output_tokens,estimate,request.deadline,features)
         model=self.resolver.catalog.data['models'][selection['selected_alias']]

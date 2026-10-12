@@ -331,6 +331,9 @@ class ApiSmokeTests(unittest.TestCase):
         with urllib.request.urlopen(req, timeout=5) as resp:
             body = json.loads(resp.read().decode("utf-8"))
         self.assertTrue(body.get("accepted"))
+        if "request_stage_ms" in body:
+            self.assertGreaterEqual(body["request_stage_ms"]["total_ms"], 0)
+            self.assertIn("execute_ms", body["request_stage_ms"])
         run_id = body["run_id"]
 
         req = urllib.request.Request(

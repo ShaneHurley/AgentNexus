@@ -3,7 +3,7 @@ import time
 import uuid
 from pathlib import Path
 import pytest
-from hypothesis import given, strategies as st
+from hypothesis import given, settings, strategies as st
 from agent_core.contracts import Grant, EffectiveGrant, ContractDenied
 from agent_core.memory import KnowledgeStore, MemoryAccess
 
@@ -85,6 +85,8 @@ def test_atomic_rollback_and_duplicate(memory):
     r=draft(s,a); s.accept(r["id"],a,expected_hash=r["content_hash"],confirmed=True)
     with pytest.raises(ValueError): draft(s,a,record_id=r["id"],body="different")
 
+# This is a SQLite state-invariant test, not a wall-time benchmark.
+@settings(deadline=None)
 @given(st.lists(st.sampled_from(["draft","accept","search","refresh"]),min_size=1,max_size=20))
 def test_lifecycle_never_implicitly_accepts(tmp_path_factory,events):
     p=tmp_path_factory.mktemp("sequence")/"s.db"; sid=str(uuid.uuid4()); a=access(p,sid); s=KnowledgeStore.create(p,store_id=sid,kind="project",access=a,raw_run_retention_days="none",confirmed=True)

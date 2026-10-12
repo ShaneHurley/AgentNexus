@@ -109,7 +109,7 @@ class ModelCommandTests(unittest.TestCase):
             with self.assertRaises(ValueError):self.call("usage-report","--records",self.file("bad.json",payload))
         from contextlib import redirect_stderr
         from io import StringIO
-        with redirect_stderr(StringIO()), self.assertRaises(SystemExit):
-            self.parser.parse_args(["eval","--records","unused.json"])
+        with redirect_stderr(StringIO()), self.assertRaises(ValueError):
+            self.call("eval","--records","unused.json")
 
 if __name__=="__main__":unittest.main()

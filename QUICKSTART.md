@@ -107,7 +107,7 @@ Set `AGENTNEXUS_REGISTRY_STORE` to that directory for runtime selection. Do not 
 
 Review and install a Docker image locally, then set `execution_policy.image` in DC policies to its exact `repository@sha256:<64 hex characters>` identifier. RF code experiments use `isolated_image` in their experiment configuration. No default image or implicit pull is provided. Workers have read-only sanitized inputs and writable disposable `/tmp` and `/outputs` directories, with no network. Tests needing private files or writable source trees must be adapted; workers cannot apply host edits.
 
-The implementation environment had Docker installed with its daemon stopped. Actual container smoke validation remains necessary after starting the daemon and provisioning the reviewed image. No paid provider evaluation was performed. If execution is unavailable, use typed inspection; the runtime does not fall back to host subprocesses.
+Docker is installed and its daemon responded during the October 11 local check. No reviewed worker image is configured yet; actual isolated-runner smoke validation remains necessary before claiming code/test execution is operational. No paid provider evaluation was performed. If execution is unavailable, use typed inspection; the runtime does not fall back to host subprocesses.
 
 
 ## Durable sessions and recovery
@@ -184,4 +184,54 @@ uv run --locked agent-nexus --repository . agents audit --select ide:researcher 
 
 The audit reads the existing manifests and contracts without creating sessions or granting capabilities. It checks all 41 IDE agents, 96 browser pastes and ten families, projections, source pins, local guide links and literal generator commands. Selected prompt sizes are estimates and exclude runtime history/tools/provider overhead. The default 32,000-byte per-prompt ceiling reports oversized instructions; it never truncates them.
 
-The version-pinned Codex adapter has passed offline contracts and one live, inference-only structured smoke test using ChatGPT login. It is not yet selectable in supervised run/resume. Do not substitute the legacy command provider: shared routing, subscription accounting and run pins still require integration. See [transport evidence](docs/ide-agents/codex-adapter-smoke.json). Full paired Research/Code evaluations, project instances and the real isolated-runner gate remain pending.
+The Codex CLI transport is explicitly selectable in supervised Daily Coder runs after reviewed local configuration. It uses ChatGPT login, never extracted credentials. The built-in API catalog remains mock-only; selecting Codex supplies its own pinned baseline policy without activating cheaper routing.
+
+```bash
+agent-nexus --repository /absolute/AgentNexus codex configure --pins /absolute/reviewed-codex-pins.json --confirm
+agent-nexus --repository /absolute/AgentNexus codex inspect
+agent-nexus --repository /absolute/AgentNexus new --project /absolute/project --profile Code
+agent-nexus --repository /absolute/AgentNexus run --session SESSION_ID --engine daily-coder --workspace /absolute/project --request "Describe the bounded task" --provider codex_cli --live --budget-usd 0 --token-limit 80000 --deadline-seconds 600
+agent-nexus --repository /absolute/AgentNexus resume RUN_ID
+```
+
+The reviewed pins file has exactly `version`, `model`, `reasoning_effort`, absolute `executable` and `catalog_path`, and SHA-256 `executable_sha256`, `catalog_sha256`, `security_config_sha256`. The catalog must have one matching model with native tools disabled; use a reviewed catalog, not the ordinary host catalog. Configuration contains no login secrets. Supported CLI versions are explicitly reviewed; an app update requires new review and confirmation. Existing runs retain old pins and block on incompatible changes.
+
+Codex runs have one active invocation per OS account across processes. Structured output requests tools through the gateway; writes still require plan approval. Reported subscription tokens are accounted separately from zero API cash exposure and unknown total dollar value. Missing usage or uncertain completion retains reservations; cancellation does not imply remote cancellation. Local character-based input estimates include role/tool schemas and a measured overhead allowance, but the CLI cannot enforce a hard remote output-token ceiling. Model-output quality failures permit at most the existing one configured schema correction after a known usage receipt.
+
+See [transport evidence](docs/ide-agents/codex-adapter-smoke.json). Full paired Research/Code evaluations, validated project profiles/instances and the real isolated-runner gate remain pending. `--profile Code` currently stores a session label; it does not activate a separate validated execution profile. Do not infer completion from a queued or blocked run.
+
+## Python reliability and bounded-context evaluation
+
+The existing Codex adapter now accepts ordinary commentary (including inline Markdown paths) before its final structured envelope. Ambiguous structured messages and native-tool events remain denied. Planning roles receive a runtime-owned explanation of review, approval and gateway writes; that explanation does not grant permissions.
+
+Run contract replay without authentication, network access, model calls or tool execution:
+
+```bash
+agent-nexus eval --mode replay --input agents/shared/agent-core/tests/fixtures/codex-replay-v1.json --output /absolute/replay-report.json
+agent-nexus tools context-preview --input /absolute/context-packet.json
+```
+
+Preview input contains `protected`, `evidence`, and optionally `prompt`, `tools`, `output_schema`, `provider_overhead_tokens`, and `max_output_tokens`. Protected fields are intent, constraints (including acceptance criteria), permissions, approval_hash, plan_hash, budget and pending_calls. Counts are estimates; provider-reported usage remains authoritative.
+
+`agent-nexus eval --mode supervised --suite /absolute/suite.json --variant baseline --repetitions 1 --output /absolute/report.json` launches the public supervised CLI with Codex subscription access and zero API cash budget. Suite version 1 declares an ID and cases with ID, profile, workspace, request_file, request_sha256, token_limit and expected_status. Supported expected states are COMPLETE and WAITING_HUMAN. Read/write approval is never automatic. At WAITING_HUMAN the command persists run/session/approval references and stops further repetitions; the approval has no timeout. Use the bridge to approve the exact reviewed plan and the saved supervisor state directory to resume. Waiting for approval is not task completion.
+
+The `bounded-context-v1` variant is evaluation-only, disabled for normal runs. `--context-evaluation` allows explicit candidate measurement without production activation. Each run pins the context policy. Optional research evidence is bounded to eight records/4,000 estimated tokens; projected tool context is bounded to 12,000 characters rather than the baseline 24,000. Complete request estimates include role instructions, tool/output schemas and provider overhead. Current-role tools are selected from effective grants. No lossy compression of authority fields is used.
+
+`filesystem.read` accepts `view=outline` for Python AST inspection without importing source. It also accepts `operation_ref`, `offset` and `limit` to expand its current run/role's completed read receipts. Each expansion reauthorizes the original capability and workspace; receipts are historical observations, not current facts. Truncated source reads explicitly require smaller line ranges.
+
+Supervised reports preserve unknown cost/usage, cached-token counts when reported, native receipt counts, repairs, denied tools, configuration/code hashes and artifacts. RF Wave 1 currently has no supervised Codex investigation adapter; Research comparison cases are explicitly BLOCKED rather than relabeled Code runs. Replay proves transport contracts, not model quality. No token-efficiency qualification or production activation is claimed without completed paired measurements. Dashboard start responses expose session/create/execute/total timings; the previously timed-out RF smoke test passed in isolation without increasing its timeout.
+
+October 11 operational check: the first user-selected game baseline did not complete. Its initial research role exhausted tool rounds, followed by a diagnostic provider configuration/schema failure. The adapter now declares required:[] for the empty no-tool object, and roles receive explicit remaining rounds with no tools on their final permitted round. A second attempt completed four research lanes, then stopped at the persistent daily token ceiling before planning or writes. No plan approval exists, and no efficiency setting was activated. The next live test requires a separately approved bounded allowance; failed runs and unknown reservations remain preserved. Latest full pytest verification: 1,049 tests and 45 subtests passed. See docs/ide-agents/python-reliability-verification.json.
+
+
+## October 12 operational test status
+
+Supplied Markdown plans can be explicitly pinned with repeated `--reference-document` options for a supervised `bounded-context-v1` evaluation. This candidate reads through PolicyGateway, reauthorizes role and target access, rejects changed sources, and keeps supplied excerpts plus research evidence within eight records and 4,000 estimated tokens. Roles without file-read authority do not receive supplied-document context. One reconnaissance lane and a deterministic empty brainstorm are used only for an explicit supplied-plan evaluation without a request to compare alternatives; normal production routing is unchanged.
+
+Receipt reduction retains call IDs, operation references, result hashes and execution outcomes. Optional argument hashes and size diagnostics are removed only when needed to fit the bound; essential overflow still fails explicitly. Codex response deadlines are bounded at 180 seconds and may be shortened by the invocation or parent deadline. Unknown remote completion retains its reservation and is not blindly retried.
+
+The Ceci game operational candidate is **not complete**. Run `3081b96c-be03-4e11-b6a9-235d13787497` was cancelled after receipt-context overflow (147,570 reported tokens; cancellation acknowledged). After repair, run `19e4c4b0-a3f1-4e43-aab9-de369aeda7af` completed reconnaissance and reached design but hit the previous 60-second provider deadline: 122,366 known reported tokens plus one unknown invocation/reservation. No game implementation or efficiency qualification is claimed. Original game plans and the original dirty AgentNexus checkout are preserved.
+
+The pinned Node isolated-runner smoke test passed through PolicyGateway: workspace writes and outbound network were denied. Image: `node@sha256:c3de60bf2f9dd0ac6370e6117950ff62d6e339527e7472301c9c78a017978392`. This verifies the runner boundary, not a game build or iPhone-device acceptance. The image still requires an explicit execution-policy binding for future supervised game verification.
+
+Verification: affected pytest suites passed 706 tests plus 45 subtests before the final small repairs; the final provider/context regressions passed 113 tests. Required DC unittest discovery passed 130 tests; DC validation, projection check, Ruff correctness checks and `git diff --check` passed. Linux/macOS CI and a complete real write/test/review game run remain release gates. No API spending occurred. The owner's October 12 authorization permits tests and necessary fixes without waiting; concrete plans and gateway approvals remain recorded.

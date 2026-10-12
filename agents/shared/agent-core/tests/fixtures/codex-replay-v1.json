@@ -1,0 +1,807 @@
+[
+  {
+    "version": 1,
+    "id": "final-role",
+    "request": {
+      "run_id": "replay-run",
+      "role": "planner",
+      "prompt": "Return the supplied role schema.",
+      "input_packet": {
+        "ORIGINAL_REQUEST": "Inspect public fixture note.txt; do not write."
+      },
+      "model_tier": "reviewed",
+      "max_output_tokens": 128,
+      "idempotency_key": "replay-only",
+      "model": "fixture-model",
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "additionalProperties": false
+      },
+      "tools": [
+        {
+          "name": "filesystem.read",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "additionalProperties": false
+          }
+        }
+      ]
+    },
+    "events": [
+      {
+        "type": "item.completed",
+        "item": {
+          "type": "agent_message",
+          "text": "{\"version\": \"anx_codex_role_v2\", \"output_json\": \"{\\\"ok\\\": true}\", \"tool_calls\": []}"
+        }
+      },
+      {
+        "type": "turn.completed",
+        "usage": {
+          "input_tokens": 12,
+          "output_tokens": 3,
+          "cached_input_tokens": 4
+        }
+      }
+    ],
+    "expected": {
+      "outcome": "accepted",
+      "output": {
+        "ok": true
+      }
+    }
+  },
+  {
+    "version": 1,
+    "id": "commentary-before-final",
+    "request": {
+      "run_id": "replay-run",
+      "role": "planner",
+      "prompt": "Return the supplied role schema.",
+      "input_packet": {
+        "ORIGINAL_REQUEST": "Inspect public fixture note.txt; do not write."
+      },
+      "model_tier": "reviewed",
+      "max_output_tokens": 128,
+      "idempotency_key": "replay-only",
+      "model": "fixture-model",
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "additionalProperties": false
+      },
+      "tools": [
+        {
+          "name": "filesystem.read",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "additionalProperties": false
+          }
+        }
+      ]
+    },
+    "events": [
+      {
+        "type": "item.completed",
+        "item": {
+          "type": "agent_message",
+          "text": "I will inspect the supplied file."
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "type": "agent_message",
+          "text": "{\"version\": \"anx_codex_role_v2\", \"output_json\": \"{\\\"ok\\\": true}\", \"tool_calls\": []}"
+        }
+      },
+      {
+        "type": "turn.completed",
+        "usage": {
+          "input_tokens": 12,
+          "output_tokens": 3,
+          "cached_input_tokens": 4
+        }
+      }
+    ],
+    "expected": {
+      "outcome": "accepted",
+      "output": {
+        "ok": true
+      }
+    }
+  },
+  {
+    "version": 1,
+    "id": "inline-backticks",
+    "request": {
+      "run_id": "replay-run",
+      "role": "planner",
+      "prompt": "Return the supplied role schema.",
+      "input_packet": {
+        "ORIGINAL_REQUEST": "Inspect public fixture note.txt; do not write."
+      },
+      "model_tier": "reviewed",
+      "max_output_tokens": 128,
+      "idempotency_key": "replay-only",
+      "model": "fixture-model",
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "additionalProperties": false
+      },
+      "tools": [
+        {
+          "name": "filesystem.read",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "additionalProperties": false
+          }
+        }
+      ]
+    },
+    "events": [
+      {
+        "type": "item.completed",
+        "item": {
+          "type": "agent_message",
+          "text": "Reading `note.txt` first."
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "type": "agent_message",
+          "text": "{\"version\": \"anx_codex_role_v2\", \"output_json\": null, \"tool_calls\": [{\"name\": \"filesystem.read\", \"arguments_json\": \"{\\\"path\\\":\\\"note.txt\\\"}\", \"call_id\": \"read-note\"}]}"
+        }
+      },
+      {
+        "type": "turn.completed",
+        "usage": {
+          "input_tokens": 12,
+          "output_tokens": 3,
+          "cached_input_tokens": 4
+        }
+      }
+    ],
+    "expected": {
+      "outcome": "accepted",
+      "finish_reason": "tool_calls"
+    }
+  },
+  {
+    "version": 1,
+    "id": "malformed-envelope",
+    "request": {
+      "run_id": "replay-run",
+      "role": "planner",
+      "prompt": "Return the supplied role schema.",
+      "input_packet": {
+        "ORIGINAL_REQUEST": "Inspect public fixture note.txt; do not write."
+      },
+      "model_tier": "reviewed",
+      "max_output_tokens": 128,
+      "idempotency_key": "replay-only",
+      "model": "fixture-model",
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "additionalProperties": false
+      },
+      "tools": [
+        {
+          "name": "filesystem.read",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "additionalProperties": false
+          }
+        }
+      ]
+    },
+    "events": [
+      {
+        "type": "item.completed",
+        "item": {
+          "type": "agent_message",
+          "text": "{broken"
+        }
+      },
+      {
+        "type": "turn.completed",
+        "usage": {
+          "input_tokens": 12,
+          "output_tokens": 3,
+          "cached_input_tokens": 4
+        }
+      }
+    ],
+    "expected": {
+      "outcome": "denied"
+    }
+  },
+  {
+    "version": 1,
+    "id": "competing-envelopes",
+    "request": {
+      "run_id": "replay-run",
+      "role": "planner",
+      "prompt": "Return the supplied role schema.",
+      "input_packet": {
+        "ORIGINAL_REQUEST": "Inspect public fixture note.txt; do not write."
+      },
+      "model_tier": "reviewed",
+      "max_output_tokens": 128,
+      "idempotency_key": "replay-only",
+      "model": "fixture-model",
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "additionalProperties": false
+      },
+      "tools": [
+        {
+          "name": "filesystem.read",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "additionalProperties": false
+          }
+        }
+      ]
+    },
+    "events": [
+      {
+        "type": "item.completed",
+        "item": {
+          "type": "agent_message",
+          "text": "{\"version\": \"anx_codex_role_v2\", \"output_json\": \"{\\\"ok\\\": true}\", \"tool_calls\": []}"
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "type": "agent_message",
+          "text": "{\"version\": \"anx_codex_role_v2\", \"output_json\": \"{\\\"ok\\\": true}\", \"tool_calls\": []}"
+        }
+      },
+      {
+        "type": "turn.completed",
+        "usage": {
+          "input_tokens": 12,
+          "output_tokens": 3,
+          "cached_input_tokens": 4
+        }
+      }
+    ],
+    "expected": {
+      "outcome": "denied",
+      "reason": "preceding_structured"
+    }
+  },
+  {
+    "version": 1,
+    "id": "partial-stream",
+    "request": {
+      "run_id": "replay-run",
+      "role": "planner",
+      "prompt": "Return the supplied role schema.",
+      "input_packet": {
+        "ORIGINAL_REQUEST": "Inspect public fixture note.txt; do not write."
+      },
+      "model_tier": "reviewed",
+      "max_output_tokens": 128,
+      "idempotency_key": "replay-only",
+      "model": "fixture-model",
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "additionalProperties": false
+      },
+      "tools": [
+        {
+          "name": "filesystem.read",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "additionalProperties": false
+          }
+        }
+      ]
+    },
+    "events": [
+      {
+        "type": "item.completed",
+        "item": {
+          "type": "agent_message",
+          "text": "{\"version\": \"anx_codex_role_v2\", \"output_json\": \"{\\\"ok\\\": true}\", \"tool_calls\": []}"
+        }
+      }
+    ],
+    "expected": {
+      "outcome": "denied",
+      "reason": "missing_completion"
+    }
+  },
+  {
+    "version": 1,
+    "id": "missing-usage",
+    "request": {
+      "run_id": "replay-run",
+      "role": "planner",
+      "prompt": "Return the supplied role schema.",
+      "input_packet": {
+        "ORIGINAL_REQUEST": "Inspect public fixture note.txt; do not write."
+      },
+      "model_tier": "reviewed",
+      "max_output_tokens": 128,
+      "idempotency_key": "replay-only",
+      "model": "fixture-model",
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "additionalProperties": false
+      },
+      "tools": [
+        {
+          "name": "filesystem.read",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "additionalProperties": false
+          }
+        }
+      ]
+    },
+    "events": [
+      {
+        "type": "item.completed",
+        "item": {
+          "type": "agent_message",
+          "text": "{\"version\": \"anx_codex_role_v2\", \"output_json\": \"{\\\"ok\\\": true}\", \"tool_calls\": []}"
+        }
+      },
+      {
+        "type": "turn.completed"
+      }
+    ],
+    "expected": {
+      "outcome": "accepted",
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null,
+        "cost_usd": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null,
+        "evidence_status": "unknown",
+        "cache_creation_tokens": null
+      }
+    }
+  },
+  {
+    "version": 1,
+    "id": "native-tool-attempt",
+    "request": {
+      "run_id": "replay-run",
+      "role": "planner",
+      "prompt": "Return the supplied role schema.",
+      "input_packet": {
+        "ORIGINAL_REQUEST": "Inspect public fixture note.txt; do not write."
+      },
+      "model_tier": "reviewed",
+      "max_output_tokens": 128,
+      "idempotency_key": "replay-only",
+      "model": "fixture-model",
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "additionalProperties": false
+      },
+      "tools": [
+        {
+          "name": "filesystem.read",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "additionalProperties": false
+          }
+        }
+      ]
+    },
+    "events": [
+      {
+        "type": "item.completed",
+        "item": {
+          "type": "command_execution",
+          "command": "touch forbidden"
+        }
+      },
+      {
+        "type": "turn.completed",
+        "usage": {
+          "input_tokens": 12,
+          "output_tokens": 3,
+          "cached_input_tokens": 4
+        }
+      }
+    ],
+    "expected": {
+      "outcome": "denied",
+      "reason": "native_tool"
+    }
+  },
+  {
+    "version": 1,
+    "id": "cancelled-turn",
+    "request": {
+      "run_id": "replay-run",
+      "role": "planner",
+      "prompt": "Return the supplied role schema.",
+      "input_packet": {
+        "ORIGINAL_REQUEST": "Inspect public fixture note.txt; do not write."
+      },
+      "model_tier": "reviewed",
+      "max_output_tokens": 128,
+      "idempotency_key": "replay-only",
+      "model": "fixture-model",
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "additionalProperties": false
+      },
+      "tools": [
+        {
+          "name": "filesystem.read",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "additionalProperties": false
+          }
+        }
+      ]
+    },
+    "events": [
+      {
+        "type": "turn.failed",
+        "error": {
+          "message": "interrupted"
+        }
+      }
+    ],
+    "expected": {
+      "outcome": "denied",
+      "reason": "turn_failed",
+      "remote_acceptance": "unknown"
+    }
+  },
+  {
+    "version": 1,
+    "id": "unapproved-tool",
+    "request": {
+      "run_id": "replay-run",
+      "role": "planner",
+      "prompt": "Return the supplied role schema.",
+      "input_packet": {
+        "ORIGINAL_REQUEST": "Inspect public fixture note.txt; do not write."
+      },
+      "model_tier": "reviewed",
+      "max_output_tokens": 128,
+      "idempotency_key": "replay-only",
+      "model": "fixture-model",
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "additionalProperties": false
+      },
+      "tools": [
+        {
+          "name": "filesystem.read",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "additionalProperties": false
+          }
+        }
+      ]
+    },
+    "events": [
+      {
+        "type": "item.completed",
+        "item": {
+          "type": "agent_message",
+          "text": "{\"version\": \"anx_codex_role_v2\", \"output_json\": null, \"tool_calls\": [{\"name\": \"filesystem.write\", \"arguments_json\": \"{\\\"path\\\":\\\"note.txt\\\",\\\"content\\\":\\\"changed\\\"}\", \"call_id\": \"write\"}]}"
+        }
+      },
+      {
+        "type": "turn.completed",
+        "usage": {
+          "input_tokens": 12,
+          "output_tokens": 3,
+          "cached_input_tokens": 4
+        }
+      }
+    ],
+    "expected": {
+      "outcome": "denied",
+      "reason": "tool_contract"
+    }
+  },
+  {
+    "version": 1,
+    "id": "bad-role-known-usage",
+    "request": {
+      "run_id": "replay-run",
+      "role": "planner",
+      "prompt": "Return the supplied role schema.",
+      "input_packet": {
+        "ORIGINAL_REQUEST": "Inspect public fixture note.txt; do not write."
+      },
+      "model_tier": "reviewed",
+      "max_output_tokens": 128,
+      "idempotency_key": "replay-only",
+      "model": "fixture-model",
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "additionalProperties": false
+      },
+      "tools": [
+        {
+          "name": "filesystem.read",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "additionalProperties": false
+          }
+        }
+      ]
+    },
+    "events": [
+      {
+        "type": "item.completed",
+        "item": {
+          "type": "agent_message",
+          "text": "{\"version\": \"anx_codex_role_v2\", \"output_json\": \"{\\\"ok\\\": \\\"bad\\\"}\", \"tool_calls\": []}"
+        }
+      },
+      {
+        "type": "turn.completed",
+        "usage": {
+          "input_tokens": 12,
+          "output_tokens": 3,
+          "cached_input_tokens": 4
+        }
+      }
+    ],
+    "expected": {
+      "outcome": "denied",
+      "reason": "role_schema",
+      "remote_acceptance": "accepted"
+    }
+  },
+  {
+    "version": 1,
+    "id": "bad-tool-arguments",
+    "request": {
+      "run_id": "replay-run",
+      "role": "planner",
+      "prompt": "Return the supplied role schema.",
+      "input_packet": {
+        "ORIGINAL_REQUEST": "Inspect public fixture note.txt; do not write."
+      },
+      "model_tier": "reviewed",
+      "max_output_tokens": 128,
+      "idempotency_key": "replay-only",
+      "model": "fixture-model",
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "additionalProperties": false
+      },
+      "tools": [
+        {
+          "name": "filesystem.read",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "additionalProperties": false
+          }
+        }
+      ]
+    },
+    "events": [
+      {
+        "type": "item.completed",
+        "item": {
+          "type": "agent_message",
+          "text": "{\"version\": \"anx_codex_role_v2\", \"output_json\": null, \"tool_calls\": [{\"name\": \"filesystem.read\", \"arguments_json\": \"{\\\"path\\\":42}\", \"call_id\": \"read\"}]}"
+        }
+      },
+      {
+        "type": "turn.completed",
+        "usage": {
+          "input_tokens": 12,
+          "output_tokens": 3,
+          "cached_input_tokens": 4
+        }
+      }
+    ],
+    "expected": {
+      "outcome": "denied",
+      "reason": "tool_schema"
+    }
+  }
+]

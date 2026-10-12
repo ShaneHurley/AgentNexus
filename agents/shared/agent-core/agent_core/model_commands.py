@@ -36,9 +36,15 @@ def register(parser_subcommands):
     for command in (inspect, explain, publish, diff, activate):
         command.add_argument("--directory", type=Path, help="Model snapshot directory")
     evaluation = parser_subcommands.add_parser("eval", help="Evaluate pinned offline task records")
-    evaluation.add_argument("--records", type=Path, required=True)
+    evaluation.add_argument("--mode", choices=("offline", "replay", "supervised"), default="offline")
+    evaluation.add_argument("--records", type=Path)
+    evaluation.add_argument("--input", type=Path)
+    evaluation.add_argument("--suite", type=Path)
+    evaluation.add_argument("--variant", choices=("baseline", "bounded-context-v1"), default="baseline")
+    evaluation.add_argument("--repetitions", type=int, default=3)
+    evaluation.add_argument("--output", type=Path)
     for flag in ("role", "evaluation-class", "candidate", "baseline", "corpus-hash", "catalog-hash", "routing-policy-hash"):
-        evaluation.add_argument("--" + flag, required=True)
+        evaluation.add_argument("--" + flag)
     evaluation.add_argument("--evidence-kind", choices=("mock", "measured"), default="mock")
     usage = parser_subcommands.add_parser("usage-report", help="Aggregate offline usage JSON; preserve unknown costs")
     usage.add_argument("--records", type=Path, required=True)
@@ -100,10 +106,26 @@ def execute(args, repository):
     Publishing a candidate never activates it; --confirm authorizes one exact pair.
     """
     if args.command == "eval":
-        return evaluate(_records(args.records), role=args.role, evaluation_class=args.evaluation_class,
-                        candidate=args.candidate, baseline=args.baseline, corpus_hash=args.corpus_hash,
-                        catalog_hash=args.catalog_hash, policy_hash=args.routing_policy_hash,
-                        evidence_kind=args.evidence_kind)
+        mode = getattr(args, "mode", "offline")
+        if mode == "replay":
+            from .replay import replay
+            if args.input is None: raise ValueError("replay requires --input")
+            result = replay(args.input)
+        elif mode == "supervised":
+            from .supervised_evaluation import run_suite
+            if args.suite is None: raise ValueError("supervised requires --suite")
+            result = run_suite(repository, args.suite, variant=args.variant, repetitions=args.repetitions)
+        else:
+            fields = ("records", "role", "evaluation_class", "candidate", "baseline", "corpus_hash", "catalog_hash", "routing_policy_hash")
+            if any(getattr(args, field, None) is None for field in fields): raise ValueError("offline eval requires records and all original qualification pins")
+            return evaluate(_records(args.records), role=args.role, evaluation_class=args.evaluation_class,
+                            candidate=args.candidate, baseline=args.baseline, corpus_hash=args.corpus_hash,
+                            catalog_hash=args.catalog_hash, policy_hash=args.routing_policy_hash,
+                            evidence_kind=args.evidence_kind)
+        if args.output is not None:
+            from .evaluation_io import write_report
+            write_report(args.output, result)
+        return result
     if args.command == "usage-report":
         from .efficiency_tools import usage_report
         return usage_report(_records(args.records))

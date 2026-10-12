@@ -22,6 +22,7 @@ REGISTERED_GET = [
     "/api/agents",
     "/api/usage",
     "/api/home/snapshot",
+    "/api/workshop/snapshot",
     "/api/docs",
     "/api/config/overlay",
     "/api/setup/runtimes",

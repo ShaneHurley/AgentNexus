@@ -1,4 +1,4 @@
-"""Shared policy helpers for IDE pack Cursor hooks (soft least-privilege; not PolicyGateway)."""
+"""Shared policy helpers for IDE pack Codex hooks (soft least-privilege; not PolicyGateway)."""
 
 from __future__ import annotations
 
@@ -22,6 +22,7 @@ MUTATING_TOOLS = frozenset(
         "Delete",
         "EditNotebook",
         "ApplyPatch",
+        "apply_patch",
         "NotebookEdit",
     }
 )
@@ -54,14 +55,13 @@ def emit(obj: dict[str, Any]) -> None:
 
 
 def deny(user_message: str, agent_message: str | None = None) -> None:
-    payload: dict[str, Any] = {"permission": "deny", "user_message": user_message}
-    if agent_message:
-        payload["agent_message"] = agent_message
-    emit(payload)
+    emit({"hookSpecificOutput": {"hookEventName": "PreToolUse",
+         "permissionDecision": "deny", "permissionDecisionReason": agent_message or user_message}})
 
 
 def allow() -> None:
-    emit({"permission": "allow"})
+    # Empty output object allows normal processing without granting authority.
+    emit({})
 
 
 def _load_json_list(path: Path, key: str) -> list[str]:
@@ -101,6 +101,7 @@ def bridge_active() -> bool:
 
 def agent_name_from_payload(payload: dict[str, Any]) -> str | None:
     for key in (
+        "agent_type",
         "agent",
         "agentName",
         "activeAgent",
@@ -160,10 +161,10 @@ def is_platform_subagent(name: str | None) -> bool:
 
 
 def agent_authority_class(name: str | None) -> str:
-    """readonly | allowlisted | platform | parent | unknown.
+    """readonly | allowlisted | unknown.
 
-    - parent (no name): main Cursor agent session — writes allowed (pack development).
-    - platform: Task built-ins — writes allowed unless also listed readonly (they aren't).
+    - Missing identity never grants mutation authority.
+    - Platform role names are not explicit write grants.
     - readonly: ide-agents research/master roles — mutations denied.
     - unknown named agent: fail-closed for mutations (spoof resistance).
     """
@@ -172,9 +173,9 @@ def agent_authority_class(name: str | None) -> str:
     if name and name in readonly_agents():
         return "readonly"
     if not name:
-        return "parent"
+        return "unknown"
     if is_platform_subagent(name):
-        return "platform"
+        return "unknown"
     return "unknown"
 
 
@@ -239,7 +240,7 @@ def append_audit(record: dict[str, Any]) -> None:
 
 
 def hook_event_name(payload: dict[str, Any]) -> str:
-    for key in ("hook_event", "event", "hookEvent", "type"):
+    for key in ("hook_event_name", "hook_event", "event", "hookEvent", "type"):
         val = payload.get(key)
         if val:
             return str(val)
@@ -251,7 +252,7 @@ def tool_name_from_payload(payload: dict[str, Any]) -> str | None:
         val = payload.get(key)
         if val is not None and str(val).strip():
             return str(val).strip()
-    inp = payload.get("input")
+    inp = payload.get("tool_input", payload.get("input"))
     if isinstance(inp, dict):
         for key in ("tool", "tool_name"):
             val = inp.get(key)
@@ -265,7 +266,7 @@ def shell_command_from_payload(payload: dict[str, Any]) -> str:
         val = payload.get(key)
         if val is not None:
             return str(val)
-    inp = payload.get("input")
+    inp = payload.get("tool_input", payload.get("input"))
     if isinstance(inp, dict):
         for key in ("command", "cmd"):
             if inp.get(key):
@@ -278,7 +279,7 @@ def file_path_from_payload(payload: dict[str, Any]) -> str:
         val = payload.get(key)
         if val is not None and str(val).strip():
             return str(val)
-    inp = payload.get("input")
+    inp = payload.get("tool_input", payload.get("input"))
     if isinstance(inp, dict):
         for key in ("file_path", "path", "filePath"):
             if inp.get(key):

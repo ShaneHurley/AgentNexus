@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 import threading
+import time
 
 
 class SupervisorAccess:
@@ -28,7 +29,9 @@ class SupervisorAccess:
             return False
 
     def start(self, request: Any, workspace: Path, *, live: bool = False, provider: str = "mock") -> dict[str, Any]:
+        started=time.monotonic()
         supervisor = self.supervisor()
+        stages={"supervisor_ms":round((time.monotonic()-started)*1000,3)}
         with self._session_lock:
             if not self._explicit_session:
                 workspace_key=str(Path(workspace).resolve())
@@ -36,9 +39,15 @@ class SupervisorAccess:
                     self._workspace_sessions[workspace_key]=supervisor.new_session(project=workspace_key)["session_id"]
                 self.session_id=self._workspace_sessions[workspace_key]
             session_id=self.session_id
+        stages["session_ms"]=round((time.monotonic()-started)*1000,3)-stages["supervisor_ms"]
+        stage_start=time.monotonic()
         row = supervisor.create_run(session_id, self.engine, request, str(workspace), live=live, provider=provider)
+        stages["create_ms"]=round((time.monotonic()-stage_start)*1000,3)
+        stage_start=time.monotonic()
         row = supervisor.execute(row["run_id"])
-        return {**row, "accepted": True, "queued": False,
+        stages["execute_ms"]=round((time.monotonic()-stage_start)*1000,3)
+        stages["total_ms"]=round((time.monotonic()-started)*1000,3)
+        return {**row, "request_stage_ms":stages, "accepted": True, "queued": False,
                 "execution_started": bool(row.get("execution_started", False)),
                 "acknowledged": bool(row.get("acknowledged", False))}
 

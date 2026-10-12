@@ -44,6 +44,29 @@ class PolicyGateway:
                 self.state.finish_tool_operation(op["operation_id"],result)
         return not self.state.pending_tool_operations(run_id)
 
+    def _expand_receipt(self,run_id,role,arguments):
+        from .tool_broker import redact
+        if set(arguments)-{"operation_ref","offset","limit"}: raise ToolDenied("receipt expansion cannot mix file arguments")
+        operation=self.state.tool_operation(arguments["operation_ref"])
+        if not operation or operation["run_id"]!=run_id or operation["role"]!=role or operation["state"]!="completed":
+            raise ToolDenied("receipt outside current run/role or incomplete")
+        if operation["tool"] not in {"filesystem.read","filesystem.list","filesystem.search","repository.status","repository.diff","repository.history"}:
+            raise ToolDenied("receipt is not an authorized read-only result")
+        self.broker.authorize(role,operation["tool"])
+        source=json.loads(operation["arguments"])
+        target=self.broker.safe_path(source.get("path","."))
+        try:
+            self.broker.authority.tool(role,operation["tool"],target=target)
+        except PermissionError as exc:
+            raise ToolDenied("receipt permission revoked") from exc
+        offset=arguments.get("offset",0); limit=arguments.get("limit",6000)
+        if type(offset) is not int or offset<0 or type(limit) is not int or not 1<=limit<=6000:
+            raise ToolDenied("invalid receipt expansion bounds")
+        body=redact(operation["result"])
+        return {"operation_ref":operation["operation_id"],"result_hash":sha256_text(operation["result"]),
+                "offset":offset,"content":body[offset:offset+limit],"truncated":offset+limit<len(body),
+                "next_offset":offset+limit if offset+limit<len(body) else None,"historical_receipt":True}
+
     def execute(self,run_id,role,phase,tool,arguments,plan_allowlist=None,plan_hash=None,operation_id=None):
         started=time.time(); operation=None; dispatched=False
         try:
@@ -82,8 +105,11 @@ class PolicyGateway:
             if old:
                 if old["state"]=="completed": return json.loads(old["result"])
                 raise ReconciliationRequired("tool outcome unknown; explicit reconciliation required")
+            expansion=self._expand_receipt(run_id,role,arguments) if tool=="filesystem.read" and "operation_ref" in arguments else None
             dispatched=True
-            if tool in {"tests.run","shell.readonly"}:
+            if expansion is not None:
+                result=expansion
+            elif tool in {"tests.run","shell.readonly"}:
                 result=self.broker.execute(role,tool,arguments,plan_allowlist=plan_allowlist,
                     cancel_check=lambda:self._cancel_requested(run_id))
             else:

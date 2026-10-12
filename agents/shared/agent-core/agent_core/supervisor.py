@@ -8,6 +8,7 @@ from .lifecycle import RunLock, RunBusy, ReconciliationRequired
 from .runtime_authority import repository_root, runtime_snapshot
 from .sessions import SessionStore, TERMINAL
 from .engine_adapters import DailyCoderAdapter, ResearchForgeAdapter
+from .providers.http import ProviderError
 
 
 class Supervisor:
@@ -25,7 +26,7 @@ class Supervisor:
     def runs(self,engine=None,session_id=None,limit=50):
         return [self.status(r["run_id"]) for r in self.store.runs(engine,session_id,limit)]
 
-    def create_run(self,session_id,engine,request,workspace,live=False, *, parent_id=None,idempotency_key=None,provider="mock",limit_usd=5.0,limit_tokens=80000,deadline=None,_imported=False,memory_binding=None):
+    def create_run(self,session_id,engine,request,workspace,live=False, *, parent_id=None,idempotency_key=None,provider="mock",limit_usd=5.0,limit_tokens=80000,deadline=None,_imported=False,memory_binding=None,context_variant="baseline",context_evaluation=False,reference_documents=()):
         if engine not in self.adapters: raise ContractDenied("unknown or unavailable execution engine")
         workspace=Path(workspace).resolve()
         if not workspace.is_dir(): raise ValueError("workspace must exist")
@@ -41,6 +42,17 @@ class Supervisor:
         if memory_binding is not None:
             from .memory_runtime import pin_binding
             snapshot.update(pin_binding(memory_binding,session,workspace,engine))
+        from .context_runtime import context_pin
+        if context_variant != "baseline" and not context_evaluation:
+            raise ContractDenied("bounded context is evaluation-only until its qualification gate passes")
+        snapshot.update(context_pin(context_variant))
+        snapshot["context_evaluation"] = bool(context_evaluation)
+        if reference_documents:
+            if engine!="daily-coder" or not context_evaluation or context_variant!="bounded-context-v1":
+                raise ContractDenied("supplied references require an explicit coding-context evaluation")
+            from .reference_context import pin_references
+            snapshot["reference_documents"]=pin_references(reference_documents,workspace,self.repository)
+            snapshot["document_strategy"]={"version":1,"strategy":"supplied-plan-v1","production_activated":False}
         registry=runtime_snapshot().snapshot_id
         row=self.store.create_run(session_id,engine,request,workspace,snapshot,registry,parent_id=parent_id,task_key=idempotency_key,limit_usd=limit_usd,limit_tokens=limit_tokens,deadline=deadline,live=live,imported=_imported)
         return self.status(row["run_id"])
@@ -57,6 +69,19 @@ class Supervisor:
         check_binding(row["snapshot"])
         for field in ("memory_binding","memory_binding_path","memory_binding_hash","memory_store_id"):
             if field in row["snapshot"]:snapshot[field]=row["snapshot"][field]
+        if "context_policy" in row["snapshot"]:
+            from .context_runtime import context_pin
+            expected=context_pin(row["snapshot"]["context_policy"]["variant"])
+            if any(row["snapshot"].get(k)!=v for k,v in expected.items()): raise ContractDenied("context policy pin changed")
+            snapshot.update(expected)
+            snapshot["context_evaluation"]=row["snapshot"].get("context_evaluation",False)
+        if row["snapshot"].get("reference_documents"):
+            from .reference_context import pin_references
+            expected=pin_references([x["path"] for x in row["snapshot"]["reference_documents"]],row["workspace"],self.repository)
+            if expected!=row["snapshot"]["reference_documents"]:
+                raise ContractDenied("supplied reference changed; start a new run")
+            snapshot["reference_documents"]=expected
+            snapshot["document_strategy"]=row["snapshot"]["document_strategy"]
         return snapshot,runtime_snapshot().snapshot_id
 
     def status(self,key):
@@ -64,6 +89,16 @@ class Supervisor:
         events=self.store.events(row["run_id"])
         row["execution_started"]=any(e["kind"] == "status" and e["payload"].get("engine_dispatch") for e in events)
         row["accounting"]=self.store.accounting(row["run_id"])
+        subscription=row["snapshot"].get("provider")=="codex_cli"
+        # Existing USD buckets represent API cash exposure. Subscription value
+        # remains unknown even when all reported tokens have been reconciled.
+        row["accounting"]["known_api_cash_usd"]=sum(row["accounting"][k] for k in ("estimated_usd","reported_usd","reconciled_usd"))
+        with self.store.connect() as connection:
+            descendants=connection.execute("WITH RECURSIVE children(id) AS (SELECT ? UNION ALL SELECT runs.run_id FROM runs JOIN children ON runs.parent_id=children.id) SELECT snapshot FROM runs JOIN children ON runs.run_id=children.id",(row["run_id"],)).fetchall()
+        import json
+        subscription=subscription or any(json.loads(child["snapshot"]).get("provider")=="codex_cli" for child in descendants)
+        row["accounting"]["total_cost_usd"]=None if subscription or row["accounting"]["usage_status"]=="unknown" else row["accounting"]["known_api_cash_usd"]
+        row["accounting"]["billing_kind"]="chatgpt_subscription" if subscription else "api"
         row["artifacts"]=self.store.artifacts(row["run_id"])
         row["cancelled"]=row["status"] == "CANCELLED"
         row["acknowledged"]=row["cancelled"] if row["cancel_requested"] else row["execution_started"]
@@ -86,7 +121,10 @@ class Supervisor:
     def _settle(self,row,call_id,result):
         result=self._record_memory(row,result)
         usage=result.get("usage") or {}
-        if usage.get("unknown") or usage.get("usd") is None or usage.get("tokens") is None or result.get("status") == "RECONCILIATION_REQUIRED":
+        subscription=(row["snapshot"].get("provider")=="codex_cli" and bool(row["snapshot"].get("codex_configuration_hash"))
+                      and usage.get("billing_kind")=="chatgpt_subscription" and usage.get("known_api_cash_usd")==0)
+        usd_value=usage.get("known_api_cash_usd") if subscription else usage.get("usd")
+        if usage.get("unknown") or usd_value is None or usage.get("tokens") is None or result.get("status") == "RECONCILIATION_REQUIRED":
             self.store.finish_call(call_id,"unknown")
             self.store.checkpoint(row["run_id"],result,result.get("artifacts",()))
             return self.status(row["run_id"])
@@ -98,7 +136,7 @@ class Supervisor:
         tokens=usage.get("tokens")
         if tokens is None: tokens=row["limit_tokens"]
         tokens=max(0,int(tokens)-previous_tokens)
-        usd=max(0,float(usage.get("usd",0))-previous_usd)
+        usd=max(0,float(usd_value)-previous_usd)
         pending=next(c for c in self.store.pending_calls(row["run_id"]) if c["call_id"]==call_id)
         overrun=tokens > pending["estimated_tokens"] or usd > pending["estimated_usd"] + 1e-9
         self.store.finish_call(call_id,"confirmed",tokens=tokens,usd=usd,usage_status=usage.get("usage_status","estimated"))
@@ -125,8 +163,8 @@ class Supervisor:
             try:
                 snapshot,registry=self._current(row)
                 self.store.check_pin(key,snapshot,registry)
-            except (ContractDenied,ValueError) as exc:
-                self.store.update(key,"BLOCKED",payload={"reason":str(exc)})
+            except (ContractDenied,ValueError,ProviderError) as exc:
+                self.store.update(key,"BLOCKED",payload={"reason":exc.category if isinstance(exc,ProviderError) else str(exc)})
                 return self.status(key)
             if row["cancel_requested"]: return self._cancel_idle(row,adapter)
             pending=self.store.pending_calls(key)
@@ -147,7 +185,8 @@ class Supervisor:
                     self.store.checkpoint(key,result,result.get("artifacts",()))
                     self.store.update(key,result["status"])
                     return self.status(key)
-            if row["limit_tokens"] <= 0 or row["limit_usd"] <= 0:
+            subscription=row["snapshot"].get("provider")=="codex_cli" and bool(row["snapshot"].get("codex_configuration_hash"))
+            if row["limit_tokens"] <= 0 or (row["limit_usd"] <= 0 and not subscription):
                 self.store.update(key,"BLOCKED",payload={"reason":"resource ceiling exhausted before dispatch"})
                 return self.status(key)
             spent=self.store.accounting(row["root_id"])
@@ -156,8 +195,8 @@ class Supervisor:
             available_tokens=max(0,root["limit_tokens"]-spent["tokens"]-spent["reserved_tokens"])
             available_usd=max(0,root["limit_usd"]-sum(spent[k] for k in ("estimated_usd","reported_usd","reconciled_usd","reserved_usd")))
             tokens=max(0,row["limit_tokens"]-own["tokens"])
-            usd=max(0,row["limit_usd"]-sum(own[k] for k in ("estimated_usd","reported_usd","reconciled_usd")))
-            if tokens <= 0 or usd <= 0 or tokens > available_tokens or usd > available_usd + 1e-9:
+            usd=0.0 if subscription else max(0,row["limit_usd"]-sum(own[k] for k in ("estimated_usd","reported_usd","reconciled_usd")))
+            if tokens <= 0 or (usd <= 0 and not subscription) or tokens > available_tokens or usd > available_usd + 1e-9:
                 self.store.update(key,"BLOCKED",payload={"reason":"parent headroom cannot cover native remaining resource grant"})
                 return self.status(key)
             if not row["legacy_id"]:

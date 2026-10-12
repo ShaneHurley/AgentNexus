@@ -1,0 +1,34 @@
+{
+  "hooks": {
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python '/Users/shurley/Documents/AgentNexus/.codex/hooks/enforce-agent-authority.py'"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python '/Users/shurley/Documents/AgentNexus/.codex/hooks/deny-mutating-for-readonly.py'"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python '/Users/shurley/Documents/AgentNexus/.codex/hooks/session-audit.py'"
+          }
+        ]
+      }
+    ]
+  }
+}

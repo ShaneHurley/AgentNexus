@@ -36,6 +36,7 @@ def main(argv=None):
     configure.add_argument("--pins",type=Path,required=True)
     configure.add_argument("--confirm",action="store_true")
     codex_sub.add_parser("inspect")
+    codex_sub.add_parser("doctor").add_argument("--json",action="store_true")
     agents=commands.add_parser("agents",help="Read-only audit of existing IDE and browser capabilities")
     audit=agents.add_subparsers(dest="agents_command",required=True).add_parser("audit")
     audit.add_argument("--select",action="append",default=[])
@@ -58,12 +59,20 @@ def main(argv=None):
     run.add_argument("--budget-usd",type=float,default=5.0)
     run.add_argument("--token-limit",type=int,default=80000)
     run.add_argument("--deadline-seconds",type=float)
+    run.add_argument("--execution-policy",choices=("legacy","coder-v1"),default="legacy")
+    run.add_argument("--approval-mode",choices=("plan","task"),default="plan")
+    run.add_argument("--task-contract",type=Path)
     resume=commands.add_parser("resume",help="Reconcile and resume a pinned run")
     resume.add_argument("run_id")
     resume.add_argument("--answer",action="append",default=[])
     for name in ("status","cancel"):
         command=commands.add_parser(name)
         command.add_argument("run_id")
+    reconcile=commands.add_parser("reconcile-read",help="Acknowledge an unavailable pure read without rerunning it")
+    reconcile.add_argument("run_id")
+    reconcile.add_argument("--operation-id",required=True)
+    reconcile.add_argument("--actor",required=True)
+    reconcile.add_argument("--ack-result-unavailable",action="store_true")
     runs=commands.add_parser("runs")
     runs.add_argument("--engine")
     runs.add_argument("--session")
@@ -81,6 +90,11 @@ def main(argv=None):
             from .runtime_authority import repository_root
             from .codex_settings import configure,load_settings
             repository=args.repository or repository_root()
+            if args.codex_command=="doctor":
+                from .codex_doctor import doctor
+                result=doctor(repository)
+                print(json.dumps(result,indent=2,allow_nan=False))
+                return 0 if result["ready"] else 3
             result=configure(repository,json.loads(args.pins.read_text()),confirmed=args.confirm) if args.codex_command=="configure" else load_settings(repository)
             print(json.dumps(result,indent=2,allow_nan=False));return 0
         if args.command == "agents":
@@ -112,14 +126,21 @@ def main(argv=None):
                 try: request=json.loads(request)
                 except json.JSONDecodeError: request={"topic":request,"objective":request}
             deadline=time.time()+args.deadline_seconds if args.deadline_seconds is not None else None
-            row=supervisor.create_run(args.session,args.engine,request,args.workspace,args.live,provider=args.provider,idempotency_key=args.idempotency_key,limit_usd=args.budget_usd,limit_tokens=args.token_limit,deadline=deadline,memory_binding=args.memory_binding,context_variant=args.context_variant,context_evaluation=args.context_evaluation,reference_documents=args.reference_document)
+            row=supervisor.create_run(args.session,args.engine,request,args.workspace,args.live,provider=args.provider,idempotency_key=args.idempotency_key,limit_usd=args.budget_usd,limit_tokens=args.token_limit,deadline=deadline,memory_binding=args.memory_binding,context_variant=args.context_variant,context_evaluation=args.context_evaluation,reference_documents=args.reference_document,execution_policy=args.execution_policy,approval_mode=args.approval_mode,task_contract=json.loads(args.task_contract.read_text()) if args.task_contract else None)
+            from .coder_capacity import announce_capacity
+            announce_capacity(supervisor,row["run_id"])
             result=supervisor.execute(row["run_id"]); code=exit_status(result)
+        elif args.command == "reconcile-read":
+            result=supervisor.reconcile_read(args.run_id,args.operation_id,actor=args.actor,acknowledge_unavailable=args.ack_result_unavailable)
+            code=0
         elif args.command == "resume":
             answers={}
             for item in args.answer:
                 key,sep,value=item.partition("=")
                 if not sep or not key: raise ValueError("answer requires CLQ-ID=value")
                 answers[key]=value
+            from .coder_capacity import announce_capacity
+            announce_capacity(supervisor,args.run_id)
             result=supervisor.execute(args.run_id,answers=answers or None); code=exit_status(result)
         print(json.dumps(result,indent=2,allow_nan=False,default=str))
         return code

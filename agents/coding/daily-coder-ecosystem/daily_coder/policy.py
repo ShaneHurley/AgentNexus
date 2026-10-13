@@ -11,10 +11,12 @@ class ApprovalRequired(RuntimeError):
         self.kind=kind; self.subject_hash=subject_hash; self.detail=detail or {}
 
 WRITE_TOOLS={"filesystem.write","patch.apply"}
+PURE_READ_TOOLS=frozenset({"filesystem.read","filesystem.list"})
 
 class PolicyGateway:
-    def __init__(self,broker,state,policies,approvals_required=True,deadline=None):
+    def __init__(self,broker,state,policies,approvals_required=True,deadline=None,task_contract=None):
         self.broker=broker; self.state=state; self.policies=policies; self.approvals_required=approvals_required; self.deadline=deadline
+        self.task_contract=task_contract
 
     def _cancel_requested(self,run_id):
         if self.deadline is not None and time.time()>=self.deadline: self.state.request_cancel(run_id)
@@ -73,6 +75,12 @@ class PolicyGateway:
             if self._cancel_requested(run_id) or self.state.get(run_id)["status"]=="RECONCILIATION_REQUIRED":
                 raise ReconciliationRequired("tool dispatch blocked by run status")
             self.broker.authorize(role,tool)
+            if self.task_contract is not None:
+                from agent_core.task_contract import validate_call
+                from agent_core.contracts import ContractDenied
+                try: validate_call(self.task_contract,tool,arguments,self.broker.repo)
+                except ContractDenied as exc:
+                    raise ToolDenied(str(exc)) from exc
             self._approved(run_id,tool,plan_hash)
             identity={"run":run_id,"role":role,"phase":phase,"tool":tool,"arguments":arguments,"plan":plan_hash}
             operation=operation_id or (sha256_text(canonical_json(identity)) if tool in WRITE_TOOLS else str(uuid.uuid4()))
@@ -132,6 +140,16 @@ class PolicyGateway:
             if operation: self.state.finish_tool_operation(operation,{"error":str(exc)},"denied")
             self.state.record_tool_call(run_id,role,phase,tool,arguments,"blocked" if isinstance(exc,ApprovalRequired) else "deny",str(exc),None,int((time.time()-started)*1000))
             raise
+        except OSError as exc:
+            if dispatched and operation and tool in PURE_READ_TOOLS:
+                result = {"read_failed": True, "error": type(exc).__name__, "message": "Filesystem read unavailable"}
+                self.state.finish_tool_operation(operation, result)
+                self.state.record_tool_call(run_id,role,phase,tool,arguments,"error",result["error"],sha256_text(canonical_json(result)),int((time.time()-started)*1000))
+                return result
+            if operation:
+                self.state.set_status(run_id,"RECONCILIATION_REQUIRED")
+                raise ReconciliationRequired("tool outcome unknown; receipt retained") from exc
+            raise
         except BaseException as exc:
             # The broker may have executed before raising, including process interruption.
             if operation:
@@ -141,7 +159,10 @@ class PolicyGateway:
 
     def safe_execute(self,run_id,role,phase,tool,arguments,plan_allowlist=None,plan_hash=None,operation_id=None):
         try:
-            return {"ok":True,"result":self.execute(run_id,role,phase,tool,arguments,plan_allowlist,plan_hash,operation_id)}
+            result=self.execute(run_id,role,phase,tool,arguments,plan_allowlist,plan_hash,operation_id)
+            if isinstance(result,dict) and result.get("read_failed") is True:
+                return {"ok":False,**result}
+            return {"ok":True,"result":result}
         except ReconciliationRequired: raise
         except ApprovalRequired as exc:
             return {"ok":False,"error":"approval_required","message":str(exc),"kind":exc.kind}

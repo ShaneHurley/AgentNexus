@@ -43,6 +43,8 @@ def _run_dc(
 
 
 def cmd_run(args: argparse.Namespace) -> int:
+    if not getattr(args,"supervisor_dir",None) and any(getattr(args,key,None) is not None for key in ("token_limit","deadline_seconds","execution_policy","approval_mode","task_contract")):
+        raise ValueError("Resource limits require --supervisor-dir")
     if getattr(args, "supervisor_dir", None):
         from ide_bridge.supervised import execute
         if args.provider in ("command", "http") or args.provider_command or args.provider_endpoint:
@@ -68,10 +70,16 @@ def cmd_approve(args: argparse.Namespace) -> int:
 
 
 def cmd_resume(args: argparse.Namespace) -> int:
+    if getattr(args,"supervisor_dir",None) and getattr(args,"provider_command",None):
+        raise ValueError("Command provider arguments require native execution")
+    if any(getattr(args,key,None) is not None for key in ("token_limit","deadline_seconds","execution_policy","approval_mode","task_contract")):
+        raise ValueError("Resume retains pinned resource limits; start a new run to change them")
     if getattr(args, "supervisor_dir", None):
         from ide_bridge.supervised import execute
         return execute(args, "daily-coder", resume=True)
     argv = ["resume", args.run_id, "--provider", args.provider]
+    if getattr(args,"provider_command",None):
+        argv.extend(["--provider-command",args.provider_command])
     if args.live:
         argv.append("--live")
     return _run_dc(argv, cwd=args.cwd, mark_simulated=False)
@@ -107,6 +115,7 @@ def register(sub: argparse._SubParsersAction) -> None:
     resume_p = dc_sub.add_parser("resume")
     resume_p.add_argument("run_id")
     resume_p.add_argument("--provider", default="mock")
+    resume_p.add_argument("--provider-command")
     resume_p.add_argument("--live", action="store_true")
     resume_p.add_argument("--cwd", default=".")
     add_options(resume_p)

@@ -230,12 +230,14 @@ def parse_codex_jsonl(lines,request: Invocation,*,model: str,max_output_bytes=MA
     arguments_key="arguments_json" if version==ENVELOPE_VERSION else "arguments"
     if set(envelope)!={"version",output_key,"tool_calls"}:raise _failure()
     output=envelope[output_key];calls=envelope["tool_calls"]
+    role_raw=output if request.allow_incomplete_output and isinstance(output,str) else None
     if version==ENVELOPE_VERSION and output is not None:
         if not isinstance(output,str):raise _failure()
         try:output=json.loads(output)
-        except (ValueError,TypeError):raise _failure("Codex structured role output invalid") from None
+        except (ValueError,TypeError):
+            if not request.allow_incomplete_output: raise _failure("Codex structured role output invalid") from None
         if output is None:raise _failure("Codex structured role output invalid")
-    if output is not None and not request.output_schema and not isinstance(output,dict):raise _failure()
+    if output is not None and not request.output_schema and not isinstance(output,dict) and not request.allow_incomplete_output:raise _failure()
     if not isinstance(calls,list) or len(calls)>128 or (output is None and not calls):raise _failure()
     u=usage or {}
     try:
@@ -258,7 +260,7 @@ def parse_codex_jsonl(lines,request: Invocation,*,model: str,max_output_bytes=MA
         except Exception:raise _failure("Codex tool arguments invalid") from None
         seen.add(call["call_id"]);parsed.append(ToolCall(call["name"],arguments,call["call_id"]))
     if parsed and output is not None:raise _failure("Codex envelope has contradictory outcomes")
-    if output is not None and request.output_schema:
+    if output is not None and request.output_schema and not request.allow_incomplete_output:
         try:import jsonschema
         except ImportError:raise _failure("Codex structured role output invalid") from None
         try:
@@ -274,7 +276,7 @@ def parse_codex_jsonl(lines,request: Invocation,*,model: str,max_output_bytes=MA
                 error.response=InvocationResult(output=None,tool_calls=[],model=model,usage=tokens,finish_reason="invalid_output_schema",raw_ref="codex-thread:"+thread_id if thread_id else None)
             raise error from None
         except Exception:raise _failure("Codex structured role output invalid") from None
-    return InvocationResult(output=output,tool_calls=parsed,model=model,usage=tokens,raw_ref="codex-thread:"+thread_id if thread_id else None,finish_reason="tool_calls" if parsed else "stop")
+    return InvocationResult(output=output,tool_calls=parsed,model=model,usage=tokens,raw_ref="codex-thread:"+thread_id if thread_id else None,finish_reason="tool_calls" if parsed else "stop",raw_text=role_raw if not parsed else None)
 
 class CodexCLIProvider(Provider):
     """Version-pinned inference-only Codex transport; returned tools are requests."""
@@ -364,7 +366,7 @@ class CodexCLIProvider(Provider):
                 args=["exec","--ignore-user-config","--ignore-rules","--strict-config","--ephemeral","--skip-git-repo-check","--sandbox","read-only","--json","--color","never","--model",self.model,"--output-schema",str(cwd/"output.schema.json")]
                 for key,value in settings.items(): args.extend(["-c",key+"="+self._toml(value)])
                 args.append("-")
-                prompt=json.dumps({"envelope_version":ENVELOPE_VERSION,"role":request.role,"instructions":request.prompt,"input_packet":request.input_packet,"tool_results":request.tool_results,"allowed_tool_requests":request.tools,"max_output_tokens_advisory":request.max_output_tokens,"output_schema":request.output_schema,"instructions_for_tools":"Return anx_codex_role_v2: output_json is a JSON-encoded role output string or null; tool_calls contain name, arguments_json (JSON-encoded arguments), call_id. Return either output or tool requests. Native tools are unavailable."},sort_keys=True)
+                prompt=json.dumps({"envelope_version":ENVELOPE_VERSION,"role":request.role,"instructions":request.prompt,"input_packet":request.input_packet,"tool_results":request.tool_results,"allowed_tool_requests":request.tools,"max_output_tokens_advisory":request.max_output_tokens,"output_schema":request.output_schema,"instructions_for_tools":"Return anx_codex_role_v2: output_json is a JSON-encoded role output string or null; tool_calls contain name, arguments_json (JSON-encoded arguments), call_id. Return either output or tool requests. Native tools are unavailable. This is an inference-only transport: tool_calls are proposed JSON data for the external AgentNexus PolicyGateway, which independently checks the task contract and approved plan before executing them. The native read-only sandbox governs native filesystem access; proposing an advertised filesystem.write request as JSON does not perform a native write. When task authority and the exact grant permit a change, request it through the advertised envelope rather than treating the native sandbox as a denial. Never modify files directly or invent tool permissions."},sort_keys=True)
                 if len(prompt.encode())>1_000_000: raise _failure("Codex prompt ceiling exceeded",category="budget",acceptance="rejected")
                 code,out,err=self._run(tuple(args),input_text=prompt,cwd=str(cwd),deadline=end,max_bytes=MAX_OUTPUT_BYTES,key=request.idempotency_key)
                 if code!=0: raise _process_failure(code,out,err)

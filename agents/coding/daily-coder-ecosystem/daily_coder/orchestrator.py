@@ -40,6 +40,7 @@ class Orchestrator:
         self.registry_snapshot = runtime_snapshot()
         self.state = state
         self.provider = provider
+        self.task_contract = None
         self.live = bool(live)
         limits=dict(resource_limits or {})
         if limits.get("deadline","absent") is None: limits.pop("deadline")
@@ -247,7 +248,7 @@ class Orchestrator:
         authority = RuntimeAuthority("dc",repo,snapshot=self.registry_snapshot,task_layers=self.config.get("task_grants"))
         broker = ToolBroker(repo, self.tools_config, self.policies,authority=authority)
         self._register_network(broker)
-        gateway = PolicyGateway(broker, self.state, self.policies, self.approvals_required and self.live,deadline=self.resource_limits.get("deadline"))
+        gateway = PolicyGateway(broker, self.state, self.policies, self.approvals_required and self.live,deadline=self.resource_limits.get("deadline"),task_contract=self.task_contract)
 
         if row["phase"] == Phase.NEW.value:
             self.state.transition(run_id, Phase.INTAKE.value, {"request_hash": sha256_text(row["request"])}, f"{run_id}:INTAKE")
@@ -429,12 +430,7 @@ class Orchestrator:
         self.state.transition(run_id, "READY_TO_BUILD", {"plan_hash": plan_hash}, f"{run_id}:READY_TO_BUILD:c{cycles}")
         return "ok"
 
-    def _acceptance(self, run_id, packet):
-        row = self.state.get(run_id)
-        if not row.get("plan_hash"):
-            self._halt(run_id, "acceptance", {"failures": ["no pinned plan hash"]})
-            return "stop"
-        approvals_ok = self.state.approval_state(run_id, "plan", row["plan_hash"]) == "approved"
+    def _acceptance_verification(self,run_id,row):
         verification_results = []
         for call in self.state.tool_calls(run_id, limit=1000):
             if (call["role"] != "test_executor" or call["phase"] != "TEST_EXECUTE"
@@ -442,10 +438,19 @@ class Orchestrator:
                 continue
             summary = json.loads(call["result_summary"]) if call.get("result_summary") else {}
             verification_results.append({**summary, "decision": call["decision"]})
+        return verification_results,self.state.jobs(run_id)
+
+    def _acceptance(self, run_id, packet):
+        row = self.state.get(run_id)
+        if not row.get("plan_hash"):
+            self._halt(run_id, "acceptance", {"failures": ["no pinned plan hash"]})
+            return "stop"
+        approvals_ok = self.state.approval_state(run_id, "plan", row["plan_hash"]) == "approved"
+        verification_results,job_results=self._acceptance_verification(run_id,row)
         result = acceptance_gate.evaluate(run=row, packet=packet, artifacts=self.state.artifacts(run_id),
                                           approvals_ok=approvals_ok, live=self.live, config=self.config,
                                           verification_results=verification_results,
-                                          job_results=self.state.jobs(run_id))
+                                          job_results=job_results)
         packet["acceptance"] = result
         self.artifacts.put(run_id, "acceptance", "orchestrator", result)
         if result["verdict"] == "fail":
@@ -545,6 +550,9 @@ class Orchestrator:
                 "instruction": "Complete only this chunk, validate it, then stop.",
             }})
             result = self._invoke(run_id, "implementer", "IMPLEMENT", packet, index, profile, gateway, extra)
+            if self.task_contract:
+                from agent_core.handoffs import is_incomplete
+                if is_incomplete(result): return result
             results.append(result)
             if result.get("blocked"):
                 break
@@ -579,6 +587,75 @@ class Orchestrator:
                 # repair path. Invalid output never reaches a phase artifact.
                 return receipt
             raise
+
+    def _sanitized_handoff_payload(self,value):
+        from agent_core.handoffs import sanitized_raw
+        if isinstance(value,str): return sanitized_raw(value)
+        if isinstance(value,list): return [self._sanitized_handoff_payload(item) for item in value]
+        if isinstance(value,dict):
+            sensitive={"apikey","secret","password","passwd","token","bearer","authorization"}
+            return {key:"[REDACTED]" if str(key).lower().replace("_","").replace("-","").replace(" ","") in sensitive else self._sanitized_handoff_payload(item) for key,item in value.items()}
+        return value
+    def _begin_role_handoff(self,run_id,role,phase,key,result):
+        from agent_core.handoffs import sanitized_raw
+        from agent_core.task_contract import digest
+        source=result.raw_text if result.raw_text is not None else result.output
+        raw=sanitized_raw(source)
+        raw_record=self.artifacts.put(run_id,"role_raw",role,{"schema_version":1,"invocation_id":key,
+            "raw":raw,"raw_sha256":sha256_text(raw)})
+        routes={"planner":("runtime:plan_review","runtime"),"implementer":("runtime:test_execute","runtime"),
+            "code_reviewer":("runtime:review_gate","runtime"),"plan_reviewer":("agent:implementer","agent"),
+            "alignment_checker":("runtime:acceptance","runtime"),"failure_diagnostician":("runtime:repair","runtime")}
+        recipient,kind=routes.get(role,("runtime:control","runtime"))
+        metadata={"schema_version":1,"revision":0,"producer":role,"intended_recipient":recipient,"recipient_kind":kind,
+            "run_id":run_id,"phase":phase,"invocation_id":key,"raw_artifact_ref":raw_record,
+            "raw_sha256":sha256_text(raw),"parsed_payload":None,"validation_problems":["not yet normalized"],
+            "evidence_refs":[{"kind":"provider_usage","invocation_id":key}],
+            "task_contract_hash":digest(self.task_contract),"delivery":"pending","acknowledgment":"pending"}
+        if result.raw_ref:
+            metadata["evidence_refs"].append({"kind":"provider_response","ref":str(result.raw_ref)[:500]})
+        self.artifacts.put(run_id,"handoff_metadata",role,metadata)
+        return metadata
+    def _role_handoff_metadata(self,run_id):
+        latest={}
+        for artifact in self.state.artifacts(run_id):
+            if artifact["kind"]!="handoff_metadata": continue
+            value=json.loads(Path(artifact["path"]).read_text())["payload"]
+            previous=latest.get(value["invocation_id"])
+            if previous is None or value.get("revision",0)>=previous.get("revision",0):
+                latest[value["invocation_id"]]=value
+        return latest
+    def _ack_role_handoffs(self,run_id,recipient,*,producers=(),route="workflow",invocation_id=None,source_invocation=None):
+        for metadata in self._role_handoff_metadata(run_id).values():
+            if metadata["delivery"]=="delivered": continue
+            intended=metadata["intended_recipient"]==recipient
+            recovery=metadata["producer"] in producers
+            exact=source_invocation is None or metadata["invocation_id"]==source_invocation
+            if not exact or not (intended or recovery): continue
+            if route=="workflow" and metadata["parsed_payload"] is None: continue
+            value={**metadata,"revision":metadata.get("revision",0)+1,"delivery":"delivered","acknowledgment":"received","delivered_to":recipient,
+                "delivery_route":route,"recipient_invocation_id":invocation_id}
+            self.artifacts.put(run_id,"handoff_metadata","runtime",value)
+            self.artifacts.put(run_id,"handoff_delivery","runtime",{"schema_version":1,
+                "producer":metadata["producer"],"recipient":recipient,"recipient_kind":"agent" if recipient.startswith("agent:") else "runtime",
+                "invocation_id":metadata["invocation_id"],"raw_artifact_ref":metadata["raw_artifact_ref"],
+                "delivery":"delivered","acknowledgment":"received","delivery_route":route,"recipient_invocation_id":invocation_id})
+    def _ack_agent_role_handoffs(self,request):
+        incoming=request.input_packet.get("INCOMPLETE_UPSTREAM_HANDOFFS",[])
+        producers=[item.get("producer") for item in incoming if isinstance(item,dict)] if isinstance(incoming,list) else []
+        delivered=request.input_packet.get("UPSTREAM_ROLE_HANDOFFS",[])
+        if isinstance(delivered,list):
+            for item in delivered:
+                if isinstance(item,dict) and isinstance(item.get("invocation_id"),str):
+                    self._ack_role_handoffs(request.run_id,"agent:"+request.role,route="workflow",
+                        invocation_id=request.idempotency_key,source_invocation=item["invocation_id"])
+        if producers:
+            self._ack_role_handoffs(request.run_id,"agent:"+request.role,producers=producers,
+                route="format_recovery",invocation_id=request.idempotency_key)
+        if request.input_packet.get("OUTPUT_CORRECTION"):
+            original=request.idempotency_key.rsplit(":retry",1)[0]
+            self._ack_role_handoffs(request.run_id,"agent:"+request.role,producers=[request.role],
+                route="format_repair",invocation_id=request.idempotency_key,source_invocation=original)
 
     def _record_provider_failure(self,run_id,key,error):
         categories={"transport","response","configuration","authorization","account_limit","budget","deadline","cancelled","security"}
@@ -708,6 +785,10 @@ class Orchestrator:
             from agent_core.context_runtime import bound_role_evidence
             sliced=bound_role_evidence(sliced)
         allowed_tools = [t for t in self.tools_config["role_allowlists"].get(role, []) if t in authority.effective(role).capabilities("tools")]
+        if self.task_contract and role=="implementer":
+            allowed_tools=[name for name in allowed_tools if name in {"filesystem.read","filesystem.list","filesystem.search","filesystem.write","patch.apply","repository.diff","repository.status"}]
+        if self.task_contract and (extra or {}).get("READ_ONLY_RECOVERY"):
+            allowed_tools=[name for name in allowed_tools if name in {"filesystem.read","filesystem.list","filesystem.search","repository.status","repository.diff","repository.history"}]
         # Tools are advertised only when a gateway can actually authorize and record them.
         tool_specs = schemas_for(allowed_tools) if (self.live and gateway is not None) else []
         sliced["permissions"]={"effective_role":role,"allowed_tools":[tool["name"] for tool in tool_specs],
@@ -724,11 +805,12 @@ class Orchestrator:
         max_turns = int(cfg.get("max_tool_turns", role_turns.get(role, self.config.get("max_tool_turns", 6))))
         plan_allowlist = packet.get("file_allowlist") or (packet.get("plan") or {}).get("file_allowlist") or []
         plan_hash = packet.get("plan_hash") or self.state.get(run_id).get("plan_hash")
-        if self.live and role in {"implementer", "test_author", "documenter"} and not plan_hash:
+        if self.live and role in {"implementer", "test_author", "documenter"} and not plan_hash and not (self.task_contract and (extra or {}).get("READ_ONLY_RECOVERY")):
             raise ValueError(f"{role} requires a pinned plan hash")
 
         grant = authority.effective(role)
         max_turns = min(max_turns,int(grant.ceiling("tool_turns")))
+        if self.task_contract: max_turns=min(max_turns,self.task_contract["limits"]["tool_rounds"])
         wall_time = grant.ceiling("wall_time")
         if wall_time <= 0: raise ContractDenied("invocation has no wall-time grant")
         invocation_started = time.monotonic()
@@ -760,7 +842,7 @@ class Orchestrator:
                                  idem_key, model=model,
                                  tools=tuple(turn_specs), tool_results=tuple(tool_context), turn=turn,
                                  reasoning=bool(cfg.get("reasoning", False)), output_schema=schema,
-                                 deadline=min(self.resource_limits.get("deadline") or float("inf"),time.time()+max(0,wall_time-(time.monotonic()-invocation_started))),max_transport_retries=getattr(self.provider,"max_transport_retries",2))
+                                 deadline=min(self.resource_limits.get("deadline") or float("inf"),time.time()+max(0,wall_time-(time.monotonic()-invocation_started))),max_transport_retries=getattr(self.provider,"max_transport_retries",2),allow_incomplete_output=bool(self.task_contract))
             started = time.time()
             try:
                 result = self._invoke_provider(request)
@@ -782,6 +864,10 @@ class Orchestrator:
                                          result.input_tokens, result.output_tokens, usd,
                                          int((time.time() - started) * 1000), "ok", None,
                                          idem_key)
+            handoff_metadata=None
+            if self.task_contract:
+                self._ack_agent_role_handoffs(request)
+                if not result.tool_calls: handoff_metadata=self._begin_role_handoff(run_id,role,phase,idem_key,result)
             self._dispatch_boundary(run_id)
             if time.monotonic()-invocation_started >= wall_time:
                 raise ContractDenied("invocation exceeded wall-time grant; usage recorded")
@@ -793,38 +879,63 @@ class Orchestrator:
                     seen_tool_calls[fingerprint] = seen_tool_calls.get(fingerprint, 0) + 1
                     if seen_tool_calls[fingerprint] > int(watchdog.get("max_identical_tool_calls", 2)):
                         raise RuntimeError(f"{role} repeated the same tool call without progress")
+                    if self.task_contract and call.name not in {spec["name"] for spec in turn_specs}:
+                        tool_results.append({"call_id":call.call_id,"tool":call.name,"arguments":call.arguments,"turn":turn,"ok":False,"error":"denied","message":"Tool not advertised for this invocation"})
+                        continue
                     outcome = gateway.safe_execute(run_id, role, phase, call.name, call.arguments,
                                                    plan_allowlist=plan_allowlist, plan_hash=plan_hash,operation_id=f"{idem_key}:tool:{call_index}")
                     tool_results.append({"call_id": call.call_id, "tool": call.name,
                                          "arguments": call.arguments, "turn": turn,
                                          "operation_ref": f"{idem_key}:tool:{call_index}", **outcome})
                 continue
-            max_retries = min(1,int(cfg.get("max_retries", 0)))
+            max_retries = 1 if self.task_contract else min(1,int(cfg.get("max_retries", 0)))
+            raw_handoff_value=result.raw_text if result.raw_text is not None else result.output
             schema_attempts = 0
             while True:
                 if time.monotonic()-invocation_started >= wall_time:
                     raise ContractDenied("invocation exceeded wall-time grant; usage recorded")
                 try:
+                    if self.task_contract:
+                        from agent_core.handoffs import normalize
+                        normalized,problems=normalize(result.output,schema)
+                        handoff_metadata={**handoff_metadata,"revision":handoff_metadata.get("revision",0)+1,"parsed_payload":self._sanitized_handoff_payload(normalized),"parsed_payload_is_sanitized":True,"validation_problems":problems}
+                        self.artifacts.put(run_id,"handoff_metadata",role,handoff_metadata)
+                        if normalized is not None: result.output=normalized
                     if result.output is None:
                         raise SchemaError(f"{role} returned empty output")
                     self.schema.validate(schema_name, result.output)
                     return result.output
-                except SchemaError:
+                except SchemaError as schema_error:
                     schema_attempts += 1
                     if schema_attempts > max_retries:
+                        if self.task_contract:
+                            from agent_core.handoffs import incomplete
+                            from agent_core.task_contract import digest
+                            recipient={"planner":"plan_reviewer","implementer":"code_reviewer","code_reviewer":"alignment_checker","plan_reviewer":"implementer"}.get(role,"master")
+                            handoff=incomplete({"original":raw_handoff_value,"repair":result.output},run_id=run_id,role=role,phase=phase,invocation_id=idem_key,recipient=recipient,contract_hash=digest(self.task_contract))
+                            self.artifacts.put(run_id,"handoff_incomplete",role,handoff)
+                            return handoff
                         raise
                     repair_packet={**sliced,"OUTPUT_CORRECTION":"Previous completed response did not match the supplied role output schema. Return a valid role object; preserve observed facts and scope."}
-                    estimate = ctx.estimate_tokens(prompt, repair_packet, cfg["max_output_tokens"], tool_context,tools=turn_specs,output_schema=schema)+getattr(self.provider,"input_overhead_tokens",0)
+                    if self.task_contract:
+                        from agent_core.handoffs import sanitized_raw
+                        repair_packet["ORIGINAL_OUTPUT"]=sanitized_raw(raw_handoff_value)
+                        repair_packet["SCHEMA_ERRORS"]=[sanitized_raw(str(schema_error))[:2000]]
+                        repair_packet["ROLE_OUTPUT_SCHEMA"]=schema
+                        repair_packet["TASK_CONSTRAINTS"]=self.task_contract
+                    estimate = ctx.estimate_tokens(prompt, repair_packet, cfg["max_output_tokens"], tool_context,tools=() if self.task_contract else turn_specs,output_schema=schema)+getattr(self.provider,"input_overhead_tokens",0)
                     retry_key = f"{idem_key}:retry{schema_attempts}"
+                    if self.task_contract:
+                        repair_packet["permissions"]={**repair_packet.get("permissions",{}),"allowed_tools":[]}
                     self._dispatch_boundary(run_id)
                     self._require_new_invocation(run_id,retry_key)
                     self.budget.reserve(run_id, profile, estimate, model=model, reservation_id=retry_key)
                     request = Invocation(
                         run_id, role, prompt, repair_packet, cfg["model_tier"], cfg["max_output_tokens"],
                         retry_key, model=model,
-                        tools=tuple(turn_specs), tool_results=tuple(tool_context), turn=turn,
+                        tools=() if self.task_contract else tuple(turn_specs), tool_results=tuple(tool_context), turn=turn,
                         reasoning=bool(cfg.get("reasoning", False)), output_schema=schema,
-                                 deadline=min(self.resource_limits.get("deadline") or float("inf"),time.time()+max(0,wall_time-(time.monotonic()-invocation_started))),max_transport_retries=getattr(self.provider,"max_transport_retries",2))
+                                 deadline=min(self.resource_limits.get("deadline") or float("inf"),time.time()+max(0,wall_time-(time.monotonic()-invocation_started))),max_transport_retries=getattr(self.provider,"max_transport_retries",2),allow_incomplete_output=bool(self.task_contract))
                     started = time.time()
                     try:
                         result = self._invoke_provider(request)
@@ -848,6 +959,9 @@ class Orchestrator:
                         result.input_tokens, result.output_tokens, usd,
                         int((time.time() - started) * 1000), "ok", None,
                         retry_key)
+                    if self.task_contract:
+                        self._ack_agent_role_handoffs(request)
+                        if not result.tool_calls: handoff_metadata=self._begin_role_handoff(run_id,role,phase,retry_key,result)
                     self._dispatch_boundary(run_id)
                     if result.tool_calls:
                         raise SchemaError(f"{role} returned tool calls during schema retry")

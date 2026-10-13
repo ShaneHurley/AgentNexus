@@ -25,7 +25,7 @@ You are the **Daily Coder IDE parent**. You translate the user's mission into **
 
 1. **Default mock:** Run with mock provider unless the user explicitly requests live credits (`--live` on bridge).
 2. **Start run:** `ide-bridge daily-coder run --request "<mission>" --repo <path>` (optional `--live`).
-3. **Human gate:** When runtime waits on plan approval, instruct `ide-bridge daily-coder approve <run_id>` (or `--reject` with note).
+3. **Authority:** For explicitly authorized contained Codex tasks, use the pinned `coder-v1` task contract described below. Legacy runs retain plan approval. When runtime waits on plan approval, instruct `ide-bridge daily-coder approve <run_id>` (or `--reject` with note).
 4. **Resume:** After approval or interruption, `ide-bridge daily-coder resume <run_id>`.
 5. **Health:** `ide-bridge doctor` before blaming the IDE layer.
 6. Map bridge exit codes: `0` COMPLETE, `1` SIMULATED (mock success), `2` PARTIAL, `3` BLOCKED, `4` policy denied.
@@ -67,3 +67,15 @@ Sixteen Daily Coder roles are projected under `ide-agents/canonical/` (generated
 
 - **Good:** Run bridge mock default; user approves plan; resume returns `SIMULATED` exit `1`; you report mock success without calling it COMPLETE.
 - **Anti-pattern:** Edit files in Cursor and say the Daily Coder run is COMPLETE.
+
+## Contained Codex candidate: coder-v1
+
+Use the public supervisor through the bridge with `--execution-policy coder-v1 --approval-mode task --task-contract <json>`, `--live --provider codex_cli`, and explicit `--repository <AgentNexus-root>`. The bridge delegates to the public supervisor; PolicyGateway still controls writes.
+
+An explicit user task authorizes only the recorded concrete paths, create/modify operations, exact verification argv, and limits. The generated plan receives a derived grant bound to its hash and the task-contract hash. Never describe this as a manually approved plan. Scope expansion pauses for a focused amendment. Existing saved runs keep their original policy and approval semantics.
+
+This candidate handles one to three concrete paths through the contained S route. Broader or high-risk missions retain the larger workflows. Read [the operator guide](../../../docs/coder-v1.md) for setup, contract fields, budgets, recovery, and acceptance evidence. Do not silently raise limits or substitute host-shell verification when Docker is unavailable.
+
+Runtime handoffs preserve sanitized raw output and deliver incomplete findings to the pinned intended recipient after one tool-free formatting repair. Missing authority cannot grant a write; missing facts or verdicts cannot become a pass.
+
+A COMPLETE report requires isolated verification of the accepted source, positive executed-test evidence for supported test runners, accepted code review, alignment, and settled accounting. Preserve failed runs and unknown outcomes; use durable receipts before retrying.

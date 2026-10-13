@@ -38,7 +38,7 @@ def _path(repository):
 def configure(repository,value,*,confirmed=False,provider_factory=CodexCLIProvider):
     if confirmed is not True:raise ContractDenied("Codex activation requires explicit reviewed configuration confirmation")
     value=_validate(value);provider=build_provider(value,provider_factory=provider_factory)
-    if not provider.diagnostics().supervised_ready:raise ContractDenied("pinned Codex ChatGPT login unavailable")
+    if not provider.diagnostics().supervised_ready:raise ContractDenied("Codex not ready; run agent-nexus codex doctor --json")
     path=_path(repository);path.parent.mkdir(parents=True,exist_ok=True)
     fd,name=tempfile.mkstemp(prefix=".codex-",dir=path.parent)
     try:
@@ -58,7 +58,7 @@ def load_settings(repository,*,pinned=None,provider_factory=CodexCLIProvider):
     result={"codex_configuration":value,"codex_configuration_hash":digest(value)}
     if pinned is not None and any(result[key]!=pinned.get(key) for key in result):raise ContractDenied("Codex configuration changed; start a new run")
     provider=build_provider(value,provider_factory=provider_factory)
-    if not provider.diagnostics().supervised_ready:raise ContractDenied("pinned Codex ChatGPT login unavailable")
+    if not provider.diagnostics().supervised_ready:raise ContractDenied("Codex not ready; run agent-nexus codex doctor --json")
     return result
 
 def routing_pins(repository,settings):

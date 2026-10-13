@@ -99,13 +99,13 @@ class ToolBroker:
 
     # --- read ---------------------------------------------------------
     def _t_filesystem_read(self,a,_allow=None):
-        p=self.safe_path(a["path"]); text=p.read_text(encoding="utf-8",errors="replace"); lines=text.splitlines()
+        p=self.safe_path(a["path"]); raw=p.read_bytes(); digest=hashlib.sha256(raw).hexdigest(); text=raw.decode("utf-8",errors="replace"); lines=text.splitlines()
         start=max(1,int(a.get("start",1))); end=min(len(lines),int(a.get("end",start+399)))
         body="\n".join(f"{i}\t{lines[i-1]}" for i in range(start,end+1)) if lines else ""
         clean=redact(body)
-        return {"path":a["path"],"start":start,"end":end,"total_lines":len(lines),"sha256":file_sha(p),
+        return {"path":a["path"],"start":start,"end":end,"total_lines":len(lines),"sha256":digest,
                 "content":clean[:MAX_OUTPUT_CHARS],"truncated":len(clean)>MAX_OUTPUT_CHARS,
-                "expansion":{"path":a["path"],"start":start,"end":end,"sha256":file_sha(p),"instruction":"Request smaller line ranges when truncated; each read is reauthorized."} if len(clean)>MAX_OUTPUT_CHARS else None}
+                "expansion":{"path":a["path"],"start":start,"end":end,"sha256":digest,"instruction":"Request smaller line ranges when truncated; each read is reauthorized."} if len(clean)>MAX_OUTPUT_CHARS else None}
     def _t_filesystem_list(self,a,_allow=None):
         p=self.safe_path(a.get("path","."))
         return {"path":a.get("path","."),"entries":[{"name":c.name,"dir":c.is_dir()} for c in sorted(p.iterdir())[:500]]}

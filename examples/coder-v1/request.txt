@@ -1,0 +1,1 @@
+Fix clamp.py so values below lower return lower. Preserve all other behavior and oracle_clamp.py. Run the five existing regression tests.

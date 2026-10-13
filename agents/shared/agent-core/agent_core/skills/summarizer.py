@@ -145,7 +145,7 @@ def summarize_key_points(text: str, max_points: int = 5) -> list[str]:
     for line in lines:
         cleaned = re.sub(r"^[-*•]\s+", "", line)
         cleaned = re.sub(r"^\d+\.\s+", "", cleaned).strip()
-        if cleaned and (line.startswith(("-", "*", "•")) or re.match(r"^\d+\.", line)):
+        if cleaned and (line.startswith(("-", "*", "•")) or re.match(r"^\d+\.\s+", line)):
             if len(cleaned) > 10 and cleaned not in points:
                 points.append(cleaned)
                 if len(points) >= max_points:

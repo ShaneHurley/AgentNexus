@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import re
 import sys
+import shlex
+from pathlib import Path
 
 from _ide_pack_policy import (
     MUTATING_SHELL_RE,
@@ -26,11 +28,65 @@ MSG = (
 )
 
 
-def is_mutating_shell(command: str) -> bool:
+def shell_substitution(command):
+    quote=None
+    escaped=False
+    for index,char in enumerate(command):
+        if escaped:
+            escaped=False
+            continue
+        if char=="\\" and quote!="'":
+            escaped=True
+            continue
+        if quote:
+            if char==quote:
+                quote=None
+            elif quote=='"' and (char=="`" or command.startswith("$(",index)):
+                return True
+            continue
+        if char in ("'",'"'):
+            quote=char
+        elif char in ("`", "\n") or command.startswith("$(",index):
+            return True
+    return False
+
+
+def trusted_bridge_command(command):
+    # Only a standalone installed bridge may bypass the shell-text heuristic.
+    try:
+        lexer=shlex.shlex(command,posix=True,punctuation_chars=True)
+        lexer.whitespace=" \t\r"
+        lexer.whitespace_split=True
+        lexer.commenters=""
+        words=list(lexer)
+    except ValueError:
+        return False
+    if not words:
+        return None
+    executable=Path(words[0])
+    if not executable.is_absolute():
+        return None
+    root=Path(__file__).resolve().parents[2]
+    trusted=root/".venv/bin/ide-bridge"
+    try:
+        if not trusted.is_file() or executable.resolve()!=trusted.resolve():
+            return None
+    except OSError:
+        return False
+    if shell_substitution(command):
+        return False
+    if any(word=="\n" or all(char in lexer.punctuation_chars for char in word) for word in words):
+        return False
+    return len(words) not in (0,1) and words[1] in {"daily-coder","research-forge","doctor","plan-prep"}
+
+
+def is_mutating_shell(command):
     if not command.strip():
         return False
-    return re.search(MUTATING_SHELL_RE, command) is not None
-
+    bridge=trusted_bridge_command(command)
+    if bridge is not None:
+        return not bridge
+    return re.search(MUTATING_SHELL_RE,command) is not None
 
 def main() -> int:
     payload = read_stdin_json()

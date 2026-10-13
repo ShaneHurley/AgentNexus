@@ -27,6 +27,8 @@ def _request_path(request: str) -> Path:
 
 
 def cmd_run(args: argparse.Namespace) -> int:
+    if not getattr(args,"supervisor_dir",None) and any(getattr(args,key,None) is not None for key in ("token_limit","deadline_seconds","execution_policy","approval_mode","task_contract")):
+        raise ValueError("Resource limits require --supervisor-dir")
     if getattr(args, "supervisor_dir", None):
         from ide_bridge.supervised import execute
         if args.dry_run:
@@ -63,6 +65,8 @@ def cmd_run(args: argparse.Namespace) -> int:
 
 
 def cmd_resume(args: argparse.Namespace) -> int:
+    if any(getattr(args,key,None) is not None for key in ("token_limit","deadline_seconds","execution_policy","approval_mode","task_contract")):
+        raise ValueError("Resume retains pinned resource limits; start a new run to change them")
     if getattr(args, "supervisor_dir", None):
         from ide_bridge.supervised import execute
         return execute(args, "research-forge", resume=True)

@@ -11,6 +11,7 @@ _TAIL_FULL = ["IMPLEMENT", "TEST_AUTHOR", "TEST_EXECUTE", "CODE_REVIEW", "DOCUME
 _TAIL_TRIVIAL = ["IMPLEMENT", "TEST_EXECUTE", "CODE_REVIEW", "ALIGNMENT", "ACCEPTANCE", "COMPLETE"]
 
 WORKFLOWS: dict[str, list[str]] = {
+    "CODER_V1": ["INTAKE","SIZE","DECIDE","PLAN","PLAN_REVIEW","READY_TO_BUILD","IMPLEMENT","TEST_EXECUTE","CODE_REVIEW","ALIGNMENT","ACCEPTANCE","COMPLETE"],
     # Contained S work: no research fan-out, no brainstorm; full build/review tail.
     "S": ["INTAKE", "SIZE", "DECIDE", "PLAN", "PLAN_REVIEW", "READY_TO_BUILD"] + _TAIL_FULL,
     # Trivial S work: skip test_author + documenter; keep ALIGNMENT for acceptance.

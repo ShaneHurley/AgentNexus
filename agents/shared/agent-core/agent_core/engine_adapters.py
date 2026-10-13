@@ -66,8 +66,13 @@ class DailyCoderAdapter:
         wrapper.capabilities=getattr(wrapper.provider,"capabilities",None)
         class ReferencesOnly:
             def get(self,*args,**kwargs):raise ContractDenied("tool credential use requires SecretBroker authorization")
+        task_options={}
+        if row["snapshot"].get("execution_policy")=="coder-v1":
+            from daily_coder.coder_v1 import CoderV1
+            Orchestrator=CoderV1
+            task_options={"task_contract":row["snapshot"]["task_contract"]}
         engine=Orchestrator(self.root,StateStore(self.root/".daily-coder/state.sqlite"),wrapper,live=row["live"],secrets=ReferencesOnly(),
-                            resource_limits={"tokens":row["limit_tokens"],"usd":row["limit_usd"],"deadline":row["deadline"]}, context_variant=row["snapshot"].get("context_policy",{}).get("variant","baseline"),reference_documents=row["snapshot"].get("reference_documents",()))
+                            resource_limits={"tokens":row["limit_tokens"],"usd":row["limit_usd"],"deadline":row["deadline"]}, context_variant=row["snapshot"].get("context_policy",{}).get("variant","baseline"),reference_documents=row["snapshot"].get("reference_documents",()),**task_options)
         if name=="codex_cli":
             from .codex_settings import translate_budgets
             translated=translate_budgets(engine.budgets,row["limit_tokens"],wrapper.input_overhead_tokens)
@@ -88,6 +93,25 @@ class DailyCoderAdapter:
     def execute(self, row, answers=None):
         self._engine(row).run(row["legacy_id"])
         return self.inspect(row)
+    @staticmethod
+    def _resumable_checkpoint(engine,native,report,pending,pending_tools):
+        if native.get("status")!="ACTIVE" or pending.get("calls") or pending_tools or report.get("settled_unreceipted",{}).get("calls"):
+            return None
+        phase=native.get("phase")
+        if phase not in {"DECIDE","PLAN","PLAN_REVIEW","IMPLEMENT","TEST_EXECUTE","CODE_REVIEW","ALIGNMENT"}: return None
+        run_id=native["run_id"]
+        events=engine.state.events(run_id,limit=1)
+        if not events or events[0]["kind"]!="transition" or events[0]["new_phase"]!=phase: return None
+        transition=events[0]
+        artifacts=[a for a in engine.state.artifacts(run_id) if a["kind"]==phase.lower() and a["created"]<=transition["created"]]
+        if not artifacts: return None
+        if any(i["created"]>transition["created"] for i in engine.state.invocations(run_id,limit=1000)): return None
+        if any(t["created"]>transition["created"] for t in engine.state.tool_calls(run_id,limit=1000)): return None
+        if any(j.get("state") in {"pending","running","cancel_requested"} for j in engine.state.jobs(run_id)): return None
+        return {"schema_version":1,"engine":"daily-coder","run_id":run_id,"phase":phase,
+                "transition_sequence":transition["seq"],"artifact_hash":artifacts[-1]["hash"],
+                "basis":"Accepted native phase boundary; no unsettled usage or subsequent effects"}
+
     def inspect(self,row):
         engine=self._engine(row); native=engine.state.get(row["legacy_id"])
         report=engine.budget.report(row["legacy_id"])
@@ -95,7 +119,9 @@ class DailyCoderAdapter:
         pending_tools=engine.state.pending_tool_operations(row["legacy_id"]) if hasattr(engine.state,"pending_tool_operations") else []
         status=native["status"]
         if (pending["calls"] or pending_tools) and status != "CANCEL_REQUESTED": status="RECONCILIATION_REQUIRED"
+        proof=self._resumable_checkpoint(engine,native,report,pending,pending_tools) if row["snapshot"].get("execution_policy")=="coder-v1" else None
         return {"status":"RUNNING" if status == "ACTIVE" else status,"phase":native["phase"],"state":native,
+                **({"resumable_checkpoint":proof} if proof else {}),
                 "usage":{"tokens":report["tokens"],"usd":report["est_usd"],"usage_status":"reported" if engine.provider.name=="codex_cli" else "estimated",
                          **({"billing_kind":"chatgpt_subscription","known_api_cash_usd":report["known_api_cash_usd"]} if engine.provider.name=="codex_cli" else {}),
                          "unknown":bool(pending["calls"] or pending_tools or report.get("settled_unreceipted",{}).get("calls"))},

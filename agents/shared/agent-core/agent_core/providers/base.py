@@ -28,9 +28,12 @@ class Invocation:
     policy_id: str | None = None
     provider_options: dict[str, Any] = field(default_factory=dict)
     max_transport_retries: int = 0
+    allow_incomplete_output: bool = False
 
     def __post_init__(self):
         import math
+        if type(self.allow_incomplete_output) is not bool:
+            raise ValueError("invalid role output recovery mode")
         if self.max_transport_retries not in (0, 1, 2):
             raise ValueError("transport retries must be 0..2")
         if self.deadline is not None and not math.isfinite(self.deadline):

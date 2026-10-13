@@ -26,7 +26,7 @@ class Supervisor:
     def runs(self,engine=None,session_id=None,limit=50):
         return [self.status(r["run_id"]) for r in self.store.runs(engine,session_id,limit)]
 
-    def create_run(self,session_id,engine,request,workspace,live=False, *, parent_id=None,idempotency_key=None,provider="mock",limit_usd=5.0,limit_tokens=80000,deadline=None,_imported=False,memory_binding=None,context_variant="baseline",context_evaluation=False,reference_documents=()):
+    def create_run(self,session_id,engine,request,workspace,live=False, *, parent_id=None,idempotency_key=None,provider="mock",limit_usd=5.0,limit_tokens=80000,deadline=None,_imported=False,memory_binding=None,context_variant="baseline",context_evaluation=False,reference_documents=(),execution_policy="legacy",approval_mode="plan",task_contract=None):
         if engine not in self.adapters: raise ContractDenied("unknown or unavailable execution engine")
         workspace=Path(workspace).resolve()
         if not workspace.is_dir(): raise ValueError("workspace must exist")
@@ -37,7 +37,22 @@ class Supervisor:
         if engine == "daily-coder" and not isinstance(request,str): raise ValueError("coding request must be text")
         if engine == "research-forge" and not isinstance(request,dict): raise ValueError("research request must be an object")
         if live and provider == "mock" and engine == "daily-coder": raise ContractDenied("live coding requires an explicit provider")
+        if execution_policy not in {"legacy","coder-v1"} or approval_mode not in {"plan","task"}:
+            raise ContractDenied("unknown coding execution or approval policy")
+        if execution_policy=="coder-v1":
+            if engine!="daily-coder" or approval_mode!="task" or task_contract is None:
+                raise ContractDenied("coder-v1 requires explicit coding task authority")
+            from .task_contract import validate_contract,digest
+            task_contract=validate_contract(task_contract,request,workspace,parent_tokens=limit_tokens)
+            limit_tokens=min(limit_tokens,task_contract["limits"]["tokens"])
+            import time
+            ceiling=time.time()+task_contract["limits"]["deadline_seconds"]
+            deadline=min(deadline,ceiling) if deadline is not None else ceiling
+        elif approval_mode!="plan" or task_contract is not None:
+            raise ContractDenied("task authority requires coder-v1 policy")
         snapshot=self.adapters[engine].snapshot(workspace,live,provider)
+        if execution_policy=="coder-v1":
+            snapshot.update(execution_policy=execution_policy,approval_mode=approval_mode,task_contract=task_contract,task_contract_hash=digest(task_contract))
         snapshot["provider"]=provider if engine == "daily-coder" else ("live" if live else "mock")
         if memory_binding is not None:
             from .memory_runtime import pin_binding
@@ -82,6 +97,11 @@ class Supervisor:
                 raise ContractDenied("supplied reference changed; start a new run")
             snapshot["reference_documents"]=expected
             snapshot["document_strategy"]=row["snapshot"]["document_strategy"]
+        if row["snapshot"].get("execution_policy")=="coder-v1":
+            from .task_contract import validate_contract,digest
+            contract=validate_contract(row["snapshot"]["task_contract"],row["request"],row["workspace"],parent_tokens=row["limit_tokens"])
+            if digest(contract)!=row["snapshot"].get("task_contract_hash"): raise ContractDenied("task contract pin changed")
+            for field in ("execution_policy","approval_mode","task_contract","task_contract_hash"): snapshot[field]=row["snapshot"][field]
         return snapshot,runtime_snapshot().snapshot_id
 
     def status(self,key):
@@ -175,8 +195,20 @@ class Supervisor:
                 if result.get("status") in TERMINAL | {"WAITING_HUMAN"} and not (result.get("usage") or {}).get("unknown"):
                     self._settle(row,pending[0]["call_id"],result)
                     return self.status(key)
-                self.store.finish_call(pending[0]["call_id"],"unknown")
-                return self.status(key)
+                proof=result.get("resumable_checkpoint") or {}
+                usage=result.get("usage") or {}
+                resumable=(row["snapshot"].get("execution_policy")=="coder-v1" and result.get("status")=="RUNNING"
+                    and proof.get("schema_version")==1 and proof.get("engine")==row["engine"]
+                    and proof.get("run_id")==row["legacy_id"] and proof.get("phase")==result.get("phase")
+                    and type(proof.get("transition_sequence")) is int and isinstance(proof.get("artifact_hash"),str)
+                    and bool(proof["artifact_hash"]) and not usage.get("unknown")
+                    and type(usage.get("tokens")) is int)
+                if not resumable:
+                    self.store.finish_call(pending[0]["call_id"],"unknown")
+                    return self.status(key)
+                settled=self._settle(row,pending[0]["call_id"],result)
+                if settled["status"]!="RUNNING" or self.store.pending_calls(key): return settled
+                row=self.store.get_run(key)
             if row["status"] == "RECONCILIATION_REQUIRED": return self.status(key)
             if row["status"] == "RUNNING" and row["legacy_id"]:
                 result=adapter.inspect(row)
@@ -244,6 +276,20 @@ class Supervisor:
                     return self._settle(row,call["call_id"],result)
                 self.store.finish_call(call["call_id"],"unknown")
         return self.status(key)
+
+    def reconcile_read(self,key,operation_id,*,actor,acknowledge_unavailable=False):
+        row=self.store.get_run(key)
+        if row["engine"]!="daily-coder" or not row.get("legacy_id"):
+            raise ContractDenied("read reconciliation requires an existing coding run")
+        adapter=self.adapters["daily-coder"]
+        if not isinstance(adapter,DailyCoderAdapter): raise ContractDenied("unreviewed native adapter")
+        from daily_coder.state_store import StateStore
+        from daily_coder.read_reconciliation import reconcile_read
+        native=StateStore(adapter.root/".daily-coder/state.sqlite")
+        result=reconcile_read(native,row["legacy_id"],operation_id,actor=actor,acknowledge_unavailable=acknowledge_unavailable)
+        report=self.status(key)
+        report["read_reconciliation"]=result
+        return report
 
     def cancel(self,key):
         row=self.store.request_cancel(key)

@@ -1,6 +1,6 @@
 """A fail-closed Docker worker. Repository writes remain gateway-owned."""
 from __future__ import annotations
-import fnmatch, os, re, shutil, stat, subprocess, tempfile, time, selectors, signal
+import hashlib, json, fnmatch, os, re, shutil, stat, subprocess, tempfile, time, selectors, signal
 from .lifecycle import ReconciliationRequired
 from pathlib import Path
 from .skills.secret_scanner import SECRET_PATTERNS
@@ -9,13 +9,14 @@ class IsolationUnavailable(PermissionError): pass
 
 class DockerRunner:
     def __init__(self, image: str, workspace: str | Path, *, deny_paths=()):
-        if not re.fullmatch(r"[a-zA-Z0-9./_:-]+@sha256:[a-f0-9]{64}", image):
+        if not isinstance(image, str) or not re.fullmatch(r"(?:sha256:[a-f0-9]{64}|[a-zA-Z0-9./_:-]+@sha256:[a-f0-9]{64})", image):
             raise ValueError("isolated image must be pinned by sha256 digest")
         self.image=image; self.workspace=Path(workspace).resolve(); self.deny_paths=tuple(deny_paths)
         if not self.workspace.is_dir(): raise ValueError("workspace must exist")
 
     def _snapshot(self, destination):
         count=total=0
+        manifest={}
         def private(name):
             return name.startswith('.') or any(x in name.lower() for x in ('secret','credential','id_rsa'))
         root_fd=os.open(self.workspace,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)
@@ -41,11 +42,13 @@ class DockerRunner:
                     if total > 256*1024*1024 or count > 20000 or len(sample) > 64*1024*1024:
                         raise IsolationUnavailable("workspace snapshot exceeds resource ceiling")
                     if any(pattern.search(sample.decode('utf-8',errors='ignore')) for _,pattern in SECRET_PATTERNS): continue
+                    manifest[rel.as_posix()]=hashlib.sha256(sample).hexdigest()
                     target=destination/rel; target.parent.mkdir(parents=True,exist_ok=True)
                     target.write_bytes(sample)
                     target.chmod(0o555 if metadata.st_mode & 0o111 else 0o444)
         finally:
             os.close(root_fd)
+        return manifest
 
     def _attach(self, command, env, timeout, cancel_check):
         """Drain bounded output while supervising an owned client process group."""
@@ -103,7 +106,8 @@ class DockerRunner:
         started=time.monotonic(); container=None
         with tempfile.TemporaryDirectory(prefix='agentnexus-worker-') as temp:
             scratch=Path(temp); workspace=scratch/'workspace'; workspace.mkdir()
-            self._snapshot(workspace)
+            source_hashes=self._snapshot(workspace)
+            source_snapshot_sha256=hashlib.sha256(json.dumps(source_hashes,sort_keys=True,separators=(",",":")).encode()).hexdigest()
             env['DOCKER_CONFIG']=str(scratch/'docker-config'); Path(env['DOCKER_CONFIG']).mkdir()
             command=[executable,'create','--pull=never','--network=none','--read-only','--cap-drop=ALL',
                      '--security-opt=no-new-privileges','--user=65534:65534','--pids-limit=128','--memory=512m',
@@ -128,6 +132,7 @@ class DockerRunner:
                 except subprocess.TimeoutExpired:
                     result={'argv':argv,'returncode':None,'timeout':True,'stdout':'','stderr':'isolated worker timed out'}
                 result['duration_s']=round(time.monotonic()-started,3)
+                result.update(image=self.image,source_hashes=source_hashes,source_snapshot_sha256=source_snapshot_sha256)
                 return result
             except (OSError,subprocess.TimeoutExpired) as exc:
                 raise IsolationUnavailable("isolated worker transport failed") from exc

@@ -24,6 +24,9 @@ def execute(args, engine: str, *, resume: bool = False) -> int:
         row = supervisor.status(args.run_id)
         if row.get("engine") != engine:
             raise ValueError("Run belongs to another engine")
+        if engine=="daily-coder" and row.get("snapshot",{}).get("execution_policy")=="coder-v1":
+            from agent_core.coder_capacity import announce_capacity
+            announce_capacity(supervisor,args.run_id)
         row = supervisor.execute(args.run_id, answers=answers or None)
     else:
         request = args.request
@@ -40,6 +43,9 @@ def execute(args, engine: str, *, resume: bool = False) -> int:
         contract_path=getattr(args,"task_contract",None)
         if contract_path: task_options["task_contract"]=json.loads(Path(contract_path).read_text())
         row = supervisor.create_run(session_id, engine, request, workspace, live=args.live, provider=getattr(args, "provider", "mock"),limit_tokens=token_limit if token_limit is not None else 80000,deadline=time.time()+seconds if seconds is not None else None,**task_options)
+        if engine=="daily-coder" and row.get("snapshot",{}).get("execution_policy")=="coder-v1":
+            from agent_core.coder_capacity import announce_capacity
+            announce_capacity(supervisor,row["run_id"])
         row = supervisor.execute(row["run_id"])
     print(json.dumps(row))
     code = exit_code_from_dc_row(row)

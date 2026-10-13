@@ -54,6 +54,7 @@ The bridge accepts the following explicit supervisor options:
 ```sh
 ide-bridge daily-coder run --request "<exact task>" --repo "<task worktree>" \
   --live --provider codex_cli --repository "<AgentNexus root>" \
+  --supervisor-dir "<AgentNexus root>/.agentnexus" \
   --execution-policy coder-v1 --approval-mode task --task-contract "<contract.json>" \
   --token-limit 300000 --deadline-seconds 1800
 ```

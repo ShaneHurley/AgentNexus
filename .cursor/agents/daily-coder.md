@@ -81,7 +81,7 @@ Sixteen Daily Coder roles are projected under `ide-agents/canonical/` (generated
 
 ## Contained Codex candidate: coder-v1
 
-Use the public supervisor through the bridge with `--execution-policy coder-v1 --approval-mode task --task-contract <json>`, `--live --provider codex_cli`, and explicit `--repository <AgentNexus-root>`. The bridge delegates to the public supervisor; PolicyGateway still controls writes.
+Use the public supervisor through the bridge with `--execution-policy coder-v1 --approval-mode task --task-contract <json>`, `--live --provider codex_cli`, and explicit `--repository <AgentNexus-root> --supervisor-dir <AgentNexus-root>/.agentnexus`. The bridge delegates to the public supervisor; PolicyGateway still controls writes.
 
 An explicit user task authorizes only the recorded concrete paths, create/modify operations, exact verification argv, and limits. The generated plan receives a derived grant bound to its hash and the task-contract hash. Never describe this as a manually approved plan. Scope expansion pauses for a focused amendment. Existing saved runs keep their original policy and approval semantics.
 

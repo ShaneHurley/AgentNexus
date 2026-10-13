@@ -105,7 +105,7 @@ agents:
   projection:
     engine: daily-coder
     hand_authored: true
-  canonical_sha256: 5f2e2cfd62d78b56025a2c0cbfa3ae790bcbf10c1df719ebbd994eb3f9c7a40d
+  canonical_sha256: a98a2882f79b97f983babcd24be832105c0b5c4cc02fc50303b0bc388ec20399
 - name: deep-research
   group: research-stack
   authority: read-only

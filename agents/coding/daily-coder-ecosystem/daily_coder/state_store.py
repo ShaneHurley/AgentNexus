@@ -260,7 +260,7 @@ class StateStore:
             if not cur.rowcount:
                 return False
             c.execute("UPDATE runs SET est_usd=est_usd+?,updated=? WHERE run_id=?",(usd,time.time(),run_id))
-            if status=="ok":
+            if status in {"ok","error_accounted"}:
                 c.execute("INSERT INTO usage VALUES(?,?,?,?,?) ON CONFLICT(run_id,role) DO UPDATE SET calls=calls+1,input_tokens=input_tokens+excluded.input_tokens,output_tokens=output_tokens+excluded.output_tokens",
                           (run_id,role,1,it,ot))
             return True
@@ -390,6 +390,11 @@ class StateStore:
             row=c.execute("SELECT COALESCE(SUM(estimated_tokens),0),COUNT(*),COALESCE(SUM(estimated_usd),0.0) "
                            "FROM budget_reservations WHERE run_id=? AND state='reserved'",(run_id,)).fetchone()
             return {"tokens":int(row[0]),"calls":int(row[1]),"est_usd":float(row[2])}
+
+    def daily_reservations(self,day):
+        with self._connect() as c:
+            row=c.execute("SELECT COALESCE(SUM(estimated_tokens),0),COUNT(*) FROM budget_reservations WHERE day=? AND state='reserved'",(day,)).fetchone()
+            return {"tokens":int(row[0]),"calls":int(row[1])}
 
     def reserve_budget(self,run_id,reservation_id,day,estimated_tokens,estimated_usd,*,
                        run_token_limit,run_call_limit,daily_token_limit=None,daily_usd_limit=None,run_usd_limit=None):

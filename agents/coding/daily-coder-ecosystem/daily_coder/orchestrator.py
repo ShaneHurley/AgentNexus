@@ -26,6 +26,12 @@ from .util import load_json, sha256_text, canonical_json
 from .web import WebClient, NetworkDenied
 from .workflow import CONTROL_PHASES, PHASE_ROLE, WORKFLOW_VERSION, role_for
 
+class AccountedProviderFailure(RuntimeError):
+    """Rejected output has settled usage and must not trigger model repair."""
+    def __init__(self,reason_code):
+        self.reason_code=reason_code
+        super().__init__(reason_code)
+
 RESEARCH_ANGLES = ["implementation sites", "callers and dependents", "existing tests",
                    "documentation and configuration", "failure modes and edge cases", "adjacent modules"]
 BRAINSTORM_ANGLES = ["failure-first alternative", "constraint inversion", "simpler conventional substitute"]
@@ -199,6 +205,8 @@ class Orchestrator:
         with lock, RunLock(self.state.path.parent / "run-locks", str(self.state.path.resolve()) + ":" + run_id):
             try:
                 return self._run_locked(run_id, _depth)
+            except AccountedProviderFailure as exc:
+                return self._halt(run_id,"provider_response_rejected",{"reason_code":exc.reason_code,"usage":"recorded"})
             finally:
                 self._cancel_boundary(run_id)
                 self.checkpoint(run_id,"execution_boundary")
@@ -301,10 +309,12 @@ class Orchestrator:
             except ReconciliationRequired:
                 self.state.set_status(run_id, RunStatus.RECONCILIATION_REQUIRED)
                 return self.state.get(run_id)
+            except AccountedProviderFailure as exc:
+                return self._halt(run_id,"provider_response_rejected",{"reason_code":exc.reason_code,"usage":"recorded"})
             except ctx.ContextCapacityError as exc:
                 return self._halt(run_id,"context_capacity",exc.as_dict())
             except (BudgetExceeded, DailyCapExceeded) as exc:
-                return self._halt(run_id, "budget", {"detail": str(exc)})
+                return self._halt(run_id, "budget", {"detail": str(exc),"budget":exc.args[0] if exc.args and isinstance(exc.args[0],dict) else None})
             except ApprovalRequired as exc:
                 self._await_human(run_id, exc.subject_hash)
                 return self.state.get(run_id)
@@ -659,6 +669,40 @@ class Orchestrator:
             self._ack_role_handoffs(request.run_id,"agent:"+request.role,producers=[request.role],
                 route="format_repair",invocation_id=request.idempotency_key,source_invocation=original)
 
+    def _account_rejected_call(self,request,error,estimate,lane,turn,cfg,started):
+        from agent_core.providers.base import InvocationResult,TokenUsage
+        from agent_core.providers.http import ProviderError
+        receipt=getattr(error,"accounting_receipt",None); meta=getattr(error,"accounting_metadata",None)
+        fields={"schema_version","run_id","invocation_id","model","reason_code","stream_sha256","event_count","output_bytes","thread_id"}
+        if (getattr(self.provider,"name",None)!="codex_cli" or not isinstance(error,ProviderError)
+            or error.category!="response" or getattr(error,"reason_code",None)!="preceding_structured"
+            or error.remote_acceptance!="accepted" or not isinstance(receipt,InvocationResult)
+            or receipt.model!=request.model or receipt.output is not None or receipt.tool_calls or receipt.raw_text is not None
+            or receipt.finish_reason!="rejected_role_output" or receipt.provider_request_id!=request.idempotency_key
+            or not isinstance(meta,dict) or set(meta)!=fields or type(meta["schema_version"]) is not int or meta["schema_version"]!=1
+            or meta["run_id"]!=request.run_id or meta["invocation_id"]!=request.idempotency_key or meta["model"]!=request.model
+            or meta["reason_code"]!="preceding_structured" or not isinstance(meta["stream_sha256"],str) or len(meta["stream_sha256"])!=64
+            or any(c not in "0123456789abcdef" for c in meta["stream_sha256"])
+            or type(meta["event_count"]) is not int or not 0 < meta["event_count"] <= 10000
+            or type(meta["output_bytes"]) is not int or not 0 < meta["output_bytes"] <= 1000000):
+            return False
+        try:
+            thread=meta["thread_id"]
+            if thread is not None and (not isinstance(thread,str) or str(uuid.UUID(thread))!=thread.lower()): return False
+            usage=receipt.usage
+            validated=TokenUsage(input_tokens=usage.input_tokens,output_tokens=usage.output_tokens,total_tokens=usage.total_tokens,
+                cached_tokens=usage.cached_tokens,reasoning_tokens=usage.reasoning_tokens,cache_creation_tokens=usage.cache_creation_tokens,evidence_status=usage.evidence_status,cost_usd=usage.cost_usd)
+            if validated.evidence_status!="reported" or validated.input_tokens is None or validated.output_tokens is None: return False
+            if validated.total_tokens!=validated.input_tokens+validated.output_tokens: return False
+            if receipt.input_tokens!=validated.input_tokens or receipt.output_tokens!=validated.output_tokens: return False
+            if receipt.raw_ref!=("codex-thread:"+thread if thread else None): return False
+        except (ValueError,TypeError,AttributeError): return False
+        usd=self._settle_response(request.run_id,estimate,receipt,request.idempotency_key)
+        self.artifacts.put(request.run_id,"accounting_only_failure","runtime",meta)
+        self.state.record_invocation(request.run_id,request.role,cfg["_phase"],lane,turn,cfg["model_tier"],receipt.model,
+            receipt.input_tokens,receipt.output_tokens,usd,int((time.time()-started)*1000),"error_accounted",error.reason_code,request.idempotency_key)
+        return True
+
     def _record_provider_failure(self,run_id,key,error):
         categories={"transport","response","configuration","authorization","account_limit","budget","deadline","cancelled","security"}
         category=getattr(error,"category","unknown")
@@ -850,6 +894,8 @@ class Orchestrator:
                 result = self._invoke_provider(request)
             except Exception as exc:
                 self._record_provider_failure(run_id,idem_key,exc)
+                if self._account_rejected_call(request,exc,estimate,lane,turn,{**cfg,"_phase":phase},started):
+                    raise AccountedProviderFailure(exc.reason_code) from exc
                 uncertain=self.live and getattr(exc,"remote_acceptance","unknown") != "rejected"
                 if not uncertain:
                     self.budget.release(run_id, estimate, idem_key)
@@ -943,6 +989,8 @@ class Orchestrator:
                         result = self._invoke_provider(request)
                     except Exception as exc:
                         self._record_provider_failure(run_id,retry_key,exc)
+                        if self._account_rejected_call(request,exc,estimate,lane,turn,{**cfg,"_phase":phase},started):
+                            raise AccountedProviderFailure(exc.reason_code) from exc
                         uncertain=self.live and getattr(exc,"remote_acceptance","unknown") != "rejected"
                         if not uncertain:
                             self.budget.release(run_id, estimate, retry_key)
@@ -1006,7 +1054,7 @@ class Orchestrator:
                 list(refined.get("reasons", [])) + ["llm-sizer"],
                 trivial if profile == "S" else False,
             )
-        except ReconciliationRequired:
+        except (ReconciliationRequired,AccountedProviderFailure):
             raise
         except Exception:
             return self._sizing_result(heuristic["profile"], heuristic["score"],
@@ -1092,6 +1140,8 @@ class Orchestrator:
             packet["diagnosis"] = diagnosis
         except ReconciliationRequired:
             return self.state.get(run_id)
+        except AccountedProviderFailure as exc:
+            return self._halt(run_id,"provider_response_rejected",{"reason_code":exc.reason_code,"usage":"recorded"})
         except Exception as exc:
             logger.warning("failure_diagnostician failed for run %s (phase %s): %s: %s",
                            run_id, phase, type(exc).__name__, exc, exc_info=True)
@@ -1150,7 +1200,7 @@ class Orchestrator:
             criterion=(packet.get("decide") or {}).get("acceptance_criteria", []))
         try:
             advice = self._invoke(run_id, "frontier_advisor", "ESCALATED", {"decision_brief": brief}, 0, profile, None)
-        except ReconciliationRequired:
+        except (ReconciliationRequired,AccountedProviderFailure):
             raise
         except Exception:
             return None

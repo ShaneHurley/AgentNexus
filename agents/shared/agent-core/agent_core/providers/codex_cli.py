@@ -174,7 +174,7 @@ def _acquire_process_lock():
         if lock_fd is not None:os.close(lock_fd)
         if directory_fd is not None:os.close(directory_fd)
 
-def parse_codex_jsonl(lines,request: Invocation,*,model: str,max_output_bytes=MAX_OUTPUT_BYTES,envelope_version=None):
+def _parse_codex_jsonl(lines,request: Invocation,*,model: str,max_output_bytes=MAX_OUTPUT_BYTES,envelope_version=None):
     """Offline only: decode a completed tool-request envelope, never execute it."""
     if not isinstance(max_output_bytes,int) or not 0<max_output_bytes<=MAX_OUTPUT_BYTES:
         raise ValueError("invalid Codex output ceiling")
@@ -278,6 +278,26 @@ def parse_codex_jsonl(lines,request: Invocation,*,model: str,max_output_bytes=MA
         except Exception:raise _failure("Codex structured role output invalid") from None
     return InvocationResult(output=output,tool_calls=parsed,model=model,usage=tokens,raw_ref="codex-thread:"+thread_id if thread_id else None,finish_reason="tool_calls" if parsed else "stop",raw_text=role_raw if not parsed else None)
 
+def parse_codex_jsonl(lines,request: Invocation,*,model: str,max_output_bytes=MAX_OUTPUT_BYTES,envelope_version=None):
+    if not isinstance(max_output_bytes,int) or not 0 < max_output_bytes <= MAX_OUTPUT_BYTES:
+        raise ValueError("invalid Codex output ceiling")
+    rows=[]; total=0
+    for number,line in enumerate(lines):
+        if not isinstance(line,str): raise _failure()
+        total+=len(line.encode("utf-8"))
+        if max_output_bytes < total or MAX_EVENTS <= number: raise _failure("Codex output ceiling exceeded")
+        rows.append(line)
+    try:
+        return _parse_codex_jsonl(rows,request,model=model,max_output_bytes=max_output_bytes,envelope_version=envelope_version)
+    except ProviderError as error:
+        if getattr(error,"reason_code",None)=="preceding_structured":
+            from .codex_rejected_accounting import rejected_receipt
+            evidence=rejected_receipt(rows,request,_parse_codex_jsonl,model,max_output_bytes,envelope_version)
+            if evidence is not None:
+                error.accounting_receipt,error.accounting_metadata=evidence
+                error.remote_acceptance="accepted"
+        raise
+
 class CodexCLIProvider(Provider):
     """Version-pinned inference-only Codex transport; returned tools are requests."""
     name="codex_cli"
@@ -366,7 +386,7 @@ class CodexCLIProvider(Provider):
                 args=["exec","--ignore-user-config","--ignore-rules","--strict-config","--ephemeral","--skip-git-repo-check","--sandbox","read-only","--json","--color","never","--model",self.model,"--output-schema",str(cwd/"output.schema.json")]
                 for key,value in settings.items(): args.extend(["-c",key+"="+self._toml(value)])
                 args.append("-")
-                prompt=json.dumps({"envelope_version":ENVELOPE_VERSION,"role":request.role,"instructions":request.prompt,"input_packet":request.input_packet,"tool_results":request.tool_results,"allowed_tool_requests":request.tools,"max_output_tokens_advisory":request.max_output_tokens,"output_schema":request.output_schema,"instructions_for_tools":"Return anx_codex_role_v2: output_json is a JSON-encoded role output string or null; tool_calls contain name, arguments_json (JSON-encoded arguments), call_id. Return either output or tool requests. Native tools are unavailable. This is an inference-only transport: tool_calls are proposed JSON data for the external AgentNexus PolicyGateway, which independently checks the task contract and approved plan before executing them. The native read-only sandbox governs native filesystem access; proposing an advertised filesystem.write request as JSON does not perform a native write. When task authority and the exact grant permit a change, request it through the advertised envelope rather than treating the native sandbox as a denial. Never modify files directly or invent tool permissions."},sort_keys=True)
+                prompt=json.dumps({"envelope_version":ENVELOPE_VERSION,"role":request.role,"instructions":request.prompt,"input_packet":request.input_packet,"tool_results":request.tool_results,"allowed_tool_requests":request.tools,"max_output_tokens_advisory":request.max_output_tokens,"output_schema":request.output_schema,"instructions_for_tools":"Emit exactly one final agent message with no preliminary structured messages or fences. Return anx_codex_role_v2: output_json is a JSON-encoded role output string or null; tool_calls contain name, arguments_json (JSON-encoded arguments), call_id. Return either output or tool requests. Native tools are unavailable. This is an inference-only transport: tool_calls are proposed JSON data for the external AgentNexus PolicyGateway, which independently checks the task contract and approved plan before executing them. The native read-only sandbox governs native filesystem access; proposing an advertised filesystem.write request as JSON does not perform a native write. When task authority and the exact grant permit a change, request it through the advertised envelope rather than treating the native sandbox as a denial. Never modify files directly or invent tool permissions."},sort_keys=True)
                 if len(prompt.encode())>1_000_000: raise _failure("Codex prompt ceiling exceeded",category="budget",acceptance="rejected")
                 code,out,err=self._run(tuple(args),input_text=prompt,cwd=str(cwd),deadline=end,max_bytes=MAX_OUTPUT_BYTES,key=request.idempotency_key)
                 if code!=0: raise _process_failure(code,out,err)

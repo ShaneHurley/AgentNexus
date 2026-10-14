@@ -9,6 +9,13 @@ def capacity_snapshot(supervisor,run_id):
     root=supervisor.adapters["daily-coder"].root
     config=json.loads((root/"config/default.json").read_text())
     ceiling=config["limits"]["max_tokens_per_day"]
+    source="default"
+    override="codex_subscription_max_tokens_per_day"
+    if row["snapshot"].get("provider")=="codex_cli" and override in config["limits"]:
+        ceiling=config["limits"][override]
+        if ceiling is not None and (type(ceiling) is not int or ceiling<=0):
+            raise ValueError("invalid Codex subscription daily token limit")
+        source=override
     day=_today()
     spent=reserved=used=own_reserved=0
     database=root/".daily-coder/state.sqlite"
@@ -27,8 +34,8 @@ def capacity_snapshot(supervisor,run_id):
     parent=supervisor.store.accounting(row["root_id"])
     parent_available=max(0,root_row["limit_tokens"]-parent["tokens"]-parent["reserved_tokens"])
     return {"schema_version":1,"kind":"coder_capacity","run_id":run_id,"budget_day":day,"budget_day_convention":"native-local-date",
-            "daily_ceiling":ceiling,"consumed_tokens":spent,"outstanding_reserved_tokens":reserved,
-            "available_daily_tokens":max(0,ceiling-spent-reserved),
+            "daily_ceiling":ceiling,"daily_limit_source":source,"consumed_tokens":spent,"outstanding_reserved_tokens":reserved,
+            "available_daily_tokens":None if ceiling is None else max(0,ceiling-spent-reserved),
             "remaining_task_grant":max(0,task_limit-used-own_reserved),
             "available_parent_tokens":parent_available,
             "note":"Preview only; atomic dispatch reservations remain authoritative."}

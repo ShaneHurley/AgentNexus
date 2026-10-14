@@ -1,0 +1,23 @@
+name: Verify PR task and epic links
+on:
+  pull_request_target:
+    types: [opened, edited, reopened, synchronize, ready_for_review]
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+jobs:
+  issue_links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate task and epic links
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python tools/check_pr_issue_links.py

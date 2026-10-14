@@ -121,6 +121,19 @@ class BudgetManager:
             raise DailyCapExceeded({"day":day,"spent":spent,"max_spend_usd":mu})
         return spent
 
+    def reservation_diagnostics(self,run_id,profile,next_estimate):
+        cap=self._cap(profile); day=_today(); usage=self.state.total_usage(run_id)
+        active=self.state.active_budget_reservations(run_id)
+        daily=self.state.daily_reservations(day) if hasattr(self.state,"daily_reservations") else {"tokens":0,"calls":0}
+        spent=self.state.spend(day); ceiling=self.limits.get("max_tokens_per_day")
+        return {"schema_version":1,"scope":"native_provider_ledger","run_grant_tokens":self.limits.get("max_tokens_per_run",cap["total_tokens"]),
+            "consumed_tokens":usage["tokens"],"active_provider_reservations":active,"next_call_estimate":next_estimate,
+            "profile_tokens":cap["total_tokens"],"effective_run_tokens":self.usable_tokens(profile),
+            "daily_ceiling":ceiling,"daily_consumed_tokens":spent["tokens"],"daily_provider_reservations":daily,
+            "daily_headroom":None if ceiling is None else max(0,ceiling-spent["tokens"]-daily["tokens"]),
+            "reservation_relationship":"Supervisor task reservations are parents of provider reservations, not additive usage",
+            "note":"Diagnostic snapshot only; atomic reservation checks remain authoritative"}
+
     def reserve(self,run_id,profile,estimated_tokens,*,model=None,estimated_usd=None,reservation_id=None):
         """Atomically reserve headroom before a provider call."""
         self.rate_limiter.acquire()  # Rate-limit gate (cheap mode)
@@ -150,7 +163,7 @@ class BudgetManager:
                     daily_token_limit=self.limits.get("max_tokens_per_day"),
                     daily_usd_limit=self.limits.get("max_spend_usd"),run_usd_limit=self.limits.get("max_spend_usd_per_run"))
             except ValueError as exc:
-                raise BudgetExceeded({"reason":"persistent_budget_cap","detail":str(exc)}) from exc
+                raise BudgetExceeded({"reason":"persistent_budget_cap","detail":str(exc),"diagnostics":self.reservation_diagnostics(run_id,profile,estimated_tokens)}) from exc
             with self._lock:
                 self._reserved[run_id]=self._reserved.get(run_id,0)+estimated_tokens
                 self._reserved_calls[run_id]=self._reserved_calls.get(run_id,0)+1

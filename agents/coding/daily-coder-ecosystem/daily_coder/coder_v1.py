@@ -251,6 +251,9 @@ class CoderV1(Orchestrator):
             return self.state.get(run_id)
 
     def _acceptance(self,run_id,packet):
+        if not self._review_manifest_valid(run_id,require_review=True):
+            self._halt(run_id,"review_evidence",{"reason":"Review binding is missing, stale or incomplete"})
+            return "stop"
         plan=packet.get("plan") or {}
         paths=self._accepted_write_paths(run_id,self._write_broker(run_id),plan.get("file_allowlist",[]))
         if not paths or set(paths)!=set((packet.get("implement") or {}).get("changed_files",[])):

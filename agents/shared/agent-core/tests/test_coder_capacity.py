@@ -55,3 +55,17 @@ def test_preview_uses_authoritative_budget_day_at_utc_rollover(tmp_path,monkeypa
     result=module.capacity_snapshot(supervisor,"run")
     assert result["budget_day"]=="2001-01-01"
     assert result["available_daily_tokens"]==50000
+
+
+def test_subscription_trial_preview_has_no_daily_ceiling_but_keeps_reservations(tmp_path):
+    supervisor,_=fixture(tmp_path)
+    supervisor.store.get_run("run")["snapshot"]["provider"]="codex_cli"
+    (tmp_path/"config/default.json").write_text(json.dumps({"limits":{"max_tokens_per_day":750000,"codex_subscription_max_tokens_per_day":None}}))
+    result=capacity_snapshot(supervisor,"run")
+    assert result["daily_ceiling"] is None and result["available_daily_tokens"] is None
+    assert result["outstanding_reserved_tokens"]==42000
+    assert result["remaining_task_grant"]==30000
+    assert result["available_parent_tokens"]==30000
+    assert result["daily_limit_source"]=="codex_subscription_max_tokens_per_day"
+    supervisor.store.get_run("run")["snapshot"]["provider"]="openai"
+    assert capacity_snapshot(supervisor,"run")["daily_ceiling"]==750000

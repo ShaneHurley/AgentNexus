@@ -77,6 +77,7 @@ class Orchestrator:
         self.secrets = secrets or SecretStore(self.runtime_dir / "secrets.json")
         self.budget = BudgetManager(self.budgets, state, pricing=self.pricing,
                                     subscription_models=getattr(provider,"subscription_models",()),
+                                    provider_name=getattr(provider,"name",None),billing_kind=getattr(provider,"billing_kind",None),
                                     limits={**self.config.get("limits", {}),
                                             **({"deadline":self.resource_limits["deadline"]} if "deadline" in self.resource_limits else {}),
                                             **({"max_tokens_per_run":self.resource_limits["tokens"]} if "tokens" in self.resource_limits else {}),

@@ -243,3 +243,80 @@ def test_reviewer_receives_persisted_test_evidence_and_current_read_receipts(tmp
     assert {row["path"] for row in sources}=={"clamp.py","test_clamp.py"}
     assert all(engine.state.tool_operation(row["operation_ref"])["phase"]=="CODE_REVIEW" for row in sources)
     assert all(engine.state.tool_operation(row["operation_ref"])["role"]=="code_reviewer" for row in sources)
+
+
+def _approved_implementation(engine,run,packet):
+    for phase in ("INTAKE","SIZE","DECIDE","PLAN","PLAN_REVIEW"):
+        engine.state.transition(run,phase,{},run+":"+phase)
+    packet["plan"]=plan()
+    engine._ready_to_build(run,packet)
+    return packet["plan_hash"]
+
+def test_invalid_write_receipt_never_commits_implementation_or_recovers(tmp_path,monkeypatch):
+    from agent_core.lifecycle import ReconciliationRequired
+    engine,run,packet,gateway,broker=make(tmp_path)
+    plan_hash=_approved_implementation(engine,run,packet)
+    result=gateway.execute(run,"implementer","IMPLEMENT","filesystem.write",
+        {"path":"clamp.py","content":"value=2\n","expected_sha256":hashlib.sha256(b"value=1\n").hexdigest()},
+        plan_allowlist=["clamp.py"],plan_hash=plan_hash,operation_id="accepted")
+    assert result["sha256"]
+    with engine.state._connect() as c:
+        c.execute("UPDATE tool_operations SET result=? WHERE operation_id='accepted'",(json.dumps({"path":"clamp.py","sha256":"0"*64}),))
+    monkeypatch.setattr(engine,"_implement_chunks",lambda *a:{"changed_files":["clamp.py"],"commands":[],"observations":[],"blocked":False})
+    with pytest.raises(ReconciliationRequired):
+        engine._run_phase(run,"IMPLEMENT","S",packet,gateway,broker)
+    assert engine.state.get(run)["phase"]=="READY_TO_BUILD"
+    with pytest.raises(ReconciliationRequired): engine.reconcile_tools(run)
+    assert engine.state.get(run)["status"]=="RECONCILIATION_REQUIRED"
+    monkeypatch.setattr(engine,"_invoke",lambda *a,**kw:pytest.fail("Invalid write evidence cannot dispatch a model"))
+    assert engine.run(run)["status"]=="RECONCILIATION_REQUIRED"
+
+def test_real_broker_rejects_historical_traversal_and_symlink_escape(tmp_path):
+    from agent_core.lifecycle import ReconciliationRequired
+    engine,run,packet,gateway,broker=make(tmp_path)
+    ph=_approved_implementation(engine,run,packet)
+    external=tmp_path/"outside.py"; external.write_text("outside")
+    for index,path in enumerate(("../outside.py","escape.py")):
+        if path=="escape.py": (broker.repo/path).symlink_to(external)
+        engine.task_contract["allowed_paths"]=[path]
+        actor="task-contract:"+digest(engine.task_contract)
+        with engine.state._connect() as c: c.execute("UPDATE approvals SET actor=? WHERE run_id=?",(actor,run))
+        op="bad"+str(index)
+        engine.state.set_status(run,"ACTIVE")
+        engine.state.begin_tool_operation(op,run,"implementer","IMPLEMENT","filesystem.write",{"path":path,"content":"outside"},ph,str(external),hashlib.sha256(b"outside").hexdigest())
+        engine.state.finish_tool_operation(op,{"path":path,"sha256":hashlib.sha256(b"outside").hexdigest()})
+        with pytest.raises(ReconciliationRequired): engine._accepted_write_paths(run,broker,[path])
+        with engine.state._connect() as c: c.execute("DELETE FROM tool_operations WHERE operation_id=?",(op,))
+
+def test_narrow_repair_plan_keeps_prior_approved_effects_without_new_authority(tmp_path,monkeypatch):
+    engine,run,packet,gateway,broker=make(tmp_path)
+    engine.task_contract["allowed_paths"]=["clamp.py","b.py"]
+    engine.task_contract["operations"]=["modify","create"]
+    gateway.task_contract=engine.task_contract
+    ph=_approved_implementation(engine,run,packet)
+    gateway.execute(run,"implementer","IMPLEMENT","filesystem.write",
+        {"path":"clamp.py","content":"value=2\n","expected_sha256":hashlib.sha256(b"value=1\n").hexdigest()},
+        plan_allowlist=["clamp.py"],plan_hash=ph,operation_id="first")
+    repair={"file_allowlist":["b.py"],"change_units":[{"id":"b","file":"b.py","operation":"create","summary":"Repair"}],"unresolved_questions":[],"verification_commands":plan()["verification_commands"]}
+    packet["plan"]=repair
+    engine.state.prepare_plan_approval(run,"repair")
+    engine.state.decide_approval(run,"plan","repair","approved","task-contract:"+digest(engine.task_contract))
+    gateway.execute(run,"implementer","IMPLEMENT","filesystem.write",{"path":"b.py","content":"ok\n"},plan_allowlist=["b.py"],plan_hash="repair",operation_id="second")
+    assert engine._accepted_write_paths(run,broker,["b.py"])==["clamp.py","b.py"]
+    engine.artifacts.put(run,"plan","planner",repair)
+    packet["implement"]={"changed_files":["clamp.py","b.py"]}
+    original=json.loads(json.dumps(packet["plan"]))
+    def evaluate_only(self,rid,view):
+        assert view["plan"]["file_allowlist"]==["b.py","clamp.py"]
+        assert self.state.get(rid)["plan_hash"]=="repair"
+        view["acceptance"]={"verdict":"scope-evaluated"}
+        return "ok"
+    from daily_coder.orchestrator import Orchestrator
+    monkeypatch.setattr(Orchestrator,"_acceptance",evaluate_only)
+    assert engine._acceptance(run,packet)=="ok"
+    assert packet["plan"]==original
+    assert engine.artifacts.load(run,"plan")==original
+    assert engine.state.approval_state(run,"plan","repair")=="approved"
+    rejected=gateway.safe_execute(run,"implementer","IMPLEMENT","patch.apply",{"path":"clamp.py","find":"value=2","replace":"value=3","expected_sha256":hashlib.sha256(b"value=2\n").hexdigest()},plan_allowlist=["b.py"],plan_hash="repair",operation_id="forbidden-new-write")
+    assert rejected["ok"] is False
+    assert (broker.repo/"clamp.py").read_text()=="value=2\n"

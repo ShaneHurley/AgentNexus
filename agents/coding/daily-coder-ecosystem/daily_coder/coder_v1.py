@@ -52,6 +52,13 @@ class CoderV1(Orchestrator):
             return False
         return all(isinstance(finding,dict) and finding.get("severity") not in {"blocking","major"} for finding in review["findings"])
     def _gate(self,run_id,phase,role,value,packet):
+        if role=="implementer" and not is_incomplete(value) and not value.get("blocked"):
+            paths=self._accepted_write_paths(run_id,self._write_broker(run_id),(packet.get("plan") or {}).get("file_allowlist",[]))
+            if not paths:
+                self._halt(run_id,"no_recorded_changes",{"reason":"No successful gateway write receipts"})
+                return "stop"
+            value["changed_files"]=paths
+            self.artifacts.put(run_id,"implement","runtime",value)
         if role=="code_reviewer": self._ack_role_handoffs(run_id,"runtime:review_gate")
         if role=="code_reviewer" and not is_incomplete(value) and not self._review_clear(value):
             return ("repair","Code review is not passing or has unresolved blocking/major findings")
@@ -188,6 +195,78 @@ class CoderV1(Orchestrator):
             verified.append({**result,"decision":"allow"})
         return verified,[]
 
+    def _write_broker(self,run_id):
+        from .tool_broker import ToolBroker
+        from agent_core.runtime_authority import RuntimeAuthority
+        row=self.state.get(run_id)
+        return ToolBroker(row["repo"],self.tools_config,self.policies,
+            authority=RuntimeAuthority("dc",row["repo"],snapshot=self.registry_snapshot))
+
+    def reconcile_tools(self,run_id):
+        from agent_core.lifecycle import RunLock
+        key=str(self.state.path.resolve())+":"+run_id
+        with RunLock(self.state.path.parent/"run-locks",key):
+            result=super().reconcile_tools(run_id)
+            if result["status"]=="ACTIVE":
+                plan=self.artifacts.load(run_id,"plan") or {}
+                self._accepted_write_paths(run_id,self._write_broker(run_id),plan.get("file_allowlist",[]))
+            return self.state.get(run_id)
+
+    def _acceptance(self,run_id,packet):
+        plan=packet.get("plan") or {}
+        paths=self._accepted_write_paths(run_id,self._write_broker(run_id),plan.get("file_allowlist",[]))
+        if not paths or set(paths)!=set((packet.get("implement") or {}).get("changed_files",[])):
+            self._halt(run_id,"write_evidence",{"reason":"Implementation scope lacks complete durable evidence"})
+            return "stop"
+        # Historical approved effects remain in candidate scope. This local
+        # evaluation view is never persisted as a new plan or used for dispatch.
+        view={**packet,"plan":{**plan,"file_allowlist":sorted(set(plan["file_allowlist"])|set(paths))}}
+        result=super()._acceptance(run_id,view)
+        if "acceptance" in view: packet["acceptance"]=view["acceptance"]
+        return result
+
+    def _accepted_write_paths(self,run_id,broker,plan_allowlist):
+        from agent_core.lifecycle import ReconciliationRequired
+        from agent_core.task_contract import literal_path
+        from .tool_broker import file_sha
+        def deny(reason):
+            self.state.set_status(run_id,RunStatus.RECONCILIATION_REQUIRED)
+            raise ReconciliationRequired(reason)
+        if self.state.pending_tool_operations(run_id):
+            deny("Pending tool effects prevent accepted-write accounting")
+        latest={}
+        try:
+            for op in self.state.write_operations(run_id):
+                if op["state"]=="denied":
+                    continue
+                if (op["state"]!="completed" or op["run_id"]!=run_id
+                    or op["role"]!="implementer" or op["phase"]!="IMPLEMENT"
+                    or op["tool"] not in {"filesystem.write","patch.apply"}
+                    or not op["plan_hash"] or op["approval_state"]!="approved"
+                    or op["approval_actor"]!="task-contract:"+digest(self.task_contract)):
+                    deny("Write receipt lacks completed task-derived authority")
+                args=json.loads(op["arguments"]); result=json.loads(op["result"])
+                if not isinstance(args,dict) or not isinstance(result,dict):
+                    deny("Malformed durable write receipt")
+                path=literal_path(args["path"])
+                if (path not in self.task_contract["allowed_paths"] or
+                    (op["plan_hash"]==self.state.get(run_id).get("plan_hash") and path not in plan_allowlist)):
+                    deny("Accepted write is outside the current task or plan")
+                target=broker.safe_path(path)
+                expected=op["expected_output_hash"]
+                if (op["path"]!=str(target) or result.get("path")!=path
+                    or not isinstance(expected,str) or len(expected)!=64
+                    or any(c not in "0123456789abcdef" for c in expected)
+                    or result.get("sha256")!=expected):
+                    deny("Durable write paths or output hashes disagree")
+                latest[path]=(target,expected)
+            for target,expected in latest.values():
+                if not target.is_file() or file_sha(target)!=expected:
+                    deny("Accepted write source changed; reconciliation required")
+        except (ValueError,KeyError,TypeError,OSError,PermissionError) as exc:
+            deny("Invalid durable write evidence: "+type(exc).__name__)
+        return list(latest)
+
     def _run_phase(self,run_id,phase,profile,packet,gateway,broker):
         received={"PLAN_REVIEW":"runtime:plan_review","TEST_EXECUTE":"runtime:test_execute"}.get(phase)
         if received: self._ack_role_handoffs(run_id,received)
@@ -213,17 +292,6 @@ class CoderV1(Orchestrator):
             value=packet.get("implement") or {}
             if is_incomplete(value) or value.get("blocked"):
                 return self._recover_then_stop(run_id,"code_reviewer","CODE_REVIEW",packet,gateway,"Implementation evidence incomplete; inspect actual diff without claiming completion.")
-            writes=[]
-            for call in self.state.tool_calls(run_id,limit=1000):
-                if call["phase"]=="IMPLEMENT" and call["tool"] in {"filesystem.write","patch.apply"} and call["decision"]=="allow":
-                    path=json.loads(call["arguments"])["path"]
-                    if path not in writes: writes.append(path)
-            if not writes:
-                self._halt(run_id,"no_recorded_changes",{"reason":"No successful gateway write receipts"})
-                return "stop"
-            value["changed_files"]=writes
-            self.artifacts.put(run_id,"implement","runtime",value)
-            packet["implement"]=value
             return outcome
         if phase=="TEST_EXECUTE":
             commands=[]; receipts=[]; passed=True

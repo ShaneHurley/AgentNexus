@@ -313,7 +313,6 @@ def test_narrow_repair_plan_keeps_prior_approved_effects_without_new_authority(t
         return "ok"
     from daily_coder.orchestrator import Orchestrator
     monkeypatch.setattr(Orchestrator,"_acceptance",evaluate_only)
-    monkeypatch.setattr(engine,"_review_manifest_valid",lambda *a,**kw:True)
     assert engine._acceptance(run,packet)=="ok"
     assert packet["plan"]==original
     assert engine.artifacts.load(run,"plan")==original

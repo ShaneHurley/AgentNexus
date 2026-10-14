@@ -60,38 +60,73 @@ class CoderV1(Orchestrator):
             value["changed_files"]=paths
             self.artifacts.put(run_id,"implement","runtime",value)
         if role=="code_reviewer": self._ack_role_handoffs(run_id,"runtime:review_gate")
+        if role=="code_reviewer" and self._review_clear(value):
+            if not self._review_manifest_valid(run_id): return ("repair","Review lacks complete current tested candidate evidence")
+            manifest=self.artifacts.load(run_id,"candidate_manifest")
+            self.artifacts.put(run_id,"review_binding","runtime",{"manifest_hash":digest(manifest),"plan_hash":self.state.get(run_id)["plan_hash"]})
         if role=="code_reviewer" and not is_incomplete(value) and not self._review_clear(value):
             return ("repair","Code review is not passing or has unresolved blocking/major findings")
         return super()._gate(run_id,phase,role,value,packet)
+    def _baseline_sources(self,run_id,broker):
+        from .candidate_evidence import collect_source
+        from agent_core.lifecycle import ReconciliationRequired
+        gateway=PolicyGateway(broker,self.state,self.policies,self.live,deadline=self.resource_limits.get("deadline"),task_contract=self.task_contract)
+        rows=[]; writes=self.state.write_operations(run_id)
+        for index,path in enumerate(self.task_contract["allowed_paths"]):
+            prefix=f"{run_id}:candidate-baseline:{index}"
+            exists=self.state.tool_operation(prefix+":0:80") is not None
+            if writes and not exists: raise ReconciliationRequired("Initial source baseline missing after a write")
+            rows.append(collect_source(self.state,gateway,run_id,"planner","PLAN",path,prefix,stored=exists))
+        return rows
+
     def _source_snapshots(self,run_id,role,broker):
-        from agent_core.task_contract import literal_path
+        from .candidate_evidence import collect_source,excerpts,oracle_paths
+        self._baseline_sources(run_id,broker)
         paths=list(self.task_contract["allowed_paths"])
-        for argv in self.task_contract["verification_commands"]:
-            for token in argv:
-                if not token.endswith(".py"): continue
-                try: path=literal_path(token)
-                except ContractDenied: continue
-                if path not in paths: paths.append(path)
-        paths=paths[:6]
+        for path in oracle_paths(self.task_contract["verification_commands"]):
+            if path not in paths: paths.append(path)
         gateway=PolicyGateway(broker,self.state,self.policies,self.live,deadline=self.resource_limits.get("deadline"),task_contract=self.task_contract)
         cycle=self.state.get(run_id).get("repair_cycles",0)
-        per_file=max(300,min(1500,4000//len(paths)))
-        entries=[]
         phase={"planner":"PLAN","implementer":"IMPLEMENT","code_reviewer":"CODE_REVIEW"}[role]
-        for index,path in enumerate(paths):
-            operation=f"{run_id}:source-prefetch:{role}:c{cycle}:{index}"
-            outcome=gateway.safe_execute(run_id,role,phase,"filesystem.read",{"path":path,"start":1,"end":120},operation_id=operation)
-            result=outcome.get("result") or {}
-            entry={"path":path,"operation_ref":operation,"write_scope":path in self.task_contract["allowed_paths"]}
-            if outcome.get("ok") is True:
-                content=result.get("content","")
-                bounded=content.encode()[:per_file].decode(errors="replace")
-                entry.update(status="available",content=bounded,content_format="numbered source lines",sha256=result.get("sha256"),
-                    complete=not result.get("truncated") and result.get("end")==result.get("total_lines") and len(content.encode())<=per_file)
-            else:
-                entry.update(status="absent" if outcome.get("error")=="FileNotFoundError" else "unavailable",error=outcome.get("error"),complete=False)
-            entries.append(entry)
-        return entries
+        rows=[collect_source(self.state,gateway,run_id,role,phase,path,f"{run_id}:source-prefetch:{role}:c{cycle}:{index}") for index,path in enumerate(paths[:6])]
+        return excerpts(rows,self.task_contract["allowed_paths"])
+
+    def _candidate_review_manifest(self,run_id,broker):
+        from .candidate_evidence import collect_source,candidate_manifest
+        row=self.state.get(run_id); plan=self.artifacts.load(run_id,"plan") or {}
+        changed=self._accepted_write_paths(run_id,broker,plan.get("file_allowlist",[]))
+        receipt=self.artifacts.load(run_id,"test_receipts") or {}
+        if not changed or not receipt.get("commands"):
+            return {"incomplete":True,"reason":"Complete accepted writes and verification receipts required"}
+        verified,_=self._acceptance_verification(run_id,row)
+        if (not verified or any(item.get("decision")!="allow" or type(item.get("returncode")) is not int
+            or item["returncode"]!=0 or item.get("timeout") or item.get("cancelled") for item in verified)):
+            return {"incomplete":True,"reason":"Durable current isolated verification is required"}
+        baseline=self._baseline_sources(run_id,broker)
+        gateway=PolicyGateway(broker,self.state,self.policies,self.live,deadline=self.resource_limits.get("deadline"),task_contract=self.task_contract)
+        current=[collect_source(self.state,gateway,run_id,"code_reviewer","CODE_REVIEW",path,f"{run_id}:review-candidate:c{row['repair_cycles']}:{index}") for index,path in enumerate(self.task_contract["allowed_paths"])]
+        manifest=candidate_manifest(self.task_contract,row["plan_hash"],receipt,baseline,current,changed)
+        self.artifacts.put(run_id,"candidate_manifest","runtime",manifest)
+        return manifest
+
+    def _review_manifest_valid(self,run_id,require_review=False):
+        from .tool_broker import file_sha
+        manifest=self.artifacts.load(run_id,"candidate_manifest") or {}; receipt=self.artifacts.load(run_id,"test_receipts") or {}
+        row=self.state.get(run_id)
+        if (manifest.get("incomplete") or manifest.get("task_contract_hash")!=digest(self.task_contract)
+            or manifest.get("plan_hash")!=row["plan_hash"] or manifest.get("test_receipt_hash")!=digest(receipt)
+            or manifest.get("tested_scope_hash")!=scope_hash(self.task_contract) or not manifest.get("files")):
+            return False
+        broker=self._write_broker(run_id); plan=self.artifacts.load(run_id,"plan") or {}
+        paths=self._accepted_write_paths(run_id,broker,plan.get("file_allowlist",[]))
+        if len(manifest["files"])!=len(paths) or {item["path"] for item in manifest["files"]}!=set(paths): return False
+        for item in manifest["files"]:
+            if item.get("complete") is not True or file_sha(broker.safe_path(item["path"]))!=item.get("after_sha256"): return False
+        if require_review:
+            binding=self.artifacts.load(run_id,"review_binding") or {}
+            if binding.get("manifest_hash")!=digest(manifest) or binding.get("plan_hash")!=row["plan_hash"]: return False
+        return True
+
     def _role_extra(self,run_id,role,packet,broker):
         extra=super()._role_extra(run_id,role,packet,broker)
         extra["TASK_CONTRACT"]=self.task_contract
@@ -99,6 +134,9 @@ class CoderV1(Orchestrator):
             extra["SOURCE_SNAPSHOTS"]=self._source_snapshots(run_id,role,broker)
             extra["SOURCE_SNAPSHOT_INSTRUCTION"]="These are actual authorized gateway read receipts, not new permissions. Use supplied content and SHA256; reread only when incomplete or stale. Verification argv names are read context only, never additional write scope."
         if role=="code_reviewer":
+            manifest=self._candidate_review_manifest(run_id,broker)
+            extra["CANDIDATE_MANIFEST"]=manifest
+            extra["diff"]={"source":"complete task-bound candidate manifest","manifest_hash":digest(manifest),"files":[{"path":item["path"]} for item in manifest.get("files",[])]}
             from agent_core.handoffs import sanitized_raw
             receipt=self.artifacts.load(run_id,"test_receipts") or {}
             evidence=self.artifacts.load(run_id,"test_execute") or {}
@@ -213,6 +251,9 @@ class CoderV1(Orchestrator):
             return self.state.get(run_id)
 
     def _acceptance(self,run_id,packet):
+        if not self._review_manifest_valid(run_id,require_review=True):
+            self._halt(run_id,"review_evidence",{"reason":"Review binding is missing, stale or incomplete"})
+            return "stop"
         plan=packet.get("plan") or {}
         paths=self._accepted_write_paths(run_id,self._write_broker(run_id),plan.get("file_allowlist",[]))
         if not paths or set(paths)!=set((packet.get("implement") or {}).get("changed_files",[])):

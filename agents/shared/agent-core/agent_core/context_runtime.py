@@ -10,7 +10,7 @@ VARIANTS = ("baseline", "bounded-context-v1")
 def context_pin(variant="baseline"):
     if variant not in VARIANTS:
         raise ValueError("unsupported context variant")
-    value = {"version": 1, "variant": variant, "evidence_records": 8, "evidence_tokens": 4000,
+    value = {"version": 2, "variant": variant, "required_field_chars":24000, "optional_field_chars":6000, "source_file_chars":12000, "source_total_chars":24000, "evidence_records": 8, "evidence_tokens": 4000,
              "tool_context_chars": 12000 if variant == "bounded-context-v1" else 24000}
     return {"context_policy": value, "context_policy_hash": digest(value)}
 

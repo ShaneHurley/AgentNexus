@@ -7,7 +7,7 @@ from __future__ import annotations
 import json
 
 # Pinned slots are never compacted away: rules, permissions, acceptance criteria, anchor.
-PINNED = ("ORIGINAL_REQUEST", "task_anchor", "constraints", "acceptance_criteria", "file_allowlist", "permissions", "profile", "repo", "plan_hash", "approval_hash", "budget", "pending_calls")
+PINNED = ("ORIGINAL_REQUEST", "task_anchor", "constraints", "acceptance_criteria", "file_allowlist", "permissions", "profile", "repo", "plan_hash", "approval_hash", "budget", "pending_calls", "TASK_CONTRACT")
 
 ROLE_INPUTS: dict[str, tuple[str, ...]] = {
     "sizer": ("request",),
@@ -15,12 +15,12 @@ ROLE_INPUTS: dict[str, tuple[str, ...]] = {
     "brainstormer": ("request", "research_digest"),
     "master": ("request", "research_digest", "brainstorm", "diagnosis", "frontier_advice"),
     "test_designer": ("decide",),
-    "planner": ("decide", "test_design", "research_digest", "skills"),
+    "planner": ("decide", "test_design", "research_digest", "skills", "SOURCE_SNAPSHOTS"),
     "plan_reviewer": ("decide", "plan", "test_design"),
-    "implementer": ("plan_slice", "plan_hash", "skills"),
+    "implementer": ("plan_slice", "plan_hash", "skills", "SOURCE_SNAPSHOTS"),
     "test_author": ("test_design", "decide", "implement_summary"),
     "test_executor": ("verification_commands", "test_author"),
-    "code_reviewer": ("diff", "decide", "plan"),
+    "code_reviewer": ("diff", "decide", "plan", "SOURCE_SNAPSHOTS", "CANDIDATE_MANIFEST", "VERIFICATION_EVIDENCE"),
     "documenter": ("decide", "implement_summary", "diff_summary"),
     "alignment_checker": ("decide", "plan_summary", "implement_summary", "boundary"),
     "failure_diagnostician": ("failure", "phase", "evidence"),
@@ -29,6 +29,17 @@ ROLE_INPUTS: dict[str, tuple[str, ...]] = {
 }
 
 MAX_FIELD_CHARS = 6000
+MAX_REQUIRED_FIELD_CHARS = 24000
+REQUIRED_FIELDS = frozenset({"TASK_CONTRACT", "plan_slice", "CANDIDATE_MANIFEST", "VERIFICATION_EVIDENCE", "SOURCE_SNAPSHOTS"})
+
+class ContextCapacityError(ValueError):
+    reason_code = "context_capacity"
+    def __init__(self, field, actual_chars, limit=MAX_REQUIRED_FIELD_CHARS):
+        self.field=field; self.actual_chars=actual_chars; self.limit=limit
+        super().__init__(f"context_capacity: {field} needs {actual_chars} characters; limit {limit}")
+    def as_dict(self):
+        return {"reason_code":self.reason_code,"field":self.field,"actual_chars":self.actual_chars,"limit":self.limit}
+
 DIGEST_CHARS = 2000
 MAX_TOOL_CONTEXT_CHARS = 24000
 RECENT_TOOL_RESULTS = 4
@@ -150,12 +161,19 @@ def should_stop_research(cards: list, *, min_cards: int = 2) -> bool:
 
 def build_packet(role, packet, extra=None):
     """Return the bounded slice for `role`."""
-    sliced = {k: packet[k] for k in PINNED if k in packet}
+    def project(key,value):
+        if key in REQUIRED_FIELDS or (key=="plan" and role in {"plan_reviewer","code_reviewer"}):
+            size=len(json.dumps(value,sort_keys=True,allow_nan=False))
+            if MAX_REQUIRED_FIELD_CHARS < size:
+                raise ContextCapacityError(key,size)
+            return value
+        return _truncate(value)
+    sliced = {k: project(k,packet[k]) if k in REQUIRED_FIELDS else packet[k] for k in PINNED if k in packet}
     for key in ROLE_INPUTS.get(role, ()):
         if key in packet:
-            sliced[key] = _truncate(packet[key])
-    for k, v in (extra or {}).items():
-        sliced[k] = _truncate(v)
+            sliced[key] = project(key,packet[key])
+    for k,v in (extra or {}).items():
+        sliced[k] = project(k,v)
     return sliced
 
 def project_tool_results(results, max_chars=MAX_TOOL_CONTEXT_CHARS, recent=RECENT_TOOL_RESULTS):
@@ -174,30 +192,54 @@ def project_tool_results(results, max_chars=MAX_TOOL_CONTEXT_CHARS, recent=RECEN
     def encoded(value):
         return json.dumps(value, sort_keys=True, default=str)
 
-    def reference(item):
-        result = item.get("result") or {}
-        serialized = encoded(result)
+    def compact_write(item):
+        if item.get("ok") is not True or item.get("tool") not in {"filesystem.write","patch.apply"}:
+            return item
+        args=item.get("arguments") or {}; result=item.get("result") or {}
+        if not isinstance(args,dict) or not isinstance(result,dict): return item
+        projected={key:item[key] for key in ("call_id","tool","operation_ref","ok","error","turn") if key in item}
+        projected.update(compacted_write=True,arguments_hash=hashlib.sha256(encoded(args).encode()).hexdigest(),
+                         result_hash=hashlib.sha256(encoded(result).encode()).hexdigest())
+        projected["result"]={key:result[key] for key in ("path","bytes","applied","sha256","status") if key in result}
+        if "expected_sha256" in args: projected["expected_sha256"]=args["expected_sha256"]
+        return projected
+
+    results=[compact_write(item) for item in results]
+    def reference(item,keep_source=False):
+        if item.get("compacted_write"): return dict(item)
+        result=item.get("result") or {}
         status = {key: result[key] for key in
                   ("returncode", "timeout", "cancelled", "cancellation_confirmed")
-                  if isinstance(result, dict) and key in result}
+                  if isinstance(result,dict) and key in result}
         ref = {
             "call_id": item.get("call_id"), "tool": item.get("tool"),
             "operation_ref": item.get("operation_ref"), "ok": item.get("ok"),
             "error": item.get("error"), "result": status,
-            "result_hash": hashlib.sha256(serialized.encode()).hexdigest(),
-            "arguments_hash": hashlib.sha256(encoded(item.get("arguments")).encode()).hexdigest(),
-            "truncated": True, "original_chars": len(encoded(item)),
+            "result_hash": item.get("result_hash") or hashlib.sha256(encoded(result).encode()).hexdigest(),
+            "arguments_hash": item.get("arguments_hash") or hashlib.sha256(encoded(item.get("arguments")).encode()).hexdigest(),
+            "truncated": True, "original_chars": item.get("original_chars",len(encoded(item))),
         }
-        if len(encoded(item.get("arguments"))) <= 1000:
-            ref["arguments"] = item.get("arguments")
+        if item.get("tool")=="filesystem.read" and isinstance(result,dict):
+            ref["result"].update({key:result[key] for key in ("path","sha256","start","end","total_lines","truncated") if key in result})
+            if keep_source and "content" in result:
+                ref["result"]["content"]=result["content"]
+            else:
+                ref["result"].update(content_omitted=True,complete=False)
+        if "arguments" in item and len(encoded(item["arguments"])) <= 1000:
+            ref["arguments"] = item["arguments"]
         return ref
 
     older, latest = results[:-recent], results[-recent:]
     projected = ([{"compacted": True, "count": len(older),
-                   "evidence": [reference(item) for item in older]}] if older else [])
+                   "evidence": [reference(item,keep_source=True) for item in older]}] if older else [])
     projected.extend(latest)
     if len(encoded(projected)) <= max_chars:
         return projected
+    # Drop older source bodies first, preserving receipt identity and hashes.
+    if older:
+        for index,item in enumerate(projected[0]["evidence"]):
+            projected[0]["evidence"][index]=reference(item)
+            if len(encoded(projected)) <= max_chars: return projected
     # Reduce observations, never their receipt identity or execution outcome.
     offset = 1 if older else 0
     for index in range(offset, len(projected)):

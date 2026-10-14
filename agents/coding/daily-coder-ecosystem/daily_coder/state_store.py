@@ -184,6 +184,18 @@ class StateStore:
             row=c.execute("SELECT * FROM tool_operations WHERE operation_id=?",(operation_id,)).fetchone()
             return dict(row) if row else None
 
+    def write_operations(self,run_id):
+        """Full durable implementation writes; display logs are never authority."""
+        with self._connect() as c:
+            return [dict(row) for row in c.execute("""
+                SELECT o.*, a.state AS approval_state, a.actor AS approval_actor
+                FROM tool_operations o LEFT JOIN approvals a
+                  ON a.run_id=o.run_id AND a.kind='plan' AND a.subject_hash=o.plan_hash
+                WHERE o.run_id=? AND o.phase='IMPLEMENT'
+                  AND o.tool IN ('filesystem.write','patch.apply')
+                ORDER BY o.created, o.operation_id
+            """,(run_id,))]
+
     def pending_tool_operations(self,run_id):
         with self._connect() as c:
             return [dict(row) for row in c.execute("SELECT * FROM tool_operations WHERE run_id=? AND state='pending'",(run_id,))]

@@ -103,8 +103,10 @@ class ToolBroker:
         start=max(1,int(a.get("start",1))); end=min(len(lines),int(a.get("end",start+399)))
         body="\n".join(f"{i}\t{lines[i-1]}" for i in range(start,end+1)) if lines else ""
         clean=redact(body)
+        source="".join(text.splitlines(keepends=True)[start-1:end]); source_clean=redact(source)
         return {"path":a["path"],"start":start,"end":end,"total_lines":len(lines),"sha256":digest,
                 "content":clean[:MAX_OUTPUT_CHARS],"truncated":len(clean)>MAX_OUTPUT_CHARS,
+                "ends_with_newline":raw.endswith(b"\n"),"source_text":source_clean[:MAX_OUTPUT_CHARS],"redacted":clean!=body or source_clean!=source,
                 "expansion":{"path":a["path"],"start":start,"end":end,"sha256":digest,"instruction":"Request smaller line ranges when truncated; each read is reauthorized."} if len(clean)>MAX_OUTPUT_CHARS else None}
     def _t_filesystem_list(self,a,_allow=None):
         p=self.safe_path(a.get("path","."))

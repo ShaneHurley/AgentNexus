@@ -112,5 +112,54 @@ class TestRoleInputs(unittest.TestCase):
             self.assertLessEqual(len(encoded), DIGEST_CHARS + 200)
 
 
+
+
+
+class TestRequiredContext(unittest.TestCase):
+    def test_long_plan_and_sources_remain_structured(self):
+        units=[{"id":"one","content":"x"*15000}]
+        sources=[{"path":"a.py","sha256":"a"*64,"content":"x"*7000,"complete":True}]
+        self.assertEqual(build_packet("implementer",{}, {"plan_slice":units})["plan_slice"],units)
+        self.assertEqual(build_packet("planner",{}, {"SOURCE_SNAPSHOTS":sources})["SOURCE_SNAPSHOTS"],sources)
+        self.assertEqual(build_packet("code_reviewer",{"plan":{"change_units":units}})["plan"],{"change_units":units})
+    def test_required_oversize_has_structured_failure(self):
+        from daily_coder.context import ContextCapacityError
+        for field in ("TASK_CONTRACT","plan_slice","SOURCE_SNAPSHOTS","CANDIDATE_MANIFEST","VERIFICATION_EVIDENCE"):
+            with self.subTest(field=field),self.assertRaises(ContextCapacityError) as caught:
+                build_packet("implementer",{}, {field:{"body":"x"*24000}})
+            self.assertEqual(caught.exception.as_dict()["reason_code"],"context_capacity")
+            self.assertEqual(caught.exception.field,field)
+    def test_write_feedback_compact_immutable_and_hash_bound(self):
+        import hashlib
+        from daily_coder.context import project_tool_results
+        args={"path":"a.py","content":"x"*16000,"expected_sha256":"a"*64}
+        item={"call_id":"call","operation_ref":"op","tool":"filesystem.write","ok":True,"arguments":args,"result":{"path":"a.py","sha256":"b"*64,"bytes":16000}}
+        before=json.loads(json.dumps(item)); output=project_tool_results([item])
+        self.assertEqual(item,before)
+        self.assertLess(len(json.dumps(output)),1000)
+        self.assertNotIn("arguments",output[0])
+        self.assertEqual(output[0]["arguments_hash"],hashlib.sha256(json.dumps(args,sort_keys=True,default=str).encode()).hexdigest())
+        self.assertEqual(output[0]["result"]["sha256"],"b"*64)
+        self.assertEqual(output[0]["operation_ref"],"op")
+    def test_older_source_fits_and_reduces_to_usable_metadata(self):
+        from daily_coder.context import project_tool_results
+        read={"call_id":"read","operation_ref":"read-op","tool":"filesystem.read","ok":True,"arguments":{"path":"a.py"},"result":{"path":"a.py","sha256":"a"*64,"start":1,"end":49,"total_lines":49,"truncated":False,"content":"x"*5000}}
+        later=[{"call_id":str(i),"tool":"filesystem.list","operation_ref":str(i),"ok":True,"result":{}} for i in range(4)]
+        output=project_tool_results([read]+later)
+        self.assertEqual(output[0]["evidence"][0]["result"]["content"],read["result"]["content"])
+        output=project_tool_results([read],max_chars=1000)
+        meta=output[0]["result"]
+        self.assertEqual(meta["sha256"],"a"*64)
+        self.assertEqual((meta["start"],meta["end"],meta["total_lines"]),(1,49,49))
+        self.assertTrue(meta["content_omitted"])
+        self.assertFalse(meta["complete"])
+
+    def test_packet_required_fields_are_selected_and_checked(self):
+        from daily_coder.context import ContextCapacityError
+        for role,key in (("planner","TASK_CONTRACT"),("planner","SOURCE_SNAPSHOTS"),("code_reviewer","CANDIDATE_MANIFEST"),("code_reviewer","VERIFICATION_EVIDENCE")):
+            value={"body":"x"*15000}
+            self.assertEqual(build_packet(role,{key:value})[key],value)
+            with self.assertRaises(ContextCapacityError): build_packet(role,{key:{"body":"x"*24000}})
+
 if __name__ == "__main__":
     unittest.main()

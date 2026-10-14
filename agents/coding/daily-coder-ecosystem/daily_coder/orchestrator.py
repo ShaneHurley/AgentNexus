@@ -301,6 +301,8 @@ class Orchestrator:
             except ReconciliationRequired:
                 self.state.set_status(run_id, RunStatus.RECONCILIATION_REQUIRED)
                 return self.state.get(run_id)
+            except ctx.ContextCapacityError as exc:
+                return self._halt(run_id,"context_capacity",exc.as_dict())
             except (BudgetExceeded, DailyCapExceeded) as exc:
                 return self._halt(run_id, "budget", {"detail": str(exc)})
             except ApprovalRequired as exc:

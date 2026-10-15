@@ -46,3 +46,22 @@ def test_paged_source_uses_original_offsets_and_does_not_expose_other_lines(tmp_
     assert first["source_text"]=="token=args[index]\n" and first["redacted"] is False
     assert "password" not in first["source_text"]
     assert second["redacted"] is True and "private-value" not in second["source_text"]
+
+
+@pytest.mark.parametrize("path",["clamp.py","settings.txt"])
+def test_secret_assignment_crossing_page_boundary_stays_hidden(tmp_path,path):
+    engine,run,packet,gateway,broker=helpers.make(tmp_path)
+    (broker.repo/path).write_text("token=\n 'private-value'\n")
+    for line in (1,2):
+        receipt=broker._t_filesystem_read({"path":path,"start":line,"end":line})
+        assert receipt["redacted"] is True
+        assert "private-value" not in receipt["source_text"]
+
+
+def test_exemption_ceiling_is_conservative(tmp_path):
+    engine,run,packet,gateway,broker=helpers.make(tmp_path)
+    (broker.repo/"clamp.py").write_text("token=args[index]\n"*513)
+    first=broker._t_filesystem_read({"path":"clamp.py","start":1,"end":1})
+    last=broker._t_filesystem_read({"path":"clamp.py","start":513,"end":513})
+    assert first["redacted"] is False
+    assert last["redacted"] is True

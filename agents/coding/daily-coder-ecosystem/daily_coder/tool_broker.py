@@ -19,7 +19,7 @@ def redact(text):
     return text
 
 def _source_read_text(text,path,start,end):
-    """Exempt only AST-proven Python reference assignments, never literals."""
+    """Preserve proven Python references and control syntax; retain credential filters."""
     safe={}
     if path.suffix==".py" and len(text)<=1000000:
         try:
@@ -42,6 +42,32 @@ def _source_read_text(text,path,start,end):
                     if target.id.casefold() not in {"api_key","apikey","secret","password","passwd","token","bearer","authorization"}: continue
                     if len(safe)==512: break
                     safe[position(target.lineno,target.col_offset)]=(position(value.lineno,value.col_offset),position(value.end_lineno,value.end_col_offset))
+            sensitive={"api_key","apikey","secret","password","passwd","token","bearer","authorization"}
+            controls=[node for node in ast.walk(tree) if isinstance(node,(ast.If,ast.While)) and node.body]
+            control_ends={(node.test.end_lineno,node.test.end_col_offset) for node in controls}
+            for node in controls:
+                if len(safe)==512: break
+                keyword={ast.Return:"return",ast.Raise:"raise",ast.Pass:"pass",ast.Break:"break",ast.Continue:"continue"}.get(type(node.body[0]))
+                if keyword is None: continue
+                first=node.body[0]; body=position(first.lineno,first.col_offset)
+                for name in ast.walk(node.test):
+                    if len(safe)==512: break
+                    if not isinstance(name,ast.Name) or name.id.casefold() not in sensitive: continue
+                    if (name.end_lineno,name.end_col_offset)!=(node.test.end_lineno,node.test.end_col_offset): continue
+                    finish=position(name.end_lineno,name.end_col_offset)
+                    if re.fullmatch(r"\s*:\s*",text[finish:body]) is None: continue
+                    if len(safe)<512: safe[position(name.lineno,name.col_offset)]=(body+len(keyword),body+len(keyword))
+            for node in ast.walk(tree):
+                if len(safe)==512: break
+                if (not isinstance(node,ast.Compare) or not isinstance(node.left,ast.Name) or node.left.id.casefold()!="token"
+                    or len(node.ops)!=1 or not isinstance(node.ops[0],ast.Eq) or len(node.comparators)!=1
+                    or not isinstance(node.comparators[0],ast.Constant) or node.comparators[0].value!="--"): continue
+                name=node.left; first=position(name.end_lineno,name.end_col_offset)+1
+                finish=position(node.end_lineno,node.end_col_offset)
+                if (node.end_lineno,node.end_col_offset) in control_ends:
+                    delimiter=re.match(r"\s*:",text[finish:])
+                    if delimiter: finish+=delimiter.end()
+                if len(safe)<512: safe[position(name.lineno,name.col_offset)]=(first,finish)
         except (SyntaxError,ValueError,RecursionError,IndexError): safe={}
     spans=[]
     for index,pattern in enumerate(SECRET_PATTERNS):

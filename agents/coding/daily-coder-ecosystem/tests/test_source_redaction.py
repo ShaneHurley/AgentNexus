@@ -1,4 +1,4 @@
-"""Source references remain exact; literals and uncertain secrets stay hidden."""
+"""Source syntax remains exact; credential assignments and uncertain text stay hidden."""
 import hashlib
 import importlib.util
 from pathlib import Path
@@ -65,3 +65,39 @@ def test_exemption_ceiling_is_conservative(tmp_path):
     last=broker._t_filesystem_read({"path":"clamp.py","start":513,"end":513})
     assert first["redacted"] is False
     assert last["redacted"] is True
+
+
+@pytest.mark.parametrize("body",[
+    "if not token: return args\n", "while token: break\n", "if token: raise ValueError()\n",
+    "if token: pass\n", "while token: continue\n", 'if token=="--":\n    pass\n',
+    'if token == "--":\n    pass\n', 'if manager=="npx" and token=="--":\n    remaining=args[index+1:]\n'])
+def test_proven_control_syntax_remains_exact(tmp_path,body):
+    engine,run,packet,gateway,broker=helpers.make(tmp_path)
+    (broker.repo/"clamp.py").write_text(body)
+    result=collect_source(engine.state,gateway,run,"planner","PLAN","clamp.py",run+":syntax")
+    assert result["content"]==body
+
+
+@pytest.mark.parametrize("body",['if password=="private-value":\n    pass\n',
+    'if password=="--":\n    pass\n','if token=="--private":\n    pass\n',
+    'text=\'token=="--":\'\n', '# token: return\n', 'if token: returnanything\n'])
+def test_literal_or_fake_control_syntax_remains_filtered(tmp_path,body):
+    engine,run,packet,gateway,broker=helpers.make(tmp_path)
+    (broker.repo/"clamp.py").write_text(body)
+    result=broker._t_filesystem_read({"path":"clamp.py","start":1,"end":80})
+    assert result["redacted"] is True
+    assert "private-value" not in result["source_text"]
+
+
+
+def test_long_condition_does_not_reencode_line_for_every_name():
+    from daily_coder.tool_broker import _source_read_text
+    encoded=[]
+    class MeasuredText(str):
+        def __getitem__(self,key): return MeasuredText(super().__getitem__(key))
+        def encode(self,*args,**kwargs):
+            encoded.append(len(self))
+            return super().encode(*args,**kwargs)
+    text=MeasuredText("if "+" or ".join(["token"]*1000)+": return args\n")
+    assert _source_read_text(text,Path("sample.py"),0,len(text))==text
+    assert sum(encoded)<=20*len(text)

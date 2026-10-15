@@ -30,7 +30,7 @@ ROLE_INPUTS: dict[str, tuple[str, ...]] = {
 
 MAX_FIELD_CHARS = 6000
 MAX_REQUIRED_FIELD_CHARS = 24000
-REQUIRED_FIELDS = frozenset({"TASK_CONTRACT", "plan_slice", "CANDIDATE_MANIFEST", "VERIFICATION_EVIDENCE", "SOURCE_SNAPSHOTS"})
+REQUIRED_FIELDS = frozenset({"TASK_CONTRACT", "plan_slice", "CANDIDATE_MANIFEST", "VERIFICATION_EVIDENCE", "SOURCE_SNAPSHOTS", "REPAIR_CONTEXT"})
 
 class ContextCapacityError(ValueError):
     reason_code = "context_capacity"

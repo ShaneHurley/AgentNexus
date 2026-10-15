@@ -19,7 +19,10 @@ class CoderV1(Orchestrator):
         if not isinstance(execution,dict) or not isinstance(execution.get("image"),str):
             raise ContractDenied("coder-v1 requires a reviewed isolated execution image")
         self.policies["execution_policy"]=dict(execution)
-        self.config["coder_v1"]={"policy_version":POLICY_VERSION,"task_contract":task_contract}
+        projection=self.config.get("coder_v1_review_source_projection","none")
+        if projection not in ("none","verified-additions-v1"):
+            raise ContractDenied("unsupported coder-v1 review source projection")
+        self.config["coder_v1"]={"policy_version":POLICY_VERSION,"task_contract":task_contract,"review_source_projection":projection}
         self.config.setdefault("evolution",{})["enabled"]=False
         limits=task_contract["limits"]
         self.config["acceptance"]["max_repair_cycles"]=limits["repair_cycles"]
@@ -29,6 +32,7 @@ class CoderV1(Orchestrator):
             budget["rate_limit_calls"]=limits["calls"]
     def _create(self,request,repo,run_id):
         self.task_contract=validate_contract(self.task_contract,request,repo,parent_tokens=self.resource_limits.get("tokens",300000))
+        self._size(run_id,request)  # Deny unsupported scope before native effects or supervisor dispatch.
         result=super()._create(request,repo,run_id)
         self.artifacts.put(run_id,"task_contract","runtime",self.task_contract)
         return result
@@ -136,6 +140,10 @@ class CoderV1(Orchestrator):
         if role=="code_reviewer":
             manifest=self._candidate_review_manifest(run_id,broker)
             extra["CANDIDATE_MANIFEST"]=manifest
+            if self.config["coder_v1"]["review_source_projection"]=="verified-additions-v1":
+                from .candidate_evidence import review_sources
+                extra["SOURCE_SNAPSHOTS"]=review_sources(extra["SOURCE_SNAPSHOTS"],manifest)
+                extra["SOURCE_SNAPSHOT_INSTRUCTION"]+=" Complete created-file content appears once as a hash-verified full addition in CANDIDATE_MANIFEST; use that addition for review."
             extra["diff"]={"source":"complete task-bound candidate manifest","manifest_hash":digest(manifest),"files":[{"path":item["path"]} for item in manifest.get("files",[])]}
             from agent_core.handoffs import sanitized_raw
             receipt=self.artifacts.load(run_id,"test_receipts") or {}

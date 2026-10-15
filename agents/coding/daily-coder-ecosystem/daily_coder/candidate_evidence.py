@@ -1,5 +1,5 @@
 """Gateway source receipts for bounded context and complete candidate review."""
-import difflib,json,hashlib
+import difflib,json,hashlib,re
 from pathlib import PurePosixPath
 from agent_core.task_contract import literal_path,digest
 from agent_core.lifecycle import ReconciliationRequired
@@ -91,3 +91,32 @@ def candidate_manifest(contract,plan_hash,receipt,baseline,current,changed):
     size=len(json.dumps(value,sort_keys=True))
     if 24000 < size: raise ContextCapacityError("CANDIDATE_MANIFEST",size)
     return value
+
+
+def review_sources(sources,manifest):
+    """Retain sources unless a complete addition independently proves its bytes."""
+    if not isinstance(sources,list) or any(not isinstance(row,dict) for row in sources): return sources
+    if not isinstance(manifest,dict) or manifest.get("incomplete"): return list(sources)
+    rows=manifest.get("files",[]); additions={}
+    if not isinstance(rows,list) or any(not isinstance(row,dict) for row in rows): return list(sources)
+    for item in rows:
+        path=item.get("path")
+        if (not isinstance(path,str) or sum(row.get("path")==path for row in rows)!=1
+            or item.get("change")!="create" or item.get("complete") is not True
+            or "before_sha256" not in item or item["before_sha256"] is not None): continue
+        patch=item.get("diff")
+        if not isinstance(patch,str): continue
+        lines=patch.splitlines(keepends=True)
+        if len(lines)<4 or lines[:2]!=["--- /dev/null\n","+++ b/"+path+"\n"]: continue
+        hunk=re.fullmatch(r"@@ -0,0 \+1(?:,([0-9]+))? @@\n",lines[2])
+        if hunk is None: continue
+        count=hunk.group(1) if hunk.group(1) is not None else "1"
+        payload=lines[3:]
+        if count!=str(len(payload)) or not payload or any(not line.startswith("+") for line in payload): continue
+        raw="".join(line[1:] for line in payload)
+        try: actual=hashlib.sha256(raw.encode("utf-8")).hexdigest()
+        except UnicodeError: continue
+        if actual==item.get("after_sha256"):
+            additions[path]=item["after_sha256"]
+    return [source for source in sources if not (source.get("status")=="available"
+        and isinstance(source.get("path"),str) and source.get("path") in additions and source.get("sha256")==additions[source["path"]])]

@@ -132,3 +132,23 @@ Copy the returned session ID into:
 ```
 
 A capacity preview appears on stderr before dispatch; the terminal result remains JSON on stdout. The fixture oracle is named `oracle_clamp.py` so the intentionally broken starting example is not collected as a repository regression. Contract preparation creates a new authority record and refuses to overwrite one; use a new output name for another task. The model may modify only `clamp.py`, not the oracle.
+
+
+## Explicit subscription trial budgets
+
+`limits.codex_subscription_max_tokens_per_day` is an optional trusted runtime configuration setting. When absent, the existing daily token ceiling applies. A positive integer overrides that ceiling only for the supervised `codex_cli` provider with validated ChatGPT subscription accounting and its exact reviewed model allowlist. An explicit JSON `null` removes that route's aggregate daily token ceiling. Other providers retain their ordinary limits, and the repository default leaves this setting absent.
+
+Task token grants, call limits, deadlines, existing reservations, usage accounting and Codex account limits still apply. The override cannot enable an API-billed or missing-model fallback. Effective limits are part of the execution configuration hash; changing them requires a new run rather than continuing an old configuration. Capacity previews show a null daily headroom when the local daily ceiling is disabled while retaining consumed usage and outstanding reservations. This is a local orchestration policy, not an increase in the signed-in account's subscription allowance.
+
+
+## Optional review source projection
+
+The trusted setting `coder_v1_review_source_projection` defaults to `"none"`.
+The experimental value `"verified-additions-v1"` removes a redundant source excerpt
+only when the complete candidate manifest contains that newly created file as a
+single full addition whose reconstructed UTF-8 bytes match the candidate SHA-256
+and the authorized source receipt hash. Modified files and uncertain evidence
+retain their source entries. The complete manifest, independent review, tested
+source bindings, task authority and acceptance checks remain required. Unsupported
+values fail before model dispatch. The selected projection is recorded in the
+execution configuration hash, so changing it requires a new run.

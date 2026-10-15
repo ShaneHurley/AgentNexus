@@ -32,7 +32,10 @@ def size_request(text):
     hits=sorted(x for x in HIGH_RISK if x in t)
     if hits: score+=3; reasons.append("risk:"+",".join(hits))
     if any(x in t for x in ["refactor","architecture","cross-cutting","new system"]): score+=2; reasons.append("broad-design")
-    ambiguity=sorted(x for x in AMBIGUOUS if x in t)
+    # Describing rejected input is a concrete validation requirement, not
+    # uncertainty about the requested change. Preserve all risk signals above.
+    intent=re.sub(r"\bunknown(?:/missing)?\s+(?:fields?|keys?|rulesets?|versions?)\b","unrecognized input",t)
+    ambiguity=sorted(x for x in AMBIGUOUS if x in intent)
     if ambiguity: score+=1; reasons.append("ambiguity:"+",".join(ambiguity))
     profile="S" if score==0 else "M" if score<=2 else "L" if score<=5 else "XL"
     trivial=trivial_signal_for(text, score)

@@ -16,7 +16,7 @@ DEFAULT_THRESHOLDS={"warn_fraction":0.7,"checkpoint_fraction":0.8,"hard_stop_fra
 def _today()->str: return datetime.date.today().isoformat()
 
 class BudgetManager:
-    def __init__(self,config,state,pricing=None,limits=None,*,subscription_models=()):
+    def __init__(self,config,state,pricing=None,limits=None,*,subscription_models=(),provider_name=None,billing_kind=None):
         # Only trusted provider setup may supply this exact allowlist. Pricing
         # metadata and role/model output cannot select an accounting mode.
         if isinstance(subscription_models,(str,bytes,Mapping)) or subscription_models is None:
@@ -28,7 +28,20 @@ class BudgetManager:
         if any(not isinstance(model,str) or not model or any(c.isspace() or c in "*?" for c in model) for model in models):
             raise ValueError("subscription_models must contain nonempty exact model names without whitespace or wildcards")
         self.subscription_models=frozenset(models)
-        self.config=config; self.state=state; self.pricing=pricing or {}; self.limits=limits or {}
+        self.config=config; self.state=state; self.pricing=pricing or {}; self.limits=dict(limits or {})
+        self.daily_limit_source="default"
+        self.codex_trial_override=False
+        override="codex_subscription_max_tokens_per_day"
+        if override in self.limits:
+            value=self.limits[override]
+            if value is not None and (type(value) is not int or value<=0):
+                raise ValueError("invalid Codex subscription daily token limit")
+            if provider_name=="codex_cli":
+                if billing_kind!="chatgpt_subscription" or not self.subscription_models:
+                    raise ValueError("Codex trial limit requires trusted subscription accounting")
+                self.limits["max_tokens_per_day"]=value
+                self.daily_limit_source=override
+                self.codex_trial_override=True
         self._lock=threading.RLock(); self._reserved={}; self._reserved_calls={}; self._reservation_ids={}; self.events=[]
         self.rate_limiter=RateLimiter(RateLimiterConfig.disabled())
 
@@ -69,6 +82,8 @@ class BudgetManager:
         Zero known API cash for a subscription is never its total dollar cost.
         validate_model_pricing and price remain strict API pricing interfaces.
         """
+        if self.codex_trial_override and model not in self.subscription_models:
+            raise BudgetExceeded({"reason":"codex_trial_requires_subscription_model"})
         if not isinstance(model,str) or not model:
             raise BudgetExceeded({"reason":"invalid_accounting_model","model":model})
         if model in self.subscription_models:
@@ -129,7 +144,7 @@ class BudgetManager:
         return {"schema_version":1,"scope":"native_provider_ledger","run_grant_tokens":self.limits.get("max_tokens_per_run",cap["total_tokens"]),
             "consumed_tokens":usage["tokens"],"active_provider_reservations":active,"next_call_estimate":next_estimate,
             "profile_tokens":cap["total_tokens"],"effective_run_tokens":self.usable_tokens(profile),
-            "daily_ceiling":ceiling,"daily_consumed_tokens":spent["tokens"],"daily_provider_reservations":daily,
+            "daily_ceiling":ceiling,"daily_limit_source":self.daily_limit_source,"daily_consumed_tokens":spent["tokens"],"daily_provider_reservations":daily,
             "daily_headroom":None if ceiling is None else max(0,ceiling-spent["tokens"]-daily["tokens"]),
             "reservation_relationship":"Supervisor task reservations are parents of provider reservations, not additive usage",
             "note":"Diagnostic snapshot only; atomic reservation checks remain authoritative"}
@@ -143,7 +158,7 @@ class BudgetManager:
             self.state.request_cancel(run_id)
             raise ReconciliationRequired("supervised deadline reached before provider reservation")
         reservation_id=reservation_id or str(uuid.uuid4())
-        accounting=self.validate_model_accounting(model) if model is not None else {}
+        accounting=self.validate_model_accounting(model) if model is not None or self.codex_trial_override else {}
         subscription=accounting.get("accounting_mode")=="subscription"
         if subscription:
             self._validate_subscription_cash(estimated_usd,model)

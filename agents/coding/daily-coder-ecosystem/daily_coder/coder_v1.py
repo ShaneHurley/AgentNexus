@@ -29,6 +29,7 @@ class CoderV1(Orchestrator):
             budget["rate_limit_calls"]=limits["calls"]
     def _create(self,request,repo,run_id):
         self.task_contract=validate_contract(self.task_contract,request,repo,parent_tokens=self.resource_limits.get("tokens",300000))
+        self._size(run_id,request)  # Deny unsupported scope before native effects or supervisor dispatch.
         result=super()._create(request,repo,run_id)
         self.artifacts.put(run_id,"task_contract","runtime",self.task_contract)
         return result

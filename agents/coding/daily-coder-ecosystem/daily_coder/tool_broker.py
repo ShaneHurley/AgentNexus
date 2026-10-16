@@ -1,5 +1,5 @@
 from __future__ import annotations
-import fnmatch, hashlib, os, re, shlex, subprocess, time
+import ast, fnmatch, hashlib, os, re, shlex, subprocess, time
 from pathlib import Path
 from agent_core.contracts import ContractDenied
 from agent_core.runtime_authority import RuntimeAuthority
@@ -17,6 +17,74 @@ def redact(text):
     if not isinstance(text,str): return text
     for p in SECRET_PATTERNS: text=p.sub("[REDACTED]",text)
     return text
+
+def _source_read_text(text,path,start,end):
+    """Preserve proven Python references and control syntax; retain credential filters."""
+    safe={}
+    if path.suffix==".py" and len(text)<=1000000:
+        try:
+            tree=ast.parse(text)
+            starts=[0]+[match.end() for match in re.finditer(r"\r\n|\r|\n",text)]
+            def position(line,column):
+                offset=starts[line-1]
+                last=starts[line] if line<len(starts) else len(text)
+                return offset+len(text[offset:last].encode("utf-8")[:column].decode("utf-8"))
+            def reference(value):
+                if isinstance(value,ast.Name): return True
+                if isinstance(value,ast.Attribute): return reference(value.value)
+                if isinstance(value,ast.Subscript):
+                    index=value.slice
+                    return reference(value.value) and (reference(index) or (isinstance(index,ast.Constant) and type(index.value) is int))
+                return False
+            for node in ast.walk(tree):
+                if isinstance(node,ast.Assign) and len(node.targets)==1 and isinstance(node.targets[0],ast.Name) and reference(node.value):
+                    target=node.targets[0]; value=node.value
+                    if target.id.casefold() not in {"api_key","apikey","secret","password","passwd","token","bearer","authorization"}: continue
+                    if len(safe)==512: break
+                    safe[position(target.lineno,target.col_offset)]=(position(value.lineno,value.col_offset),position(value.end_lineno,value.end_col_offset))
+            sensitive={"api_key","apikey","secret","password","passwd","token","bearer","authorization"}
+            controls=[node for node in ast.walk(tree) if isinstance(node,(ast.If,ast.While)) and node.body]
+            control_ends={(node.test.end_lineno,node.test.end_col_offset) for node in controls}
+            for node in controls:
+                if len(safe)==512: break
+                keyword={ast.Return:"return",ast.Raise:"raise",ast.Pass:"pass",ast.Break:"break",ast.Continue:"continue"}.get(type(node.body[0]))
+                if keyword is None: continue
+                first=node.body[0]; body=position(first.lineno,first.col_offset)
+                for name in ast.walk(node.test):
+                    if len(safe)==512: break
+                    if not isinstance(name,ast.Name) or name.id.casefold() not in sensitive: continue
+                    if (name.end_lineno,name.end_col_offset)!=(node.test.end_lineno,node.test.end_col_offset): continue
+                    finish=position(name.end_lineno,name.end_col_offset)
+                    if re.fullmatch(r"\s*:\s*",text[finish:body]) is None: continue
+                    if len(safe)<512: safe[position(name.lineno,name.col_offset)]=(body+len(keyword),body+len(keyword))
+            for node in ast.walk(tree):
+                if len(safe)==512: break
+                if (not isinstance(node,ast.Compare) or not isinstance(node.left,ast.Name) or node.left.id.casefold()!="token"
+                    or len(node.ops)!=1 or not isinstance(node.ops[0],ast.Eq) or len(node.comparators)!=1
+                    or not isinstance(node.comparators[0],ast.Constant) or node.comparators[0].value!="--"): continue
+                name=node.left; first=position(name.end_lineno,name.end_col_offset)+1
+                finish=position(node.end_lineno,node.end_col_offset)
+                if (node.end_lineno,node.end_col_offset) in control_ends:
+                    delimiter=re.match(r"\s*:",text[finish:])
+                    if delimiter: finish+=delimiter.end()
+                if len(safe)<512: safe[position(name.lineno,name.col_offset)]=(first,finish)
+        except (SyntaxError,ValueError,RecursionError,IndexError): safe={}
+    spans=[]
+    for index,pattern in enumerate(SECRET_PATTERNS):
+        for match in pattern.finditer(text):
+            bounds=safe.get(match.start())
+            if index==0 and bounds and bounds[0]<=match.end()<=bounds[1]: continue
+            left,right=max(start,match.start()),min(end,match.end())
+            if left<right: spans.append((left,right))
+    merged=[]
+    for left,right in sorted(spans):
+        if merged and left<=merged[-1][1]: merged[-1]=(merged[-1][0],max(right,merged[-1][1]))
+        else: merged.append((left,right))
+    pieces=[]; cursor=start
+    for left,right in merged:
+        pieces.extend((text[cursor:left],"[REDACTED]")); cursor=right
+    pieces.append(text[cursor:end])
+    return "".join(pieces)
 
 def bounded_output(text,limit=MAX_OUTPUT_CHARS):
     text=redact(text or "")
@@ -101,12 +169,12 @@ class ToolBroker:
     def _t_filesystem_read(self,a,_allow=None):
         p=self.safe_path(a["path"]); raw=p.read_bytes(); digest=hashlib.sha256(raw).hexdigest(); text=raw.decode("utf-8",errors="replace"); lines=text.splitlines()
         start=max(1,int(a.get("start",1))); end=min(len(lines),int(a.get("end",start+399)))
-        body="\n".join(f"{i}\t{lines[i-1]}" for i in range(start,end+1)) if lines else ""
-        clean=redact(body)
-        source="".join(text.splitlines(keepends=True)[start-1:end]); source_clean=redact(source)
+        chunks=text.splitlines(keepends=True); left=sum(len(line) for line in chunks[:start-1]); right=left+sum(len(line) for line in chunks[start-1:end])
+        source=text[left:right]; source_clean=_source_read_text(text,p,left,right)
+        clean="\n".join(f"{start+index}\t{line}" for index,line in enumerate(source_clean.splitlines()))
         return {"path":a["path"],"start":start,"end":end,"total_lines":len(lines),"sha256":digest,
                 "content":clean[:MAX_OUTPUT_CHARS],"truncated":len(clean)>MAX_OUTPUT_CHARS,
-                "ends_with_newline":raw.endswith(b"\n"),"source_text":source_clean[:MAX_OUTPUT_CHARS],"redacted":clean!=body or source_clean!=source,
+                "ends_with_newline":raw.endswith(b"\n"),"source_text":source_clean[:MAX_OUTPUT_CHARS],"redacted":source_clean!=source,
                 "expansion":{"path":a["path"],"start":start,"end":end,"sha256":digest,"instruction":"Request smaller line ranges when truncated; each read is reauthorized."} if len(clean)>MAX_OUTPUT_CHARS else None}
     def _t_filesystem_list(self,a,_allow=None):
         p=self.safe_path(a.get("path","."))

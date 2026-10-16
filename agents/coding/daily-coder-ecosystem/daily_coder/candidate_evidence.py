@@ -4,6 +4,7 @@ from pathlib import PurePosixPath
 from agent_core.task_contract import literal_path,digest
 from agent_core.lifecycle import ReconciliationRequired
 from .context import ContextCapacityError
+from .tool_broker import ToolDenied
 PAGE_LINES=80
 MAX_SOURCE_CHARS=1000000
 
@@ -38,7 +39,8 @@ def collect_source(state,gateway,run,role,phase,path,prefix,*,stored=False):
             if page==0 and result.get("error")=="FileNotFoundError":
                 return {"path":path,"status":"absent","sha256":None,"content":"","numbered":"","total_lines":0,"operation_refs":refs}
             raise ReconciliationRequired("Authorized source read unavailable")
-        if result.get("truncated") or result.get("redacted"): raise ContextCapacityError("source_line",MAX_SOURCE_CHARS+1,MAX_SOURCE_CHARS)
+        if result.get("redacted"): raise ToolDenied("required_source_redacted: exact authorized source is unavailable: "+path)
+        if result.get("truncated"): raise ContextCapacityError("source_line",MAX_SOURCE_CHARS+1,MAX_SOURCE_CHARS)
         if snapshot is None: snapshot=result["sha256"]
         if result.get("path")!=path or result.get("start")!=start or result.get("sha256")!=snapshot: raise ReconciliationRequired("Source changed between authorized read pages")
         source=result.get("source_text")

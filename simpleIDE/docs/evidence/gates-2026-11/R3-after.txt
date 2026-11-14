@@ -1,0 +1,8 @@
+test_r3_conflicting_model_flags_fail_without_writes (test_repairs.Repairs.test_r3_conflicting_model_flags_fail_without_writes) ... ok
+test_r3_global_partial_uninstall_preserves_models (test_repairs.Repairs.test_r3_global_partial_uninstall_preserves_models) ... ok
+test_r3_partial_uninstall_preserves_surviving_models (test_repairs.Repairs.test_r3_partial_uninstall_preserves_surviving_models) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.558s
+
+OK

@@ -341,7 +341,7 @@ def main(argv=None):
     ap.add_argument("--target", default=".", help="project folder (default: current folder)")
     ap.add_argument("--tools", default="all", help="comma list of %s, or all" % ",".join(TOOLS))
     ap.add_argument("--global", dest="is_global", action="store_true", help="install for every project of this user")
-    ap.add_argument("--models", default=str(SRC / "core/models.json"), help="model map to use")
+    ap.add_argument("--models", default=None, help="model map to apply to the selected hosts; omitted means keep installed settings")
     ap.add_argument("--uninstall", action="store_true")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--hooks", action="store_true", help="merge simpleIDE hooks into tool configs")
@@ -371,6 +371,47 @@ def validate_hooks(path, tool):
                 raise ValueError("invalid nested hook commands")
 
 
+def resolve_models(supplied, installed, defaults, selected, previous_hosts, uninstall):
+    if uninstall and supplied is not None:
+        raise ValueError("--models cannot be combined with --uninstall")
+    if supplied is not None:
+        for host in supplied:
+            if host in previous_hosts and host not in selected:
+                raise ValueError(f"--models would change installed host {host} that is not in --tools")
+    result = json.loads(json.dumps(installed if isinstance(installed, dict) else defaults))
+    roles = {"planner", "worker", "tester", "reviewer"}
+    for host in TOOLS:
+        if isinstance(installed, dict) and host in installed:
+            if host in previous_hosts:
+                entry = dict(installed[host])
+                if supplied is not None and host in supplied:
+                    entry = {**entry, **supplied[host]}
+                result[host] = entry
+            elif not uninstall and host in selected:
+                if supplied is None:
+                    result[host] = dict(defaults.get(host, {}))
+                else:
+                    entry = dict(supplied.get(host, {}))
+                    for role in roles:
+                        entry.setdefault(role, {"model": "inherit"})
+                    result[host] = entry
+            else:
+                result[host] = dict(installed[host])
+        else:
+            if supplied is None:
+                result[host] = dict(defaults.get(host, {}))
+            else:
+                entry = dict(supplied.get(host, {}))
+                for role in roles:
+                    entry.setdefault(role, {"model": "inherit"})
+                result[host] = entry
+    for host in TOOLS:
+        mapping = result.setdefault(host, {})
+        for role in roles:
+            mapping.setdefault(role, {"model": "inherit"})
+    return result
+
+
 def install_plan(args):
     tools = set(TOOLS if args.tools == "all" else (t.strip() for t in args.tools.split(",") if t.strip()))
     if not tools or tools - set(TOOLS): raise ValueError("select at least one supported tool")
@@ -379,23 +420,29 @@ def install_plan(args):
     if not base.is_dir():
         if not args.is_global: raise ValueError("target folder does not exist")
         # No mkdir here: dry run and preflight have no destination mutations.
-    models = json.loads(Path(args.models).read_text())
+    supplied = None
     roles = {"planner", "worker", "tester", "reviewer"}
-    if not isinstance(models, dict) or not any(k in TOOLS for k in models):
-        raise ValueError("model map must be a nonempty host mapping")
-    for tool, mapping in models.items():
-        if tool.startswith("_"): continue
-        if tool not in TOOLS or not isinstance(mapping,dict) or not mapping:
-            raise ValueError("invalid/empty model mapping: " + tool)
-        if set(mapping) - (roles | {"scout"}): raise ValueError("unknown model role in " + tool)
-        if any(not isinstance(v,dict) or not isinstance(v.get("model"),str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}",v["model"]) or ("effort" in v and v["effort"] not in ("low","medium","high","xhigh","max","ultra")) for v in mapping.values()):
-            raise ValueError("invalid/empty model role in " + tool)
-    # A partial custom map deliberately inherits unspecified roles; persisted map is complete.
-    for tool in TOOLS:
-        mapping = models.setdefault(tool,{})
-        for role in roles: mapping.setdefault(role,{"model":"inherit"})
+    if args.models is not None:
+        supplied = json.loads(Path(args.models).read_text())
+        if not isinstance(supplied, dict) or not any(k in TOOLS for k in supplied):
+            raise ValueError("model map must be a nonempty host mapping")
+        for tool, mapping in supplied.items():
+            if tool.startswith("_"): continue
+            if tool not in TOOLS or not isinstance(mapping,dict) or not mapping:
+                raise ValueError("invalid/empty model mapping: " + tool)
+            if set(mapping) - (roles | {"scout"}): raise ValueError("unknown model role in " + tool)
+            if any(not isinstance(v,dict) or not isinstance(v.get("model"),str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}",v["model"]) or ("effort" in v and v["effort"] not in ("low","medium","high","xhigh","max","ultra")) for v in mapping.values()):
+                raise ValueError("invalid/empty model role in " + tool)
+    defaults = json.loads((SRC / "core/models.json").read_text())
     agents = load_agents()
     mem_dir = base / ".simpleide"
+    installed_models_path = mem_dir / "models.json"
+    installed = None
+    if installed_models_path.exists():
+        try:
+            installed = json.loads(installed_models_path.read_text())
+        except Exception:
+            raise ValueError("installed models.json is unreadable; repair it before reinstalling")
     manifest_path = mem_dir / "install-manifest.json"
     previous = json.loads(manifest_path.read_text()) if manifest_path.exists() else {"version": 1,"hosts": [],"assets": {},"hooks": {},"hook_entries": {}}
     if previous.get("version") != 1 or not isinstance(previous.get("assets"),dict) or not isinstance(previous.get("hosts"),list):
@@ -416,6 +463,7 @@ def install_plan(args):
             worker = directory / ("sx-worker" + ext)
             if worker.is_file() and digest(worker.read_text()) in known:
                 existing_hosts.add(tool)
+    models = resolve_models(supplied, installed, defaults, tools, existing_hosts, args.uninstall)
     hosts = existing_hosts - tools if args.uninstall else existing_hosts | tools
     command = sx_command(mem_dir, args.is_global)
     ins = Installer(args.dry_run, command, previous.get("hook_entries"))

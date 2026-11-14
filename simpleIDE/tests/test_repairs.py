@@ -740,5 +740,48 @@ class Repairs(unittest.TestCase):
         self.ok('mem', 'add', 'note', 'plain')
         self.assertTrue((self.root / '.simpleide/project.db').exists())
 
+    def custom_models(self):
+        custom = self.base / 'custom-models.json'
+        custom.write_text(json.dumps({'codex': {'worker': {'model': 'custom-worker'}}}))
+        return custom
+
+    def test_r3_partial_uninstall_preserves_surviving_models(self):
+        custom = self.custom_models()
+        self.ok('--target', str(self.root), '--tools', 'cursor,codex', '--models', str(custom), install=True)
+        agent = self.root / '.codex/agents/sx-worker.toml'
+        installed = self.root / '.simpleide/models.json'
+        agent_before, models_before = agent.read_bytes(), installed.read_bytes()
+        self.assertIn(b'custom-worker', agent_before)
+        custom.unlink()
+        self.ok('--target', str(self.root), '--tools', 'cursor', '--uninstall', install=True)
+        self.assertEqual(agent_before, agent.read_bytes())
+        self.assertEqual(models_before, installed.read_bytes())
+        self.ok('--target', str(self.root), '--tools', 'cursor', install=True)
+        self.assertIn('custom-worker', agent.read_text())
+        self.ok('--target', str(self.root), '--tools', 'codex', install=True)
+        self.assertIn('custom-worker', agent.read_text())
+
+    def test_r3_global_partial_uninstall_preserves_models(self):
+        custom = self.custom_models()
+        self.ok('--global', '--tools', 'cursor,codex', '--models', str(custom), install=True)
+        home = Path(self.env['HOME'])
+        agents = list(home.rglob('sx-worker.toml'))
+        self.assertEqual(len(agents), 1, agents)
+        before = agents[0].read_bytes()
+        self.ok('--global', '--tools', 'cursor', '--uninstall', install=True)
+        self.assertEqual(before, agents[0].read_bytes())
+
+    def test_r3_conflicting_model_flags_fail_without_writes(self):
+        custom = self.custom_models()
+        self.ok('--target', str(self.root), '--tools', 'cursor,codex', install=True)
+        before = self.snapshot()
+        result = self.cli('--target', str(self.root), '--tools', 'cursor', '--uninstall', '--models', str(custom), install=True)
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertEqual(before, self.snapshot())
+        result = self.cli('--target', str(self.root), '--tools', 'cursor', '--models', str(custom), install=True)
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertEqual(before, self.snapshot())
+
+
 
 

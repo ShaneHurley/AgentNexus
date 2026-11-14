@@ -706,55 +706,102 @@ def config_hash(cfg):
     return hashlib.sha256(json.dumps(cfg, sort_keys=True).encode()).hexdigest()
 
 
-def revision(root):
+def revision(root, depth=0):
+    if depth > 5:
+        return None
     head = git(root, "rev-parse", "HEAD", check=False)
     if head.returncode:
         return None
-    paths = git(root, "ls-files", "-z", "--cached", "--others", "--exclude-standard").stdout.split("\0")
-    digest = hashlib.sha256(head.stdout.encode())
-    for path in sorted(set(paths) - {""}):
+    digest = hashlib.sha256(b"git-source-v2\0" + head.stdout.encode())
+    tracked = set()
+    submodules = set()
+    for entry in git(root, "ls-files", "-s", "-z").stdout.split("\0"):
+        if not entry:
+            continue
+        meta, path = entry.split("\t", 1)
+        mode, _obj, stage = meta.split(" ")
+        if stage != "0":
+            return None
+        tracked.add(path)
+        if mode == "160000":
+            submodules.add(path)
+    untracked = set(git(root, "ls-files", "-z", "--others", "--exclude-standard").stdout.split("\0")) - {""}
+    for path in sorted(tracked | untracked):
         if path.startswith((".simpleide/project.db", ".simpleide/artifacts/", ".simpleide/context.json",
                             ".simpleide/worktrees.json", ".simpleide/hook-created-")):
             continue
+        digest.update(b"path\0" + path.encode("utf-8", "surrogateescape") + b"\0")
         f = root / path
-        digest.update(path.encode("utf-8", "surrogateescape"))
-        if f.is_symlink():
+        if path in submodules:
+            sub = root / path
+            if not (sub / ".git").exists():
+                return None
+            top = git(sub, "rev-parse", "--show-toplevel", check=False)
+            if top.returncode or Path(top.stdout.strip()).resolve() != sub.resolve():
+                return None
+            inner = revision(sub, depth + 1)
+            if inner is None:
+                return None
+            digest.update(b"submodule\0" + inner.encode() + b"\0")
+        elif f.is_symlink():
             digest.update(b"symlink:" + os.readlink(f).encode("utf-8", "surrogateescape"))
         elif f.is_file():
             digest.update(str(f.stat().st_mode).encode())
             with f.open("rb") as source:
                 for block in iter(lambda: source.read(65536), b""):
                     digest.update(block)
+        elif f.is_dir():
+            return None
         else:
-            digest.update(b"deleted")
-    return digest.hexdigest()
+            digest.update(b"deleted\0")
+    return "v2:" + digest.hexdigest()
 
 
-def check_summary(con, root, task):
+def check_states(con, root, task):
     cfg = check_config(root)
     if cfg is None:
         historical = con.execute("SELECT COUNT(*) FROM rec WHERE task=? AND kind='test'", (task,)).fetchone()[0]
-        return ["historical/unverified checks" ] if historical else []
+        return [("*", "historical")] if historical else []
     if cfg.get("confirmed") is not True:
-        return ["checks unverified: configuration unconfirmed"]
+        return [("*", "unconfirmed")]
     fingerprint = revision(root)
-    summaries = []
+    states = []
     for name in cfg["checks"]:
         row = con.execute("SELECT * FROM check_obs WHERE task=? AND name=? AND execution_root=? ORDER BY id DESC LIMIT 1",
                           (task, name, str(root))).fetchone()
         if not row:
-            status = "missing/unverified"
+            state = "missing"
         elif row["exit_code"] is None or row["exit_code"] < 0:
-            status = "interrupted/unverified"
+            state = "interrupted"
         elif row["exit_code"]:
-            status = "failed (FAIL)"
+            state = "failed"
         elif not fingerprint:
-            status = "freshness unknown/unverified"
+            state = "unknown"
         elif row["before_hash"] != fingerprint or row["after_hash"] != fingerprint or row["config_hash"] != config_hash(cfg):
-            status = "stale/unverified"
+            state = "stale"
         else:
-            status = "PASS current"
-        summaries.append(name + ": " + status)
+            state = "current"
+        states.append((name, state))
+    return states
+
+
+def check_summary(con, root, task):
+    display_map = {
+        "historical": "historical/unverified checks",
+        "unconfirmed": "checks unverified: configuration unconfirmed",
+        "missing": "missing/unverified",
+        "interrupted": "interrupted/unverified",
+        "failed": "failed (FAIL)",
+        "unknown": "freshness unknown/unverified",
+        "stale": "stale/unverified",
+        "current": "PASS current",
+    }
+    summaries = []
+    for name, state in check_states(con, root, task):
+        if name == "*":
+            summaries.append(display_map[state])
+        else:
+            summaries.append(name + ": " + display_map[state])
     return summaries
 
 
@@ -1161,8 +1208,9 @@ def close_task(con, root, args):
             if (row["outcome"], row["result_id"], row["actor"], row["outcome_refs"]) == (args.outcome, result["id"], args.by, refs):
                 return
             raise ValueError("terminal outcome is immutable; export evidence for an explicit correction")
+        states = check_states(con, root, args.slug)
         summaries = check_summary(con, root, args.slug)
-        if args.outcome == "accepted" and any("PASS current" not in v for v in summaries) and not args.exception:
+        if args.outcome == "accepted" and any(st != "current" for _, st in states) and not args.exception:
             raise ValueError("acceptance requires current checks or --exception Pdecision: " + " | ".join(summaries))
         con.execute("UPDATE run SET end=CURRENT_TIMESTAMP,outcome=?,provenance='explicit',actor=?,result_id=?,outcome_refs=? WHERE task=?",
                     (args.outcome, args.by, result["id"], refs, args.slug))

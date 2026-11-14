@@ -1,0 +1,33 @@
+test_r4_submodule_commit_and_untracked_change_invalidate_pass (test_repairs.Repairs.test_r4_submodule_commit_and_untracked_change_invalidate_pass) ... FAIL
+test_r4_submodule_file_change_invalidates_pass (test_repairs.Repairs.test_r4_submodule_file_change_invalidates_pass) ... FAIL
+test_r4_unchanged_submodule_stays_current (test_repairs.Repairs.test_r4_unchanged_submodule_stays_current) ... ok
+test_r4_uninitialized_submodule_is_unknown_and_blocks_acceptance (test_repairs.Repairs.test_r4_uninitialized_submodule_is_unknown_and_blocks_acceptance) ... FAIL
+
+======================================================================
+FAIL: test_r4_submodule_commit_and_untracked_change_invalidate_pass (test_repairs.Repairs.test_r4_submodule_commit_and_untracked_change_invalidate_pass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 644, in test_r4_submodule_commit_and_untracked_change_invalidate_pass
+    self.assertNotIn('PASS current', self.ok('pack', '--task', 't', '--base', 'HEAD'))
+AssertionError: 'PASS current' unexpectedly found in 'REQUEST  missing\nCRITERIA missing\nBASE     HEAD\nCHECKS   test: PASS current\nSCOPE    not supplied\nREAD     /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/sx-repair-bjt18m0o/project with spaces/.simpleide/artifacts/t/request-9b74a2d5fd2dbe1e4c066f2f57830e6e38e07bd15d646791cd4bb5c4f1dbbc50.md; git diff HEAD -- <paths>\n'
+
+======================================================================
+FAIL: test_r4_submodule_file_change_invalidates_pass (test_repairs.Repairs.test_r4_submodule_file_change_invalidates_pass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 638, in test_r4_submodule_file_change_invalidates_pass
+    self.assertNotIn('PASS current', self.ok('pack', '--task', 't', '--base', 'HEAD'))
+AssertionError: 'PASS current' unexpectedly found in 'REQUEST  missing\nCRITERIA missing\nBASE     HEAD\nCHANGED  "dep" +0 -0\nCHECKS   test: PASS current\nSCOPE    not supplied\nREAD     /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/sx-repair-5pp2e4tp/project with spaces/.simpleide/artifacts/t/request-9b74a2d5fd2dbe1e4c066f2f57830e6e38e07bd15d646791cd4bb5c4f1dbbc50.md; git diff HEAD -- <paths>\n'
+
+======================================================================
+FAIL: test_r4_uninitialized_submodule_is_unknown_and_blocks_acceptance (test_repairs.Repairs.test_r4_uninitialized_submodule_is_unknown_and_blocks_acceptance)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 655, in test_r4_uninitialized_submodule_is_unknown_and_blocks_acceptance
+    self.assertNotIn('PASS current', packet)
+AssertionError: 'PASS current' unexpectedly found in 'REQUEST  missing\nCRITERIA missing\nBASE     HEAD\nCHECKS   test: PASS current\nSCOPE    not supplied\nREAD     /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/sx-repair-onr2ngup/project with spaces/.simpleide/artifacts/t/request-9b74a2d5fd2dbe1e4c066f2f57830e6e38e07bd15d646791cd4bb5c4f1dbbc50.md; git diff HEAD -- <paths>\n'
+
+----------------------------------------------------------------------
+Ran 4 tests in 6.241s
+
+FAILED (failures=3)

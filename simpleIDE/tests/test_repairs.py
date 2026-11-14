@@ -4,6 +4,7 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+import shlex
 import sqlite3
 import subprocess
 import sys
@@ -604,3 +605,58 @@ class Repairs(unittest.TestCase):
         artifacts[0].write_text('interrupted partial write')
         self.ok('pack','--task','t','--base','HEAD')
         self.assertEqual(artifacts[0].read_text(),text)
+
+    def submodule_repository(self):
+        library = self.base / 'library'
+        library.mkdir()
+        self.git('init', '-q', root=library)
+        (library / 'value.txt').write_text('good\n')
+        self.git('add', '.', root=library)
+        self.git('commit', '-qm', 'library', root=library)
+        self.repository()
+        self.git('-c', 'protocol.file.allow=always', 'submodule', 'add', '-q', str(library), 'dep')
+        self.git('commit', '-qam', 'add dependency')
+        self.ok('mem', 'add', 'goal', 'Check dependency', '--task', 't')
+        command = shlex.quote(sys.executable) + ' -c ' + shlex.quote(
+            'from pathlib import Path; assert Path("dep/value.txt").read_text() == "good\\n"')
+        self.checks({'test': command})
+        self.ok('check', '--task', 't')
+
+    def close_accepted(self):
+        result = self.ok('mem', 'add', 'result', 'Done', '--task', 't').split()[0]
+        return self.cli('task', 'close', 't', '--outcome', 'accepted', '--result', result,
+                        '--by', 'assistant', '--refs', 'check observation')
+
+    def test_r4_unchanged_submodule_stays_current(self):
+        self.submodule_repository()
+        self.assertIn('PASS current', self.ok('pack', '--task', 't', '--base', 'HEAD'))
+        self.assertIn('PASS current', self.ok('pack', '--task', 't', '--base', 'HEAD'))
+
+    def test_r4_submodule_file_change_invalidates_pass(self):
+        self.submodule_repository()
+        (self.root / 'dep/value.txt').write_text('broken\n')
+        self.assertNotIn('PASS current', self.ok('pack', '--task', 't', '--base', 'HEAD'))
+        self.assertNotEqual(self.close_accepted().returncode, 0)
+
+    def test_r4_submodule_commit_and_untracked_change_invalidate_pass(self):
+        self.submodule_repository()
+        (self.root / 'dep/extra.txt').write_text('untracked\n')
+        self.assertNotIn('PASS current', self.ok('pack', '--task', 't', '--base', 'HEAD'))
+        (self.root / 'dep/extra.txt').unlink()
+        self.assertIn('PASS current', self.ok('pack', '--task', 't', '--base', 'HEAD'))
+        (self.root / 'dep/value.txt').write_text('good\n')
+        self.git('commit', '--allow-empty', '-qm', 'moved', root=self.root / 'dep')
+        self.assertNotIn('PASS current', self.ok('pack', '--task', 't', '--base', 'HEAD'))
+
+    def test_r4_uninitialized_submodule_is_unknown_and_blocks_acceptance(self):
+        self.submodule_repository()
+        self.git('submodule', 'deinit', '-q', '-f', 'dep')
+        packet = self.ok('pack', '--task', 't', '--base', 'HEAD')
+        self.assertNotIn('PASS current', packet)
+        self.assertIn('unknown', packet)
+        self.assertNotEqual(self.close_accepted().returncode, 0)
+        decision = self.ok('mem', 'add', 'decision', 'Accept without submodule coverage', '--task', 't').split()[0]
+        result = self.ok('mem', 'add', 'result', 'Done anyway', '--task', 't').split()[0]
+        self.ok('task', 'close', 't', '--outcome', 'accepted', '--result', result, '--by', 'assistant',
+                '--refs', 'explicit exception', '--exception', decision)
+

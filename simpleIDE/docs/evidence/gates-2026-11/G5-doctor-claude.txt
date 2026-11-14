@@ -1,0 +1,40 @@
+OK /private/tmp/sx-g5/claude/.claude/agents/sx-planner.md
+OK /private/tmp/sx-g5/claude/.claude/agents/sx-reviewer.md
+OK /private/tmp/sx-g5/claude/.claude/agents/sx-tester.md
+OK /private/tmp/sx-g5/claude/.claude/agents/sx-worker.md
+OK /private/tmp/sx-g5/claude/.claude/skills/simpleide/SKILL.md
+OK /private/tmp/sx-g5/claude/.claude/skills/simpleide/references/brief-template.md
+OK /private/tmp/sx-g5/claude/.claude/skills/simpleide/references/coding.md
+OK /private/tmp/sx-g5/claude/.claude/skills/simpleide/references/large.md
+OK /private/tmp/sx-g5/claude/.claude/skills/simpleide/references/models.md
+OK /private/tmp/sx-g5/claude/.claude/skills/simpleide/references/research.md
+OK /private/tmp/sx-g5/claude/.claude/skills/sx-writeup/SKILL.md
+OK /private/tmp/sx-g5/claude/.simpleide/.gitignore
+OK /private/tmp/sx-g5/claude/.simpleide/legacy-owned-hashes.json
+OK /private/tmp/sx-g5/claude/.simpleide/mem.py
+OK /private/tmp/sx-g5/claude/.simpleide/models.json
+OK /private/tmp/sx-g5/claude/.simpleide/sx.py
+OK /private/tmp/sx-g5/claude/AGENTS.md
+OK /private/tmp/sx-g5/claude/CLAUDE.md
+claude models: configured
+claude hooks: optional, not configured
+store: ed8aab5b19a14306b03089e41c1b42e2; path=/private/tmp/sx-g5/claude; integrity=True
+python: 3.12.0; FTS5: yes
+shared db: writable
+budget rule block AGENTS.md: 1,932 / 2,500 bytes ok
+budget rule block CLAUDE.md: 129 / 2,500 bytes ok
+budget SKILL.md SKILL.md: 2,703 / 3,072 bytes ok
+budget description sx-planner.md: 228 / 400 chars ok
+budget description sx-reviewer.md: 277 / 400 chars ok
+budget description sx-tester.md: 287 / 400 chars ok
+budget description sx-worker.md: 214 / 400 chars ok
+budget description SKILL.md: 145 / 400 chars ok
+budget description SKILL.md: 131 / 400 chars ok
+budget idle estimate claude: 804 / 1,000 tokens ok
+budget hook capture-request: 78.2 / 100 ms ok
+budget hook dispatch-guard: 79.4 / 100 ms ok
+budget hook shell-guard: 78.9 / 100 ms ok
+budget hook return-log: 82.1 / 100 ms ok
+budget hook stop-check: 84.7 / 100 ms ok
+budget hook resume: 77.8 / 100 ms ok
+Files configured/present only. Live role discovery, actual model and hook enforcement require host observations.

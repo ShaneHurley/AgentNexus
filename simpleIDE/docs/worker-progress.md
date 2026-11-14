@@ -17,3 +17,6 @@ Assignment: docs/worker-gemini-flash-gates-G2-G5-G7.md
 | 4.3 | update legacy test, full suite check | all 3 R2 pass, full suite OK on 3.12/3.10 |
 | 5.1 | R3 tests written | all 3 fail, before saved |
 | 5.2 | fix install.py resolve_models | all 3 R3 pass, full suite OK on 3.12/3.10 |
+| 5.3 | postrepair_review check | 8 OK lines; Gate G2 is met |
+| 6.1 | G5 tests written | all 3 fail, before saved |
+| 6.2 | doctor --budgets enforcement | all pass, 4 fresh installs exit 0 under 100ms; Gate G5 met |

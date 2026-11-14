@@ -1,0 +1,40 @@
+OK /private/tmp/sx-g5/antigravity/.agents/agents/sx-planner.md
+OK /private/tmp/sx-g5/antigravity/.agents/agents/sx-reviewer.md
+OK /private/tmp/sx-g5/antigravity/.agents/agents/sx-scout.md
+OK /private/tmp/sx-g5/antigravity/.agents/agents/sx-tester.md
+OK /private/tmp/sx-g5/antigravity/.agents/agents/sx-worker.md
+OK /private/tmp/sx-g5/antigravity/.agents/skills/simpleide/SKILL.md
+OK /private/tmp/sx-g5/antigravity/.agents/skills/simpleide/references/brief-template.md
+OK /private/tmp/sx-g5/antigravity/.agents/skills/simpleide/references/coding.md
+OK /private/tmp/sx-g5/antigravity/.agents/skills/simpleide/references/large.md
+OK /private/tmp/sx-g5/antigravity/.agents/skills/simpleide/references/models.md
+OK /private/tmp/sx-g5/antigravity/.agents/skills/simpleide/references/research.md
+OK /private/tmp/sx-g5/antigravity/.agents/skills/sx-writeup/SKILL.md
+OK /private/tmp/sx-g5/antigravity/.simpleide/.gitignore
+OK /private/tmp/sx-g5/antigravity/.simpleide/legacy-owned-hashes.json
+OK /private/tmp/sx-g5/antigravity/.simpleide/mem.py
+OK /private/tmp/sx-g5/antigravity/.simpleide/models.json
+OK /private/tmp/sx-g5/antigravity/.simpleide/sx.py
+OK /private/tmp/sx-g5/antigravity/AGENTS.md
+antigravity models: configured
+antigravity hooks: optional, not configured
+store: 7cacf8831b7c4b9a978b61c7cfb08b5c; path=/private/tmp/sx-g5/antigravity; integrity=True
+python: 3.12.0; FTS5: yes
+shared db: writable
+budget rule block AGENTS.md: 1,932 / 2,500 bytes ok
+budget SKILL.md SKILL.md: 2,703 / 3,072 bytes ok
+budget description sx-planner.md: 228 / 400 chars ok
+budget description sx-reviewer.md: 277 / 400 chars ok
+budget description sx-scout.md: 137 / 400 chars ok
+budget description sx-tester.md: 287 / 400 chars ok
+budget description sx-worker.md: 214 / 400 chars ok
+budget description SKILL.md: 145 / 400 chars ok
+budget description SKILL.md: 131 / 400 chars ok
+budget idle estimate antigravity: 838 / 1,000 tokens ok
+budget hook capture-request: 80.8 / 100 ms ok
+budget hook dispatch-guard: 80.9 / 100 ms ok
+budget hook shell-guard: 84.9 / 100 ms ok
+budget hook return-log: 83.6 / 100 ms ok
+budget hook stop-check: 80.9 / 100 ms ok
+budget hook resume: 80.0 / 100 ms ok
+Files configured/present only. Live role discovery, actual model and hook enforcement require host observations.

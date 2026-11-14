@@ -1,0 +1,8 @@
+test_g5_doctor_budgets_fail_when_exceeded (test_repairs.Repairs.test_g5_doctor_budgets_fail_when_exceeded) ... ok
+test_g5_doctor_budgets_pass_on_fresh_install (test_repairs.Repairs.test_g5_doctor_budgets_pass_on_fresh_install) ... ok
+test_g5_plain_doctor_reports_sizes_without_timing (test_repairs.Repairs.test_g5_plain_doctor_reports_sizes_without_timing) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 10.683s
+
+OK

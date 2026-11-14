@@ -1,0 +1,38 @@
+OK /private/tmp/sx-g5/cursor/.agents/skills/simpleide/SKILL.md
+OK /private/tmp/sx-g5/cursor/.agents/skills/simpleide/references/brief-template.md
+OK /private/tmp/sx-g5/cursor/.agents/skills/simpleide/references/coding.md
+OK /private/tmp/sx-g5/cursor/.agents/skills/simpleide/references/large.md
+OK /private/tmp/sx-g5/cursor/.agents/skills/simpleide/references/models.md
+OK /private/tmp/sx-g5/cursor/.agents/skills/simpleide/references/research.md
+OK /private/tmp/sx-g5/cursor/.agents/skills/sx-writeup/SKILL.md
+OK /private/tmp/sx-g5/cursor/.cursor/agents/sx-planner.md
+OK /private/tmp/sx-g5/cursor/.cursor/agents/sx-reviewer.md
+OK /private/tmp/sx-g5/cursor/.cursor/agents/sx-tester.md
+OK /private/tmp/sx-g5/cursor/.cursor/agents/sx-worker.md
+OK /private/tmp/sx-g5/cursor/.simpleide/.gitignore
+OK /private/tmp/sx-g5/cursor/.simpleide/legacy-owned-hashes.json
+OK /private/tmp/sx-g5/cursor/.simpleide/mem.py
+OK /private/tmp/sx-g5/cursor/.simpleide/models.json
+OK /private/tmp/sx-g5/cursor/.simpleide/sx.py
+OK /private/tmp/sx-g5/cursor/AGENTS.md
+cursor models: configured
+cursor hooks: optional, not configured
+store: e1cd68c3bdda47c69ab95e1d5d4ac4a1; path=/private/tmp/sx-g5/cursor; integrity=True
+python: 3.12.0; FTS5: yes
+shared db: writable
+budget rule block AGENTS.md: 1,932 / 2,500 bytes ok
+budget SKILL.md SKILL.md: 2,703 / 3,072 bytes ok
+budget description SKILL.md: 145 / 400 chars ok
+budget description SKILL.md: 131 / 400 chars ok
+budget description sx-planner.md: 228 / 400 chars ok
+budget description sx-reviewer.md: 277 / 400 chars ok
+budget description sx-tester.md: 287 / 400 chars ok
+budget description sx-worker.md: 214 / 400 chars ok
+budget idle estimate cursor: 804 / 1,000 tokens ok
+budget hook capture-request: 77.8 / 100 ms ok
+budget hook dispatch-guard: 81.1 / 100 ms ok
+budget hook shell-guard: 80.5 / 100 ms ok
+budget hook return-log: 81.5 / 100 ms ok
+budget hook stop-check: 79.4 / 100 ms ok
+budget hook resume: 78.6 / 100 ms ok
+Files configured/present only. Live role discovery, actual model and hook enforcement require host observations.

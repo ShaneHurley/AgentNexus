@@ -1186,7 +1186,102 @@ def _worktree_cmd(root, action, slug, piece=None, discard=False, apply=False):
     return 0
 
 
-def doctor_cmd(root):
+def budget_report(install_dir, manifest, timing):
+    base = install_dir.parent
+    lines, ok = [], True
+    assets = manifest.get("assets", {})
+    block_entries = []
+    desc_entries = []
+    for rel, asset in sorted(assets.items()):
+        f = base / rel
+        if asset.get("kind") == "block":
+            text = f.read_text() if f.is_file() else ""
+            block = re.search(r"<!-- simpleIDE:start.*?<!-- simpleIDE:end -->", text, re.S)
+            b_len = len(block.group().strip().encode()) if block else 0
+            block_entries.append((rel, asset.get("consumers", []), b_len))
+            over = b_len > 2500
+            if over: ok = False
+            lines.append(f"budget rule block {Path(rel).name}: {b_len:,} / 2,500 bytes {'OVER' if over else 'ok'}")
+    for rel, asset in sorted(assets.items()):
+        if rel.endswith("skills/simpleide/SKILL.md"):
+            f = base / rel
+            s_len = len(f.read_bytes()) if f.is_file() else 0
+            over = s_len > 3072
+            if over: ok = False
+            lines.append(f"budget SKILL.md {Path(rel).name}: {s_len:,} / 3,072 bytes {'OVER' if over else 'ok'}")
+    for rel, asset in sorted(assets.items()):
+        p = Path(rel)
+        if p.name == "SKILL.md" or (p.name.startswith("sx-") and p.suffix in (".md", ".toml")):
+            f = base / rel
+            text = f.read_text() if f.is_file() else ""
+            desc = ""
+            if p.suffix == ".toml":
+                m = re.search(r'^description\s*=\s*(.*)$', text, re.M)
+                if m:
+                    try:
+                        import tomllib
+                        desc = tomllib.loads(text).get("description", "")
+                    except Exception:
+                        try:
+                            desc = json.loads(m.group(1).strip())
+                        except Exception:
+                            desc = m.group(1).strip().strip('"')
+            else:
+                m = re.search(r"^---\n(.*?)\n---", text, re.S)
+                if m:
+                    dm = re.search(r"^description:\s*(.*)$", fm_text := m.group(1), re.M)
+                    if dm:
+                        desc = dm.group(1).strip().strip("'\"")
+            d_len = len(desc)
+            desc_entries.append((rel, asset.get("consumers", []), d_len))
+            over = d_len > 400
+            if over: ok = False
+            lines.append(f"budget description {p.name}: {d_len:,} / 400 chars {'OVER' if over else 'ok'}")
+    for host in manifest.get("hosts", []):
+        blocks = [b_len for (rel, c, b_len) in block_entries if host in c]
+        max_b = max(blocks) if blocks else 0
+        descs = [d_len for (rel, c, d_len) in desc_entries if host in c]
+        tokens = int(round((max_b + sum(descs)) / 4))
+        over = tokens > 1000
+        if over: ok = False
+        lines.append(f"budget idle estimate {host}: {tokens:,} / 1,000 tokens {'OVER' if over else 'ok'}")
+    if timing:
+        hosts = manifest.get("hosts", [])
+        hook_host = "codex"
+        for h in ("claude", "cursor", "codex"):
+            if h in hosts:
+                hook_host = h; break
+        handlers = [
+            ("capture-request", "{}"),
+            ("dispatch-guard", "{}"),
+            ("shell-guard", json.dumps({"command": "true"})),
+            ("return-log", "{}"),
+            ("stop-check", "{}"),
+            ("resume", "{}"),
+        ]
+        limit_ms = float(os.environ.get("SIMPLEIDE_HOOK_BUDGET_MS", "100"))
+        with tempfile.TemporaryDirectory() as td:
+            temp_path = Path(td)
+            shared_dir = temp_path / "shared"
+            shared_dir.mkdir(parents=True, exist_ok=True)
+            env = dict(os.environ, SIMPLEIDE_PROJECT=str(temp_path), SIMPLEIDE_HOME=str(shared_dir))
+            for handler, stdin_data in handlers:
+                cmd = [sys.executable, str(Path(__file__).resolve()), "hook", handler, "--host", hook_host]
+                subprocess.run(cmd, cwd=str(temp_path), env=env, input=stdin_data, text=True, capture_output=True)
+                durations = []
+                for _ in range(3):
+                    t0 = time.monotonic()
+                    subprocess.run(cmd, cwd=str(temp_path), env=env, input=stdin_data, text=True, capture_output=True)
+                    durations.append((time.monotonic() - t0) * 1000.0)
+                durations.sort()
+                median_ms = durations[1]
+                over = median_ms > limit_ms
+                if over: ok = False
+                lines.append(f"budget hook {handler}: {median_ms:.1f} / {limit_ms:.0f} ms {'OVER' if over else 'ok'}")
+    return lines, ok
+
+
+def doctor_cmd(root, timing=False):
     install_dir = root / ".simpleide"
     if not (install_dir / "install-manifest.json").exists():
         install_dir = Path.home() / ".simpleide"
@@ -1235,6 +1330,10 @@ def doctor_cmd(root):
     try:
         connect(shared_path()).close(); print("shared db: writable")
     except (OSError,sqlite3.Error): print("shared db: lessons will queue")
+    budget_lines, budget_ok = budget_report(install_dir, manifest, timing)
+    for line in budget_lines:
+        print(line)
+    ok &= budget_ok
     print("Files configured/present only. Live role discovery, actual model and hook enforcement require host observations.")
     return 0 if ok else 1
 
@@ -1639,7 +1738,7 @@ def main(argv=None):
     cl = ts.add_parser("close"); cl.add_argument("slug"); cl.add_argument("--outcome", choices=("accepted","failed","abandoned"), required=True); cl.add_argument("--result", required=True); cl.add_argument("--by", choices=("user","assistant"), required=True); cl.add_argument("--refs", required=True); cl.add_argument("--exception")
     td = ts.add_parser("dispatches"); td.add_argument("slug")
     tc = ts.add_parser("cancel"); tc.add_argument("slug"); tc.add_argument("--dispatch", type=int, required=True); tc.add_argument("--refs", required=True)
-    sub.add_parser("doctor")
+    doc = sub.add_parser("doctor"); doc.add_argument("--budgets", action="store_true")
     st = sub.add_parser("stats"); st.add_argument("--task"); st.add_argument("--cost", type=float); st.add_argument("--tokens", type=int); st.add_argument("--usage-source")
     cx = sub.add_parser("context"); cx.add_argument("mode", choices=("standalone",))
     h = sub.add_parser("hook"); h.add_argument("event", choices=("capture-request", "dispatch-guard", "shell-guard", "return-log", "stop-check", "resume")); h.add_argument("--host", choices=("claude", "cursor", "codex"))
@@ -1668,7 +1767,7 @@ def main(argv=None):
                     for r in con.execute("SELECT * FROM dispatch WHERE task=?", (args.slug,)):
                         print(json.dumps(dict(r)))
             return 0
-        if args.cmd == "doctor": return doctor_cmd(root)
+        if args.cmd == "doctor": return doctor_cmd(root, timing=args.budgets)
         if args.cmd == "context":
             if (root / ".simpleide/context.json").exists():
                 raise ValueError("managed worktree; use worktree reconcile")

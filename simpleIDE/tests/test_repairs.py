@@ -782,6 +782,31 @@ class Repairs(unittest.TestCase):
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
         self.assertEqual(before, self.snapshot())
 
+    def test_g5_doctor_budgets_pass_on_fresh_install(self):
+        for tools in ('claude', 'cursor', 'codex', 'antigravity'):
+            with self.subTest(tools=tools):
+                root = self.base / ('budget-' + tools)
+                root.mkdir()
+                self.ok('--target', str(root), '--tools', tools, install=True)
+                out = self.ok('doctor', '--budgets', root=root, installed=True,
+                              env={'SIMPLEIDE_HOOK_BUDGET_MS': '10000'})
+                for label in ('rule block', 'SKILL.md', 'description', 'idle estimate', 'hook capture-request',
+                              'hook dispatch-guard', 'hook shell-guard', 'hook return-log', 'hook stop-check', 'hook resume'):
+                    self.assertIn(label, out)
+
+    def test_g5_doctor_budgets_fail_when_exceeded(self):
+        self.ok('--target', str(self.root), '--tools', 'codex', install=True)
+        result = self.cli('doctor', '--budgets', installed=True, env={'SIMPLEIDE_HOOK_BUDGET_MS': '0'})
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('OVER', result.stdout)
+
+    def test_g5_plain_doctor_reports_sizes_without_timing(self):
+        self.ok('--target', str(self.root), '--tools', 'codex', install=True)
+        out = self.ok('doctor', installed=True)
+        self.assertIn('rule block', out)
+        self.assertNotIn('hook resume', out)
+
+
 
 
 

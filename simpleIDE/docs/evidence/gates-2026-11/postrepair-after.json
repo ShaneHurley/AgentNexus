@@ -1,0 +1,58 @@
+{
+  "python": "3.12.0",
+  "observations": [
+    {
+      "id": "R1_branch_mismatch",
+      "expected": "Refuse merge/clean when actual worktree branch differs from recorded branch",
+      "merge": {
+        "code": 2,
+        "stdout": "",
+        "stderr": "sx: piece one: worktree is on refs/heads/worker-repair, expected codex/sx-t-one; restore the expected branch first\n"
+      },
+      "cleanup": {
+        "code": 2,
+        "stdout": "",
+        "stderr": "sx: piece one: worktree is on refs/heads/worker-repair, expected codex/sx-t-one; restore the expected branch first\n"
+      },
+      "implementation_integrated": false,
+      "worker_removed": false
+    },
+    {
+      "id": "R2_missing_context",
+      "expected": "Fail for a managed worktree with missing store pointer; do not create a new store",
+      "read": {
+        "code": 2,
+        "stdout": "",
+        "stderr": "sx: this is a Git linked worktree with no simpleIDE context; from the parent checkout run: sx worktree reconcile <task> --apply, or declare it independent with: sx context standalone\n"
+      },
+      "replacement_database_created": false
+    },
+    {
+      "id": "R3_partial_uninstall_models",
+      "expected": "Uninstalling Cursor preserves the remaining Codex model selection",
+      "before_model": "model = \"custom-worker\"",
+      "after_model": "model = \"custom-worker\"",
+      "codex_agent_unchanged": true
+    },
+    {
+      "id": "R4_submodule_freshness",
+      "expected": "Changed tested submodule content invalidates PASS; accepted closure requires fresh checks",
+      "packet": {
+        "code": 0,
+        "stdout": "REQUEST  missing\nCRITERIA missing\nBASE     HEAD\nCHANGED  \".simpleide/config.json\" +? -?\nCHANGED  \"dep\" +0 -0\nCHECKS   test: stale/unverified\nSCOPE    not supplied\nREAD     /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/sx-postrepair-review-uhlbrhex/submodule-check/.simpleide/artifacts/t/request-9b74a2d5fd2dbe1e4c066f2f57830e6e38e07bd15d646791cd4bb5c4f1dbbc50.md; git diff HEAD -- <paths>\n",
+        "stderr": ""
+      },
+      "close": {
+        "code": 2,
+        "stdout": "",
+        "stderr": "sx: acceptance requires current checks or --exception Pdecision: test: stale/unverified\n"
+      },
+      "actual_check_now": {
+        "code": 1,
+        "stdout": "",
+        "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\nAssertionError\n"
+      },
+      "git_status": " m dep\n?? .simpleide/config.json\n"
+    }
+  ]
+}

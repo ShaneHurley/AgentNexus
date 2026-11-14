@@ -1,0 +1,40 @@
+OK /private/tmp/sx-g5/codex/.agents/skills/simpleide/SKILL.md
+OK /private/tmp/sx-g5/codex/.agents/skills/simpleide/references/brief-template.md
+OK /private/tmp/sx-g5/codex/.agents/skills/simpleide/references/coding.md
+OK /private/tmp/sx-g5/codex/.agents/skills/simpleide/references/large.md
+OK /private/tmp/sx-g5/codex/.agents/skills/simpleide/references/models.md
+OK /private/tmp/sx-g5/codex/.agents/skills/simpleide/references/research.md
+OK /private/tmp/sx-g5/codex/.agents/skills/sx-writeup/SKILL.md
+OK /private/tmp/sx-g5/codex/.codex/agents/sx-planner.toml
+OK /private/tmp/sx-g5/codex/.codex/agents/sx-reviewer.toml
+OK /private/tmp/sx-g5/codex/.codex/agents/sx-scout.toml
+OK /private/tmp/sx-g5/codex/.codex/agents/sx-tester.toml
+OK /private/tmp/sx-g5/codex/.codex/agents/sx-worker.toml
+OK /private/tmp/sx-g5/codex/.simpleide/.gitignore
+OK /private/tmp/sx-g5/codex/.simpleide/legacy-owned-hashes.json
+OK /private/tmp/sx-g5/codex/.simpleide/mem.py
+OK /private/tmp/sx-g5/codex/.simpleide/models.json
+OK /private/tmp/sx-g5/codex/.simpleide/sx.py
+OK /private/tmp/sx-g5/codex/AGENTS.md
+codex models: configured
+codex hooks: optional, not configured
+store: 005404a126ca45278b240dade801c870; path=/private/tmp/sx-g5/codex; integrity=True
+python: 3.12.0; FTS5: yes
+shared db: writable
+budget rule block AGENTS.md: 1,932 / 2,500 bytes ok
+budget SKILL.md SKILL.md: 2,703 / 3,072 bytes ok
+budget description SKILL.md: 145 / 400 chars ok
+budget description SKILL.md: 131 / 400 chars ok
+budget description sx-planner.toml: 228 / 400 chars ok
+budget description sx-reviewer.toml: 277 / 400 chars ok
+budget description sx-scout.toml: 137 / 400 chars ok
+budget description sx-tester.toml: 287 / 400 chars ok
+budget description sx-worker.toml: 214 / 400 chars ok
+budget idle estimate codex: 838 / 1,000 tokens ok
+budget hook capture-request: 81.8 / 100 ms ok
+budget hook dispatch-guard: 84.3 / 100 ms ok
+budget hook shell-guard: 88.1 / 100 ms ok
+budget hook return-log: 86.4 / 100 ms ok
+budget hook stop-check: 80.0 / 100 ms ok
+budget hook resume: 81.2 / 100 ms ok
+Files configured/present only. Live role discovery, actual model and hook enforcement require host observations.

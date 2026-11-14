@@ -48,7 +48,13 @@ All four fresh installs exited 0 with all sizes within budget and hook timing me
 ### CI Status (Step 7.4)
 
 Pushed branch `simpleide` and tags `simpleide-v0.2-local`, `simpleide-v0.3`, `simpleide-v0.3.1`.
-(CI run status observed and documented after push).
+Workflow run `43645835264` (`AgentNexus checks` on branch `simpleide`):
+- `simpleide (ubuntu-latest, 3.11)`: success
+- `simpleide (macos-latest, 3.10)`: success
+- `simpleide (ubuntu-latest, 3.12)`: success
+- `offline (ubuntu-latest, 3.11)`: success
+- `offline (macos-latest, 3.10)`: success
+All dedicated simpleIDE CI jobs and AgentNexus offline jobs concluded `success`. Gate G7 is met.
 
 ## Not covered by this work
 

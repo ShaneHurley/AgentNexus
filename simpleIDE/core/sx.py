@@ -1087,16 +1087,21 @@ def _worktree_cmd(root, action, slug, piece=None, discard=False, apply=False):
     if action == "reconcile":
         for e in entries:
             present = e["path"] in inventory
-            integrated = git(root,"merge-base","--is-ancestor",e["branch"],"HEAD",check=False).returncode == 0
-            print(f"{e['piece']}: recorded={e['state']} present={present} integrated={integrated} diagnostic={e['diagnostic']}")
+            actual = inventory.get(e["path"], "") if present else ""
+            actual_branch = actual.replace("refs/heads/", "") if actual.startswith("refs/heads/") else (actual or "detached")
+            worker_head = git(Path(e["path"]), "rev-parse", "HEAD", check=False).stdout.strip() if present else ""
+            integrated = git(root, "merge-base", "--is-ancestor", worker_head, "HEAD", check=False).returncode == 0 if (present and worker_head) else False
+            print(f"{e['piece']}: recorded={e['state']} present={present} actual={actual_branch} integrated={integrated} diagnostic={e['diagnostic']}")
             if apply:
-                state = "removed" if not present and e["state"] == "removing" and Path(e["diagnostic"]).is_file() else "merged" if present and integrated else None
+                branch_matches = (actual == "refs/heads/" + e["branch"])
+                state = "removed" if not present and e["state"] == "removing" and Path(e["diagnostic"]).is_file() else "merged" if present and branch_matches and integrated else None
                 if state:
                     with con: con.execute("UPDATE worktree SET state=? WHERE id=?",(state,e["id"]))
         return 0
     if action == "merge" and git(root, "status", "--porcelain").stdout.strip():
         raise ValueError("main checkout has uncommitted work; resolve/commit any merge before retry")
     # Every piece and pointer is checked before the first destructive operation.
+    heads = {}
     for entry in entries:
         path = Path(entry["path"])
         if entry["state"] == "removed": continue
@@ -1105,17 +1110,26 @@ def _worktree_cmd(root, action, slug, piece=None, discard=False, apply=False):
                 with con: con.execute("UPDATE worktree SET state='removed' WHERE id=?",(entry["id"],))
                 continue
             raise ValueError("worktree missing unexpectedly; run worktree reconcile " + slug)
+        actual = inventory[entry["path"]]
+        if actual != "refs/heads/" + entry["branch"]:
+            raise ValueError("piece %s: worktree is on %s, expected %s; restore the expected branch first"
+                             % (entry["piece"], actual or "a detached HEAD", entry["branch"]))
+        heads[entry["id"]] = git(path, "rev-parse", "HEAD").stdout.strip()
         if git(path,"status","--porcelain").stdout.strip():
             raise ValueError("worktree has uncommitted work: " + str(path))
         if (path / ".simpleide/context.json").exists():
             if store_root(path) != store_root(root): raise ValueError("worker evidence store differs")
-        integrated = git(root,"merge-base","--is-ancestor",entry["branch"],"HEAD",check=False).returncode == 0
+        integrated = git(root,"merge-base","--is-ancestor",heads[entry["id"]],"HEAD",check=False).returncode == 0
         if action == "clean" and not integrated and not discard:
             raise ValueError("unintegrated branch: " + entry["branch"] + "; merge it or explicitly use --discard")
     if action == "clean":
         archives = {e["id"]: archive_worker(con, root, e) for e in entries if Path(e["path"]).exists() and e["state"] != "removed"}
         for entry in entries:
             if not Path(entry["path"]).exists() or entry["state"] == "removed": continue
+            current_head = git(Path(entry["path"]), "rev-parse", "HEAD").stdout.strip()
+            current_branch = worktree_inventory(root).get(entry["path"], "")
+            if current_head != heads[entry["id"]] or current_branch != "refs/heads/" + entry["branch"]:
+                raise ValueError("piece %s changed during clean; aborting" % entry["piece"])
             with con:
                 con.execute("UPDATE worktree SET state='removing',diagnostic=? WHERE id=?", (archives[entry["id"]],entry["id"]))
             git(root,"worktree","remove",entry["path"])
@@ -1124,15 +1138,18 @@ def _worktree_cmd(root, action, slug, piece=None, discard=False, apply=False):
     elif action == "merge":
         for entry in entries:
             if entry["state"] == "removed": continue
-            integrated = git(root,"merge-base","--is-ancestor",entry["branch"],"HEAD",check=False).returncode == 0
+            commit = heads[entry["id"]]
+            integrated = git(root,"merge-base","--is-ancestor",commit,"HEAD",check=False).returncode == 0
             if not integrated:
                 with con: con.execute("UPDATE worktree SET state='merging' WHERE id=?", (entry["id"],))
-                p = git(root,"merge","--no-ff","--no-edit",entry["branch"],check=False)
+                p = git(root,"merge","--no-ff","--no-edit",commit,check=False)
                 if p.returncode:
                     with con: con.execute("UPDATE worktree SET diagnostic=? WHERE id=?", (p.stderr or p.stdout,entry["id"]))
                     raise ValueError("merge conflict at " + entry["piece"] + "; resolve and commit before retry")
+                if git(root,"merge-base","--is-ancestor",commit,"HEAD",check=False).returncode != 0:
+                    raise ValueError("merged commit %s is not an ancestor of HEAD" % commit[:12])
             with con: con.execute("UPDATE worktree SET state='merged',diagnostic='' WHERE id=?", (entry["id"],))
-            print("merged " + entry["piece"])
+            print("merged %s %s" % (entry["piece"], commit[:12]))
     return 0
 
 

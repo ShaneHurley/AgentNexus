@@ -1,0 +1,25 @@
+test_r1_commit_after_merge_blocks_clean (test_repairs.Repairs.test_r1_commit_after_merge_blocks_clean) ... ok
+test_r1_detached_head_is_rejected (test_repairs.Repairs.test_r1_detached_head_is_rejected) ... FAIL
+test_r1_restoring_branch_allows_merge_and_clean (test_repairs.Repairs.test_r1_restoring_branch_allows_merge_and_clean) ... ok
+test_r1_switched_branch_blocks_merge_and_clean (test_repairs.Repairs.test_r1_switched_branch_blocks_merge_and_clean) ... FAIL
+
+======================================================================
+FAIL: test_r1_detached_head_is_rejected (test_repairs.Repairs.test_r1_detached_head_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 696, in test_r1_detached_head_is_rejected
+    self.assertNotEqual(self.cli('worktree', 'merge', 't').returncode, 0)
+AssertionError: 0 == 0
+
+======================================================================
+FAIL: test_r1_switched_branch_blocks_merge_and_clean (test_repairs.Repairs.test_r1_switched_branch_blocks_merge_and_clean)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 674, in test_r1_switched_branch_blocks_merge_and_clean
+    self.assertNotEqual(self.cli('worktree', 'merge', 't').returncode, 0)
+AssertionError: 0 == 0
+
+----------------------------------------------------------------------
+Ran 4 tests in 4.420s
+
+FAILED (failures=2)

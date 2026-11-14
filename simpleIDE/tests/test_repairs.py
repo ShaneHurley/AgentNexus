@@ -660,3 +660,57 @@ class Repairs(unittest.TestCase):
         self.ok('task', 'close', 't', '--outcome', 'accepted', '--result', result, '--by', 'assistant',
                 '--refs', 'explicit exception', '--exception', decision)
 
+    def switched_worker(self):
+        self.installed_repository()
+        worker = Path(self.ok('worktree', 'add', 't', 'one').splitlines()[0])
+        self.git('checkout', '-qb', 'worker-repair', root=worker)
+        (worker / 'worker-change.txt').write_text('required implementation\n')
+        self.git('add', 'worker-change.txt', root=worker)
+        self.git('commit', '-qm', 'worker implementation', root=worker)
+        return worker
+
+    def test_r1_switched_branch_blocks_merge_and_clean(self):
+        worker = self.switched_worker()
+        self.assertNotEqual(self.cli('worktree', 'merge', 't').returncode, 0)
+        self.assertNotEqual(self.cli('worktree', 'clean', 't').returncode, 0)
+        self.assertTrue(worker.exists())
+        self.assertFalse((self.root / 'worker-change.txt').exists())
+        reconcile = self.ok('worktree', 'reconcile', 't', '--apply')
+        with self.db() as c:
+            self.assertNotEqual(c.execute("SELECT state FROM worktree WHERE piece='one'").fetchone()[0], 'merged')
+
+    def test_r1_restoring_branch_allows_merge_and_clean(self):
+        worker = self.switched_worker()
+        self.git('checkout', '-q', 'codex/sx-t-one', root=worker)
+        self.git('merge', '-q', '--ff-only', 'worker-repair', root=worker)
+        out = self.ok('worktree', 'merge', 't')
+        self.assertIn('merged one', out)
+        self.assertTrue((self.root / 'worker-change.txt').exists())
+        self.ok('worktree', 'clean', 't')
+        self.assertFalse(worker.exists())
+
+    def test_r1_detached_head_is_rejected(self):
+        self.installed_repository()
+        worker = Path(self.ok('worktree', 'add', 't', 'one').splitlines()[0])
+        self.git('checkout', '-q', '--detach', root=worker)
+        self.assertNotEqual(self.cli('worktree', 'merge', 't').returncode, 0)
+        self.assertNotEqual(self.cli('worktree', 'clean', 't', '--discard').returncode, 0)
+        self.assertTrue(worker.exists())
+
+    def test_r1_commit_after_merge_blocks_clean(self):
+        self.installed_repository()
+        worker = Path(self.ok('worktree', 'add', 't', 'one').splitlines()[0])
+        (worker / 'first.txt').write_text('first\n')
+        self.git('add', 'first.txt', root=worker)
+        self.git('commit', '-qm', 'first', root=worker)
+        self.ok('worktree', 'merge', 't')
+        (worker / 'second.txt').write_text('second\n')
+        self.git('add', 'second.txt', root=worker)
+        self.git('commit', '-qm', 'second', root=worker)
+        self.assertNotEqual(self.cli('worktree', 'clean', 't').returncode, 0)
+        self.assertTrue(worker.exists())
+        self.ok('worktree', 'merge', 't')
+        self.assertTrue((self.root / 'second.txt').exists())
+        self.ok('worktree', 'clean', 't')
+
+

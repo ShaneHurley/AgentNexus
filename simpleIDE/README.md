@@ -13,7 +13,7 @@ python3 simpleIDE/install.py --target /path/to/project --tools codex --hooks
 python3 simpleIDE/install.py --target /path/to/project --tools cursor --uninstall
 ```
 
-Use `--global` for user-level installation, in a home you intend to modify. Restart the host. First hook registration is opt-in; updates preserve existing enabled state. Review new/changed hooks through the host's native trust UI. The installer never changes sandbox, approval, trust or model-default settings. `--models FILE` supplies nonempty per-host role mappings; unspecified roles in a partial custom map explicitly inherit. Confirm actual model availability in the host.
+Use `--global` for user-level installation, in a home you intend to modify. Restart the host. First hook registration is opt-in; updates preserve existing enabled state. Review new/changed hooks through the host's native trust UI. The installer never changes sandbox, approval, trust or model-default settings. `--models FILE` supplies nonempty per-host role mappings; unspecified roles in a partial custom map explicitly inherit, while omitting `--models` preserves existing installed model settings across updates and uninstalls. Confirm actual model availability in the host.
 
 The manifest tracks consumers, hashes and exact hook entries. Partial uninstall retains assets used by remaining hosts. Unknown/edited collisions stop before writes, user additions survive, and an apply failure restores the prior installation. Memory stays on uninstall. Read [migration and rollback instructions](docs/migrations-and-recovery.md) before upgrading an existing store.
 
@@ -41,6 +41,8 @@ python3 .simpleide/sx.py task close export --outcome accepted --result P7 --by a
 python3 .simpleide/sx.py mem export --task export --out .simpleide/artifacts/export/final.md
 python3 .simpleide/sx.py stats --task export
 python3 .simpleide/sx.py doctor
+python3 .simpleide/sx.py doctor --budgets
+python3 .simpleide/sx.py context standalone
 ```
 
 Substitute actual captured request/result IDs from command output. If no capture exists, omit `--request`, then deliberately bind with `task bind export --host codex --session SESSION`. A new session never selects another session's newest task. Results do not close tasks. Closure requires accepted/failed/abandoned, the task's result ID, actor and evidence. `--by user` is attribution, not proof: reference the actual user's judgment. Blocked remains open. Completed slugs are immutable; use a fresh slug and optional `--retry-of export`.

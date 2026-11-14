@@ -1,5 +1,7 @@
 # Root-cause repair plan — 12 November 2026
 
+> Superseded: the four defects it targets were fixed with smaller changes; see gates-G2-G5-G7-completion.md.
+
 Status: planned, not implemented. Scope: the four reproduced defects in the [independent post-repair review](postrepair-review-2026-11-11.md), plus adjacent cases exercising the same contracts. This refines the earlier repair plan; it does not reopen every prior work item. The current baseline is 67 passing tests, with the four defects reproduced separately in [saved observations](evidence/postrepair-review-2026-11-11.json).
 
 ## Why the previous repairs were insufficient

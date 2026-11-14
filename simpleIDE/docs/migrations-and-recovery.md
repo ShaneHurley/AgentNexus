@@ -54,3 +54,13 @@ PY
 Repeat for the shared store if needed. Do not reopen with the new runtime until intending to migrate again. A backup cannot reconstruct previously deleted evidence, old deduplicated check events or unverifiable host/model observations.
 
 Search attribution requires a matching host/session pair or an explicit matching search ID. A plain show with neither supplies no evidence that the opening belongs to a prior search; it remains ordinary record access and earns no usage credit. Missing identity is not treated as a shared session.
+
+## Upgrading to the gate release (November 2026)
+
+- Check fingerprints now use version 2 and include submodules. After upgrading, every earlier check shows "stale". Re-run `sx check --task <slug>` for open tasks. Closed tasks are not changed.
+- An uninitialized or unreadable submodule makes freshness "unknown". Accepted closure then needs fresh checks or an explicit `--exception` decision.
+- `worktree merge` and `clean` refuse a worktree that is on another branch or a detached HEAD. Recovery: check out the expected branch in the worker (bring the commits with `git merge --ff-only` or `cherry-pick`), then retry. Merges now use the exact commit and print it.
+- A managed worktree without `.simpleide/context.json` refuses to run. Recovery: from the parent checkout, `sx worktree reconcile <slug> --apply`. For a linked worktree you want independent: `sx context standalone`.
+- The installer keeps installed model settings. `--models` changes only the hosts selected with `--tools`; it cannot be combined with `--uninstall`.
+- Upgrade steps: pull the branch, run `install.py --target <project> --tools <hosts>` (add `--hooks` only if hooks were enabled before; updates keep them), restart the host, run `sx doctor --budgets`.
+- Rollback: `git checkout simpleide-v0.2-local -- simpleIDE` in a scratch clone, then run that version's installer over the project. No database schema changed in this release, so stores need no rollback. Check observations recorded under version 2 will look stale to the old runtime; re-run checks.

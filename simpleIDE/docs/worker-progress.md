@@ -20,3 +20,6 @@ Assignment: docs/worker-gemini-flash-gates-G2-G5-G7.md
 | 5.3 | postrepair_review check | 8 OK lines; Gate G2 is met |
 | 6.1 | G5 tests written | all 3 fail, before saved |
 | 6.2 | doctor --budgets enforcement | all pass, 4 fresh installs exit 0 under 100ms; Gate G5 met |
+| 7.1 | dedicated CI job | simpleIDE regression suite in dedicated matrix job |
+| 7.2 | documentation | upgrade/rollback docs, README commands, completion doc, plan headers updated, all links resolve |
+| 7.3 | final local verification | 84 OK on 3.12 and 3.10 (skipped=1); line counts within budget; no whitespace errors |

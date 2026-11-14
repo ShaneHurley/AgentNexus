@@ -1,5 +1,7 @@
 # simpleIDE repair and qualification plan
 
+> Superseded by finalization-plan-2026-11-14.md; its follow-up defects are closed in gates-G2-G5-G7-completion.md.
+
 Written 11 November 2026. This is an implementation plan, not a claim that the repairs have shipped. Production scripts, agents and skills were unchanged in this investigation.
 
 ## Decision

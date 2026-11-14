@@ -1,0 +1,93 @@
+test_claude_launch_logs_child_identity_once (test_regressions.Regressions) ... ok
+test_concurrent_cursor_starts_enforce_limit_atomically (test_regressions.Regressions) ... ok
+test_each_single_tool_installs_both_skills (test_regressions.Regressions) ... ok
+test_empty_and_missing_sections_are_rejected (test_regressions.Regressions) ... ok
+test_existing_dispatch_database_migrates_without_losing_records (test_regressions.Regressions) ... ok
+test_fresh_cursor_hooks_have_version_and_reinstall_is_idempotent (test_regressions.Regressions) ... ok
+test_legacy_return_without_id_uses_unique_brief_and_rejects_ambiguity (test_regressions.Regressions) ... ok
+test_missing_cursor_version_is_added_without_reformatting_user_entries (test_regressions.Regressions) ... ok
+test_parallel_returns_correlate_out_of_order_and_duplicates_are_idempotent (test_regressions.Regressions) ... ok
+test_repeated_checks_keep_chronology_and_distinct_artifacts (test_regressions.Regressions) ... ok
+test_replayed_start_does_not_double_count (test_regressions.Regressions) ... ok
+test_return_identity_does_not_cross_sessions_or_hosts (test_regressions.Regressions) ... ok
+test_shell_guard_flag_variants_and_safe_controls (test_regressions.Regressions) ... ok
+test_shell_guard_handles_host_payloads_and_fails_closed_on_invalid_input (test_regressions.Regressions) ... ok
+test_shell_guard_uses_event_cwd_and_recognizes_readonly_role (test_regressions.Regressions) ... ok
+test_shipped_briefs_and_standalone_headings_pass_all_blocking_guards (test_regressions.Regressions) ... ok
+test_changed_during_check_and_conflicting_return_ids (test_repairs.Repairs) ... ok
+test_checks_keep_failures_currentness_and_close_gate (test_repairs.Repairs) ... ok
+test_cleanup_preflights_all_and_rejects_bad_store (test_repairs.Repairs) ... ok
+test_concurrent_first_open_and_duplicate (test_repairs.Repairs) ... ok
+test_concurrent_worktree_add_and_missing_runtime (test_repairs.Repairs) ... ok
+test_correlated_intent_and_unknown_lifecycle (test_repairs.Repairs) ... ok
+test_empty_section_contents_rejected (test_repairs.Repairs) ... ok
+test_explicit_binding_isolates_sessions_and_all_criteria (test_repairs.Repairs) ... ok
+test_full_installed_workflow (test_repairs.Repairs) ... ok
+test_g5_doctor_budgets_fail_when_exceeded (test_repairs.Repairs) ... ok
+test_g5_doctor_budgets_pass_on_fresh_install (test_repairs.Repairs) ... ok
+test_g5_plain_doctor_reports_sizes_without_timing (test_repairs.Repairs) ... ok
+test_global_and_local_rendered_commands_from_subdirectory (test_repairs.Repairs) ... ok
+test_ids_never_reused_and_strict_ids (test_repairs.Repairs) ... ok
+test_installer_preflight_and_exact_hook_ownership (test_repairs.Repairs) ... ok
+test_installer_validation_dry_run_rollback_and_doctor (test_repairs.Repairs) ... install: injected apply failure
+ok
+test_interrupted_check_retains_output_and_unknown_freshness_requires_exception (test_repairs.Repairs) ... ok
+test_invalid_shapes_fail_before_mutation_without_tracebacks (test_repairs.Repairs) ... ok
+test_legacy_install_bootstrap_and_edited_collision (test_repairs.Repairs) ... ok
+test_legacy_outcome_and_shared_store_migration (test_repairs.Repairs) ... ok
+test_migration_backup_fts_and_identity (test_repairs.Repairs) ... ok
+test_migration_failure_rolls_back (test_repairs.Repairs) ... ok
+test_outcomes_are_explicit_immutable_and_filtered (test_repairs.Repairs) ... ok
+test_pack_uses_selected_primary_request_and_repairs_partial_handoff (test_repairs.Repairs) ... ok
+test_pending_admission_limit_is_atomic (test_repairs.Repairs) ... ok
+test_post_close_capture_does_not_reopen_old_task (test_repairs.Repairs) ... ok
+test_question_resolution_and_export_provenance (test_repairs.Repairs) ... ok
+test_r1_commit_after_merge_blocks_clean (test_repairs.Repairs) ... ok
+test_r1_detached_head_is_rejected (test_repairs.Repairs) ... ok
+test_r1_restoring_branch_allows_merge_and_clean (test_repairs.Repairs) ... ok
+test_r1_switched_branch_blocks_merge_and_clean (test_repairs.Repairs) ... ok
+test_r2_declared_standalone_worktree_keeps_own_store (test_repairs.Repairs) ... ok
+test_r2_missing_context_fails_without_new_store (test_repairs.Repairs) ... ok
+test_r2_plain_project_still_creates_store (test_repairs.Repairs) ... ok
+test_r3_conflicting_model_flags_fail_without_writes (test_repairs.Repairs) ... ok
+test_r3_global_partial_uninstall_preserves_models (test_repairs.Repairs) ... ok
+test_r3_partial_uninstall_preserves_surviving_models (test_repairs.Repairs) ... ok
+test_r4_submodule_commit_and_untracked_change_invalidate_pass (test_repairs.Repairs) ... ok
+test_r4_submodule_file_change_invalidates_pass (test_repairs.Repairs) ... ok
+test_r4_unchanged_submodule_stays_current (test_repairs.Repairs) ... ok
+test_r4_uninitialized_submodule_is_unknown_and_blocks_acceptance (test_repairs.Repairs) ... ok
+test_raw_git_paths_and_concurrent_check_logs (test_repairs.Repairs) ... ok
+test_search_attribution_requires_actual_hit_and_matching_session (test_repairs.Repairs) ... ok
+test_sharing_promotion_same_basename_and_total_limit (test_repairs.Repairs) ... ok
+test_worktree_context_executes_worker_and_preserves_evidence (test_repairs.Repairs) ... ok
+test_worktree_legacy_archive_and_interrupted_clean_recovery (test_repairs.Repairs) ... ok
+test_codex_toml_parses (test_simpleide.Install) ... skipped 'tomllib needs Python 3.11+'
+test_custom_models (test_simpleide.Install) ... ok
+test_dry_run_writes_nothing (test_simpleide.Install) ... ok
+test_install_all_is_idempotent_and_preserves_user_content (test_simpleide.Install) ... ok
+test_uninstall_removes_only_ours (test_simpleide.Install) ... ok
+test_add_search_ranked_and_scoped (test_simpleide.Mem) ... ok
+test_duplicate_not_stored_twice (test_simpleide.Mem) ... ok
+test_export_and_forget (test_simpleide.Mem) ... ok
+test_lesson_is_shared_across_projects (test_simpleide.Mem) ... ok
+test_local_lesson_stays_local (test_simpleide.Mem) ... ok
+test_odd_query_characters_do_not_crash (test_simpleide.Mem) ... ok
+test_unwritable_shared_db_queues_then_syncs (test_simpleide.Mem) ... ok
+test_check_proposal_and_failing_artifact (test_sx.Commands) ... ok
+test_claude_and_cursor_hook_shapes (test_sx.Commands) ... ok
+test_codex_pretool_brief_can_be_denied (test_sx.Commands) ... ok
+test_doctor_reports_missing_then_installed (test_sx.Commands) ... ok
+test_hook_capture_and_cursor_brief_guard (test_sx.Commands) ... ok
+test_install_hooks_merges_and_uninstalls (test_sx.Commands) ... ok
+test_lesson_use_and_prune (test_sx.Commands) ... ok
+test_scope_and_pack_handle_many_files (test_sx.Commands) ... ok
+test_scope_without_git_fails (test_sx.Commands) ... ok
+test_worktree_refuses_uncommitted_and_merges_in_order (test_sx.Commands) ... ok
+
+----------------------------------------------------------------------
+Ran 84 tests in 74.523s
+
+OK (skipped=1)
+test: INTERRUPTED (0.00s; exit -2)
+  interrupted/error:
+  full output: /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/sx-repair-g3rfmukk/project with spaces/.simpleide/artifacts/t/test-nu5rbcn1.txt

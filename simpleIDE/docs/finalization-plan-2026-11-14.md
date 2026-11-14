@@ -1,5 +1,7 @@
 # simpleIDE: finalization plan
 
+> Status: gates G2, G5 and G7 were completed by the worker assignment in worker-gemini-flash-gates-G2-G5-G7.md; see gates-G2-G5-G7-completion.md. R2, R3 (Stage 5.1, 5.2) and doctor budgets (Stage 4.3) were done early.
+
 Written 14 November 2026. This plan takes simpleIDE from its current state (built and locally tested, never used on real work) to the architecture in the design of 10 November (`claude/simpleIDE-plan.md` in the project, `simpleIDE/PLAN.md` in the repo). Section numbers such as "design §7.2" refer to that document.
 
 Everything stated about the current state was checked against the code on 14 November: the files in `simpleIDE/`, the 67-test suite (run again today: 67 run, 1 expected skip on Python 3.10), and the review documents in `simpleIDE/docs/`.

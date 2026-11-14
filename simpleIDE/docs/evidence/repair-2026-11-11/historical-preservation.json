@@ -1,0 +1,11 @@
+{
+  "unchanged_original_audit_json": {
+    "docs/evidence/followup-probe-2026-11-11.json": "9e610e79e989bffe44d82b8c47a417cee8e51f7c0762504d65c9e15c6303ba60",
+    "docs/evidence/runtime-probe-2026-11-10.json": "2670b70b0c0ccfa3365a4b1b53a572a44d3b652392d7ffa80fa0d9642eb3668c",
+    "docs/evidence/readiness-probe-2026-11-11.json": "e101cc7cccf7455e5a78784b1a8e1260d3ac7144351e4cb33e8e0acfec310562",
+    "docs/evidence/installed-cli-smoke-2026-11-10.json": "eee9e8a4b566fa06eeb667e255f0a4c280ca18ef77da8aba2dfff23fd5b9e846",
+    "docs/evidence/codex-live-2026-11-10.json": "f5f6d84e12136a84eeeebb6c6ab131043ef6d786e4bdba05c7a2ff67e95d38c4",
+    "docs/evidence/runtime-probe-fixed-2026-11-10.json": "679aa81dbfb63ae3665394282047c2eb9afbcae0ba868c6b63ef82bf17d274f7",
+    "docs/evidence/installed-cli-fixed-2026-11-10.json": "6f8af209e2ca263c1b17ecb7776964f74630f722105158a4d44be3b4c300304a"
+  }
+}

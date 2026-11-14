@@ -1,0 +1,127 @@
+{
+  "python": "3.12.0",
+  "kind": "local subprocess probes; not live IDE trials",
+  "passed": 3,
+  "total": 14,
+  "observations": [
+    {
+      "name": "Cursor-only installation exits successfully",
+      "passed": true,
+      "expected": 0,
+      "actual": 0
+    },
+    {
+      "name": "Cursor-only installation includes both skills",
+      "passed": false,
+      "expected": [
+        true,
+        true
+      ],
+      "actual": [
+        false,
+        false
+      ]
+    },
+    {
+      "name": "Fresh Cursor hook configuration has required version",
+      "passed": false,
+      "expected": 1,
+      "actual": null
+    },
+    {
+      "name": "Documented brief template passes dispatch guard",
+      "passed": false,
+      "expected": "allow",
+      "actual": "deny"
+    },
+    {
+      "name": "Three returned workers all become inactive",
+      "passed": false,
+      "expected": [
+        "done",
+        "done",
+        "done"
+      ],
+      "actual": [
+        "",
+        "",
+        "done"
+      ]
+    },
+    {
+      "name": "Two fresh workers allowed after completed parallel work",
+      "passed": false,
+      "expected": [
+        "allow",
+        "allow"
+      ],
+      "actual": [
+        "allow",
+        "deny"
+      ]
+    },
+    {
+      "name": "Fail/pass/fail check history preserves all observations",
+      "passed": false,
+      "expected": [
+        "test: FAIL",
+        "test: PASS",
+        "test: FAIL"
+      ],
+      "actual": [
+        "test: FAIL",
+        "test: PASS"
+      ]
+    },
+    {
+      "name": "Stop warning identifies latest failed check",
+      "passed": false,
+      "expected": true,
+      "actual": false
+    },
+    {
+      "name": "Shell guard denies: git reset --hard HEAD",
+      "passed": true,
+      "expected": "deny",
+      "actual": "deny"
+    },
+    {
+      "name": "Shell guard denies: git push -f origin main",
+      "passed": false,
+      "expected": "deny",
+      "actual": "allow"
+    },
+    {
+      "name": "Shell guard denies: git clean -fdx",
+      "passed": false,
+      "expected": "deny",
+      "actual": "allow"
+    },
+    {
+      "name": "Shell guard denies: rm --recursive /tmp/simpleide-outside-probe",
+      "passed": false,
+      "expected": "deny",
+      "actual": "allow"
+    },
+    {
+      "name": "Codex fourth worker is denied by PreToolUse",
+      "passed": true,
+      "expected": "deny",
+      "actual": "deny"
+    },
+    {
+      "name": "Codex returned workers all become inactive",
+      "passed": false,
+      "expected": [
+        "done",
+        "done",
+        "done"
+      ],
+      "actual": [
+        "",
+        "",
+        "done"
+      ]
+    }
+  ]
+}

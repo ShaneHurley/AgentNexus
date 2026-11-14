@@ -1,0 +1,38 @@
+test_changed_during_check_and_conflicting_return_ids (test_repairs.Repairs.test_changed_during_check_and_conflicting_return_ids) ... ok
+test_checks_keep_failures_currentness_and_close_gate (test_repairs.Repairs.test_checks_keep_failures_currentness_and_close_gate) ... ok
+test_cleanup_preflights_all_and_rejects_bad_store (test_repairs.Repairs.test_cleanup_preflights_all_and_rejects_bad_store) ... ok
+test_concurrent_first_open_and_duplicate (test_repairs.Repairs.test_concurrent_first_open_and_duplicate) ... ok
+test_concurrent_worktree_add_and_missing_runtime (test_repairs.Repairs.test_concurrent_worktree_add_and_missing_runtime) ... ok
+test_correlated_intent_and_unknown_lifecycle (test_repairs.Repairs.test_correlated_intent_and_unknown_lifecycle) ... ok
+test_empty_section_contents_rejected (test_repairs.Repairs.test_empty_section_contents_rejected) ... ok
+test_explicit_binding_isolates_sessions_and_all_criteria (test_repairs.Repairs.test_explicit_binding_isolates_sessions_and_all_criteria) ... ok
+test_full_installed_workflow (test_repairs.Repairs.test_full_installed_workflow) ... ok
+test_global_and_local_rendered_commands_from_subdirectory (test_repairs.Repairs.test_global_and_local_rendered_commands_from_subdirectory) ... ok
+test_ids_never_reused_and_strict_ids (test_repairs.Repairs.test_ids_never_reused_and_strict_ids) ... ok
+test_installer_preflight_and_exact_hook_ownership (test_repairs.Repairs.test_installer_preflight_and_exact_hook_ownership) ... ok
+test_installer_validation_dry_run_rollback_and_doctor (test_repairs.Repairs.test_installer_validation_dry_run_rollback_and_doctor) ... install: injected apply failure
+ok
+test_interrupted_check_retains_output_and_unknown_freshness_requires_exception (test_repairs.Repairs.test_interrupted_check_retains_output_and_unknown_freshness_requires_exception) ... ok
+test_invalid_shapes_fail_before_mutation_without_tracebacks (test_repairs.Repairs.test_invalid_shapes_fail_before_mutation_without_tracebacks) ... ok
+test_legacy_install_bootstrap_and_edited_collision (test_repairs.Repairs.test_legacy_install_bootstrap_and_edited_collision) ... ok
+test_legacy_outcome_and_shared_store_migration (test_repairs.Repairs.test_legacy_outcome_and_shared_store_migration) ... ok
+test_migration_backup_fts_and_identity (test_repairs.Repairs.test_migration_backup_fts_and_identity) ... ok
+test_migration_failure_rolls_back (test_repairs.Repairs.test_migration_failure_rolls_back) ... ok
+test_outcomes_are_explicit_immutable_and_filtered (test_repairs.Repairs.test_outcomes_are_explicit_immutable_and_filtered) ... ok
+test_pack_uses_selected_primary_request_and_repairs_partial_handoff (test_repairs.Repairs.test_pack_uses_selected_primary_request_and_repairs_partial_handoff) ... ok
+test_pending_admission_limit_is_atomic (test_repairs.Repairs.test_pending_admission_limit_is_atomic) ... ok
+test_post_close_capture_does_not_reopen_old_task (test_repairs.Repairs.test_post_close_capture_does_not_reopen_old_task) ... ok
+test_question_resolution_and_export_provenance (test_repairs.Repairs.test_question_resolution_and_export_provenance) ... ok
+test_raw_git_paths_and_concurrent_check_logs (test_repairs.Repairs.test_raw_git_paths_and_concurrent_check_logs) ... ok
+test_search_attribution_requires_actual_hit_and_matching_session (test_repairs.Repairs.test_search_attribution_requires_actual_hit_and_matching_session) ... ok
+test_sharing_promotion_same_basename_and_total_limit (test_repairs.Repairs.test_sharing_promotion_same_basename_and_total_limit) ... ok
+test_worktree_context_executes_worker_and_preserves_evidence (test_repairs.Repairs.test_worktree_context_executes_worker_and_preserves_evidence) ... ok
+test_worktree_legacy_archive_and_interrupted_clean_recovery (test_repairs.Repairs.test_worktree_legacy_archive_and_interrupted_clean_recovery) ... ok
+
+----------------------------------------------------------------------
+Ran 29 tests in 19.568s
+
+OK
+test: INTERRUPTED (0.00s; exit -2)
+  interrupted/error:
+  full output: /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/sx-repair-4ljeok16/project with spaces/.simpleide/artifacts/t/test-9fq26gn_.txt

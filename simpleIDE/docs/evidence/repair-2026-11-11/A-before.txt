@@ -1,0 +1,33 @@
+test_concurrent_first_open_and_duplicate (test_repairs.Repairs.test_concurrent_first_open_and_duplicate) ... ok
+test_ids_never_reused_and_strict_ids (test_repairs.Repairs.test_ids_never_reused_and_strict_ids) ... FAIL
+test_migration_backup_fts_and_identity (test_repairs.Repairs.test_migration_backup_fts_and_identity) ... FAIL
+test_migration_failure_rolls_back (test_repairs.Repairs.test_migration_failure_rolls_back) ... FAIL
+
+======================================================================
+FAIL: test_ids_never_reused_and_strict_ids (test_repairs.Repairs.test_ids_never_reused_and_strict_ids)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 70, in test_ids_never_reused_and_strict_ids
+    self.assertIn('P3', self.ok('mem', 'add', 'note', 'replacement'))
+AssertionError: 'P3' not found in 'P2 note saved\n'
+
+======================================================================
+FAIL: test_migration_backup_fts_and_identity (test_repairs.Repairs.test_migration_backup_fts_and_identity)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 85, in test_migration_backup_fts_and_identity
+    self.assertIn('Legacy needle', self.ok('mem', 'search', 'needle', '--scope', 'project'))
+AssertionError: 'Legacy needle' not found in 'no matches\n'
+
+======================================================================
+FAIL: test_migration_failure_rolls_back (test_repairs.Repairs.test_migration_failure_rolls_back)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 102, in test_migration_failure_rolls_back
+    with self.assertRaises(sqlite3.Error):
+AssertionError: Error not raised
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.406s
+
+FAILED (failures=3)

@@ -1,0 +1,13 @@
+{
+  "kind": "summary retained from observed CLI tool output of the initial final-runtime confirmation",
+  "runtime_sha256": "61213ed6176239fcd0cedc79eaffaf209decc265dccaa1faf21a699d6943b9c4",
+  "binary_version": "codex-cli 0.163.0-alpha.10.2",
+  "exit": 0,
+  "observations": [
+    "doctor files/config/store integrity passed",
+    "check test PASS",
+    "pack reported test: stale/unverified with nonignored Python bytecode among changed paths",
+    "separate final-runtime-verification export written; terminal outcome unchanged"
+  ],
+  "limit": "Summary only; the latest full confirmation trace is live-final-runtime.json. This summary is not native hook or actual-model evidence."
+}

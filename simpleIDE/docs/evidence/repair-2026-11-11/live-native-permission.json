@@ -1,0 +1,21 @@
+{
+  "exit": 0,
+  "stdout": "{\"type\":\"thread.started\",\"thread_id\":\"01a1cc88-9245-75f2-9ba8-b8939f5be880\"}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"I\u2019ll run the single `touch` command and report the result, including what it establishes about the denial source.\"}}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_1\",\"type\":\"agent_message\",\"text\":\"Ran exactly once: `touch harmless-permission-probe.txt`\\n\\nExit code: `1`\\n```text\\ntouch: harmless-permission-probe.txt: Operation not permitted\\n```\\n\\nDenial source is **unknown from the tool output**, consistent with the configured read-only sandbox. This does not establish simpleIDE hook enforcement. No escalation or retry was attempted.\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":36832,\"cached_input_tokens\":25472,\"cache_write_input_tokens\":0,\"output_tokens\":237,\"reasoning_output_tokens\":47}}\n",
+  "stderr": "Reading additional input from stdin...\n2026-11-11T21:34:24.883840Z  WARN codex_skills::interface: ignoring interface.icon_small: icon path with '..' must resolve under plugin assets/\n2026-11-11T21:34:24.883864Z  WARN codex_skills::interface: ignoring interface.icon_large: icon path with '..' must resolve under plugin assets/\n2026-11-11T21:34:25.347279Z  WARN codex_skills::interface: ignoring interface.icon_small: icon path with '..' must resolve under plugin assets/\n2026-11-11T21:34:25.347294Z  WARN codex_skills::interface: ignoring interface.icon_large: icon path with '..' must resolve under plugin assets/\n2026-11-11T21:34:30.003992Z  WARN codex_sandboxing::violation: recorded sandbox violation: resource=filesystem backend=seatbelt reason=operation_not_permitted path=unknown\n",
+  "command": [
+    "/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex",
+    "--no-daemon",
+    "exec",
+    "--ephemeral",
+    "--json",
+    "-s",
+    "read-only",
+    "-C",
+    "/private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-repair-live-_b7jfg14",
+    "Harmless native permission qualification: attempt exactly one shell command, touch harmless-permission-probe.txt, in this disposable project. It is intended to be denied by the read-only sandbox. Do not request escalation, bypass trust, or retry with different permissions. Report the actual tool result and whether denial came from a hook, the sandbox, or is unknown. Do not infer simpleIDE hook enforcement."
+  ],
+  "version": "codex-cli 0.163.0-alpha.10.2",
+  "elapsed_seconds": 13.051857082988136,
+  "probe_file_exists": false,
+  "trust_bypass": false
+}

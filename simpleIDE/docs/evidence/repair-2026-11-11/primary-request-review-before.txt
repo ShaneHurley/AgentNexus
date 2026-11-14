@@ -1,0 +1,14 @@
+test_pack_uses_selected_primary_request_and_repairs_partial_handoff (test_repairs.Repairs.test_pack_uses_selected_primary_request_and_repairs_partial_handoff) ... FAIL
+
+======================================================================
+FAIL: test_pack_uses_selected_primary_request_and_repairs_partial_handoff (test_repairs.Repairs.test_pack_uses_selected_primary_request_and_repairs_partial_handoff)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 590, in test_pack_uses_selected_primary_request_and_repairs_partial_handoff
+    self.assertIn('REQUEST  '+selected+' ',packet)
+AssertionError: 'REQUEST  P3 ' not found in 'REQUEST  P1 (sx mem show P1)\nCRITERIA missing\nBASE     HEAD\nCHECKS   none configured\nSCOPE    not supplied\nREAD     /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/sx-repair-bj7sqxgg/project with spaces/.simpleide/artifacts/t/request-dcf15e81d84356ff15cd3bf2fb970a226de8dfbada024421c47fdd1b251f5db4.md; git diff HEAD -- <paths>\n'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.446s
+
+FAILED (failures=1)

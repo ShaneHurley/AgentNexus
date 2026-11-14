@@ -1,0 +1,125 @@
+{
+  "python": "3.12.0",
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "kind": "installed CLI, migrations, concurrent operations and repaired audits; fixture hooks; no live host",
+  "total": 29,
+  "passed": true,
+  "observations": [
+    {
+      "test": "test_repairs.Repairs.test_changed_during_check_and_conflicting_return_ids",
+      "passed": true
+    },
+    {
+      "test": "test_repairs.Repairs.test_checks_keep_failures_currentness_and_close_gate",
+      "passed": true
+    },
+    {
+      "test": "test_repairs.Repairs.test_cleanup_preflights_all_and_rejects_bad_store",
+      "passed": true
+    },
+    {
+      "test": "test_repairs.Repairs.test_concurrent_first_open_and_duplicate",
+      "passed": true
+    },
+    {
+      "test": "test_repairs.Repairs.test_concurrent_worktree_add_and_missing_runtime",
+      "passed": true
+    },
+    {
+      "test": "test_repairs.Repairs.test_correlated_intent_and_unknown_lifecycle",
+      "passed": true
+    },
+    {
+      "test": "test_repairs.Repairs.test_empty_section_contents_rejected",
+      "passed": true
+    },
+    {
+      "test": "test_repairs.Repairs.test_explicit_binding_isolates_sessions_and_all_criteria",
+      "passed": true
+    },
+    {
+      "test": "test_repairs.Repairs.test_full_installed_workflow",
+      "passed": true
+    },
+    {
+      "test": "test_repairs.Repairs.test_global_and_local_rendered_commands_from_subdirectory",
+      "passed": true
+    },
+    {
+      "test": "test_repairs.Repairs.test_ids_never_reused_and_strict_ids",
+      "passed": true
+    },
+    {
+      "test": "test_repairs.Repairs.test_installer_preflight_and_exact_hook_ownership",
+      "passed": true
+    },
+    {
+      "test": "test_repairs.Repairs.test_installer_validation_dry_run_rollback_and_doctor",
+      "passed": true
+    },
+    {
+      "test": "test_repairs.Repairs.test_interrupted_check_retains_output_and_unknown_freshness_requires_exception",
+      "passed": true
+    },
+    {
+      "test": "test_repairs.Repairs.test_invalid_shapes_fail_before_mutation_without_tracebacks",
+      "passed": true
+    },
+    {
+      "test": "test_repairs.Repairs.test_legacy_install_bootstrap_and_edited_collision",
+      "passed": true
+    },
+    {
+      "test": "test_repairs.Repairs.test_legacy_outcome_and_shared_store_migration",
+      "passed": true
+    },
+    {
+      "test": "test_repairs.Repairs.test_migration_backup_fts_and_identity",
+      "passed": true
+    },
+    {
+      "test": "test_repairs.Repairs.test_migration_failure_rolls_back",
+      "passed": true
+    },
+    {
+      "test": "test_repairs.Repairs.test_outcomes_are_explicit_immutable_and_filtered",
+      "passed": true
+    },
+    {
+      "test": "test_repairs.Repairs.test_pack_uses_selected_primary_request_and_repairs_partial_handoff",
+      "passed": true
+    },
+    {
+      "test": "test_repairs.Repairs.test_pending_admission_limit_is_atomic",
+      "passed": true
+    },
+    {
+      "test": "test_repairs.Repairs.test_post_close_capture_does_not_reopen_old_task",
+      "passed": true
+    },
+    {
+      "test": "test_repairs.Repairs.test_question_resolution_and_export_provenance",
+      "passed": true
+    },
+    {
+      "test": "test_repairs.Repairs.test_raw_git_paths_and_concurrent_check_logs",
+      "passed": true
+    },
+    {
+      "test": "test_repairs.Repairs.test_search_attribution_requires_actual_hit_and_matching_session",
+      "passed": true
+    },
+    {
+      "test": "test_repairs.Repairs.test_sharing_promotion_same_basename_and_total_limit",
+      "passed": true
+    },
+    {
+      "test": "test_repairs.Repairs.test_worktree_context_executes_worker_and_preserves_evidence",
+      "passed": true
+    },
+    {
+      "test": "test_repairs.Repairs.test_worktree_legacy_archive_and_interrupted_clean_recovery",
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,130 @@
+{
+  "python": "3.12.0",
+  "total": 13,
+  "unmet": 13,
+  "observations": [
+    {
+      "id": "N01_record_id_reuse",
+      "passed": false,
+      "expected": false,
+      "actual": true,
+      "old_id": "P2",
+      "replacement_id": "P2",
+      "old_reference_now": "P2 note 2026-11-11 15:44 task=- tags=- project=identity\nUnrelated replacement\n\nrefs: -\n\n"
+    },
+    {
+      "id": "N02_fts_initial_population",
+      "passed": false,
+      "expected": true,
+      "actual": false,
+      "output": "no matches\n",
+      "setup": "Existing store with rows and no FTS tables, representing fallback-only storage"
+    },
+    {
+      "id": "N03_stop_remembers_failed_named_check",
+      "passed": false,
+      "expected": true,
+      "actual": false,
+      "checks": {
+        "code": 1,
+        "stdout": "test: FAIL (0.03s; exit 1) \n  full output: .simpleide/artifacts/t/test-1.txt\nlint: PASS (0.02s; exit 0) \n  full output: .simpleide/artifacts/t/lint-1.txt\n",
+        "stderr": ""
+      },
+      "stop_output": "{\"decision\": \"block\", \"reason\": \"simpleIDE: open task t has no result.\"}\n"
+    },
+    {
+      "id": "N04_result_does_not_hide_failed_checks",
+      "passed": false,
+      "expected": true,
+      "actual": false,
+      "stop_output": "{}\n"
+    },
+    {
+      "id": "N05_stale_check_is_distinguished",
+      "passed": false,
+      "expected": true,
+      "actual": false,
+      "packet": "REQUEST  missing\nCRITERIA missing\nBASE     HEAD\nCHANGED  source.txt +1 -1\nCHECKS   test: PASS\nSCOPE    not supplied\nREAD     git diff HEAD -- <paths>\n"
+    },
+    {
+      "id": "N06_scope_handles_git_quoted_paths",
+      "passed": false,
+      "expected": 0,
+      "actual": 1,
+      "output": {
+        "code": 1,
+        "stdout": "\"allowed/caf\\303\\251.py\"\n",
+        "stderr": ""
+      }
+    },
+    {
+      "id": "N07_cleanup_preflights_all_pieces",
+      "passed": false,
+      "expected": true,
+      "actual": false,
+      "output": {
+        "code": 2,
+        "stdout": "removed /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-followup-b8gemtio/cleanup-sx-t-one\n",
+        "stderr": "sx: worktree has uncommitted work: /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-followup-b8gemtio/cleanup-sx-t-two\n"
+      }
+    },
+    {
+      "id": "N08_cleanup_retry_recovers",
+      "passed": false,
+      "expected": 0,
+      "actual": 2,
+      "output": {
+        "code": 2,
+        "stdout": "",
+        "stderr": "sx: [Errno 2] No such file or directory: '/private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-followup-b8gemtio/cleanup-sx-t-one'\n"
+      }
+    },
+    {
+      "id": "N09_cleanup_preserves_worker_ledger",
+      "passed": false,
+      "expected": true,
+      "actual": false,
+      "output": "removed /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-followup-b8gemtio/cleanup-evidence-sx-t-one\n",
+      "parent_has_record": false
+    },
+    {
+      "id": "N10_installer_preflight_before_writes",
+      "passed": false,
+      "expected": false,
+      "actual": true,
+      "output": {
+        "code": 1,
+        "stdout": "",
+        "stderr": "Traceback (most recent call last):\n  File \"/Users/shurley/Documents/AgentNexus/simpleIDE/install.py\", line 372, in <module>\n    sys.exit(main())\n             ^^^^^^\n  File \"/Users/shurley/Documents/AgentNexus/simpleIDE/install.py\", line 352, in main\n    ins.hooks(base / {\"claude\": \".claude/settings.json\", \"cursor\": \".cursor/hooks.json\", \"codex\": \".codex/hooks.json\"}[tool], tool)\n  File \"/Users/shurley/Documents/AgentNexus/simpleIDE/install.py\", line 182, in hooks\n    old_data = json.loads(old_text)\n               ^^^^^^^^^^^^^^^^^^^^\n  File \"/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/json/__init__.py\", line 346, in loads\n    return _default_decoder.decode(s)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/json/decoder.py\", line 337, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/json/decoder.py\", line 353, in raw_decode\n    obj, end = self.scan_once(s, idx)\n               ^^^^^^^^^^^^^^^^^^^^^^\njson.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 3 (char 2)\n"
+      },
+      "installed_agent": true
+    },
+    {
+      "id": "N11_empty_sections_are_denied",
+      "passed": false,
+      "expected": "deny",
+      "actual": "allow",
+      "response": "{\"permission\": \"allow\"}\n"
+    },
+    {
+      "id": "N12_unrelated_show_not_counted_as_search_use",
+      "passed": false,
+      "expected": 0,
+      "actual": 1
+    },
+    {
+      "id": "N13_hook_ownership_not_substring",
+      "passed": false,
+      "expected": true,
+      "actual": false,
+      "original": {
+        "command": "echo \"documented .simpleide/sx.py hook syntax\""
+      },
+      "actual_entries": [
+        {
+          "command": "python3 .simpleide/sx.py hook stop-check --host cursor"
+        }
+      ]
+    }
+  ]
+}

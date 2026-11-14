@@ -1,0 +1,36 @@
+{
+  "_readme": [
+    "Which model each role runs on, per tool. Edit, then re-run install.py.",
+    "An empty model means: inherit whatever the main session is using.",
+    "Only put a model id here after you have seen it in that tool's own model picker.",
+    "Roles: planner = strong reasoning, read-only. worker = cheap, does the labour.",
+    "       tester = writes tests independently. reviewer = adversarial, read-only."
+  ],
+  "claude": {
+    "planner":  {"model": "opus"},
+    "worker":   {"model": "sonnet"},
+    "tester":   {"model": "sonnet"},
+    "reviewer": {"model": "sonnet"},
+    "scout": {"model": "haiku"}
+  },
+  "cursor": {
+    "planner":  {"model": "inherit"},
+    "worker":   {"model": "inherit"},
+    "tester":   {"model": "inherit"},
+    "reviewer": {"model": "inherit"}
+  },
+  "codex": {
+    "planner":  {"model": "gpt-6.1-sol", "effort": "high"},
+    "worker":   {"model": "gpt-6-luna", "effort": "high"},
+    "tester":   {"model": "gpt-6.1-terra", "effort": "medium"},
+    "reviewer": {"model": "gpt-6.1-sol", "effort": "high"},
+    "scout": {"model": "gpt-6-luna", "effort": "low"}
+  },
+  "antigravity": {
+    "planner": {"model": "pro"},
+    "worker": {"model": "flash"},
+    "tester": {"model": "flash"},
+    "reviewer": {"model": "pro"},
+    "scout": {"model": "flash"}
+  }
+}

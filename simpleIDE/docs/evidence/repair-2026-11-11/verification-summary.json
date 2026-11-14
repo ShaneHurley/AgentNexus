@@ -1,0 +1,42 @@
+{
+  "date_local": "2026-11-11",
+  "timezone": "America/Detroit",
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "source_sha256": "9595e90c92e4f43e2fbfcf754839dea1d2405f5a758661ff3452fee64a10e025",
+  "tests": {
+    "python3.12": {
+      "run": 67,
+      "skipped": 0,
+      "success": true
+    },
+    "python3.10": {
+      "run": 67,
+      "skipped": 1,
+      "success": true
+    },
+    "repaired_audits": {
+      "run": 29,
+      "success": true
+    }
+  },
+  "coverage": [
+    "migration and rollback",
+    "concurrent operations",
+    "installed CLI end-to-end",
+    "repaired audit scenarios",
+    "legacy evidence preservation"
+  ],
+  "live": {
+    "codex_version": "codex-cli 0.163.0-alpha.10.2",
+    "final_installed_hash_matches_source": true,
+    "final_commands_exit": 0,
+    "actual_child_model": "unknown",
+    "native_hook_enforcement": "unverified"
+  },
+  "pending": [
+    "Python 3.11 / Ubuntu remote CI",
+    "full native hook and child-model qualification",
+    "other live hosts",
+    "nine real comparison tasks and actual user judgments"
+  ]
+}

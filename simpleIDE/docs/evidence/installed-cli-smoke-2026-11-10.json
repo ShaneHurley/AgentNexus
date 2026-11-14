@@ -1,0 +1,115 @@
+[
+  {
+    "args": [
+      "mem",
+      "add",
+      "goal",
+      "Verify installed commands",
+      "--task",
+      "local-smoke",
+      "--size",
+      "MEDIUM"
+    ],
+    "exit": 0,
+    "stdout": "P1 goal saved\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "mem",
+      "add",
+      "criteria",
+      "The arithmetic file contains 19 + 23",
+      "--task",
+      "local-smoke"
+    ],
+    "exit": 0,
+    "stdout": "P2 criteria saved\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "check",
+      "test",
+      "--task",
+      "local-smoke"
+    ],
+    "exit": 2,
+    "stdout": "Wrote proposed checks to /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-live-7auwo3fr/.simpleide/config.json; inspect and set confirmed to true.\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "check",
+      "test",
+      "--task",
+      "local-smoke"
+    ],
+    "exit": 0,
+    "stdout": "test: PASS (0.07s; exit 0) \n  full output: .simpleide/artifacts/local-smoke/test-1.txt\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "mem",
+      "lesson",
+      "This smoke arithmetic fixture sums to 42",
+      "--local",
+      "--task",
+      "local-smoke"
+    ],
+    "exit": 0,
+    "stdout": "P4 lesson saved\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "mem",
+      "search",
+      "arithmetic"
+    ],
+    "exit": 0,
+    "stdout": "P2 criteria 2026-11-10 task=local-smoke | The arithmetic file contains 19 + 23\nP4 lesson 2026-11-10 task=local-smoke | This smoke arithmetic fixture sums to 42\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "mem",
+      "add",
+      "result",
+      "Installed CLI check passed",
+      "--task",
+      "local-smoke"
+    ],
+    "exit": 0,
+    "stdout": "P5 result saved\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "mem",
+      "export",
+      "--task",
+      "local-smoke"
+    ],
+    "exit": 0,
+    "stdout": "# local-smoke \u2014 work record\n\n## Goal\n\n- **Verify installed commands** _(2026-11-10 19:24, P1)_\n\n## Acceptance criteria\n\n- **The arithmetic file contains 19 + 23** _(2026-11-10 19:24, P2)_\n\n## Tests\n\n- **test: PASS** \u2014 python3.12 -m unittest smoke_test -v Refs: .simpleide/artifacts/local-smoke/test-1.txt. _(2026-11-10 19:24, P3)_\n\n## Result\n\n- **Installed CLI check passed** _(2026-11-10 19:24, P5)_\n\n## Lessons\n\n- **This smoke arithmetic fixture sums to 42** _(2026-11-10 19:24, P4)_\n\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "stats"
+    ],
+    "exit": 0,
+    "stdout": "MEDIUM tasks=1 accepted=1 avg_dispatches=0.0 avg_repairs=0.0 check_failures=0 avg_seconds=1.0 tokens=None cost=None\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "doctor"
+    ],
+    "exit": 0,
+    "stdout": "OK /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-live-7auwo3fr/.simpleide/sx.py\nOK /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-live-7auwo3fr/.simpleide/mem.py\nOK /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-live-7auwo3fr/AGENTS.md\nmodels: ok\npython: 3.12.0; FTS5: yes\nproject db: writable\nshared db: writable\nrule bytes: 2477\nclaude hooks: not installed\ncursor hooks: not installed\ncodex hooks: registered\nManual: verify agents listed, skill listed, and actual worker model in each tool.\n",
+    "stderr": ""
+  }
+]

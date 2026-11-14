@@ -1,0 +1,31 @@
+{
+  "kind": "direct installed CLI repeat after native trial generated nonignored bytecode; no host/hook claim",
+  "observations": [
+    {
+      "command": [
+        "python3.12",
+        "/private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-medium-live-k2uwd_8r/.simpleide/sx.py",
+        "check",
+        "--task",
+        "live-medium"
+      ],
+      "exit": 0,
+      "stdout": "test: PASS (0.09s; exit 0)\n  full output: /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-medium-live-k2uwd_8r/.simpleide/artifacts/live-medium/test-o3sl9wtx.txt\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3.12",
+        "/private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-medium-live-k2uwd_8r/.simpleide/sx.py",
+        "pack",
+        "--task",
+        "live-medium",
+        "--base",
+        "HEAD"
+      ],
+      "exit": 0,
+      "stdout": "REQUEST  P1 (sx mem show P1)\nCRITERIA P3 P4 P5 P6 P7\nBASE     HEAD\nCHANGED  \".agents/skills/simpleide/SKILL.md\" +8 -6\nCHANGED  \".agents/skills/simpleide/references/brief-template.md\" +2 -0\nCHANGED  \".agents/skills/simpleide/references/coding.md\" +2 -0\nCHANGED  \".agents/skills/simpleide/references/large.md\" +2 -2\nCHANGED  \".codex/hooks.json\" +1 -10\nCHANGED  \".simpleide/config.json\" +? -?\nCHANGED  \".simpleide/install-manifest.json\" +6 -6\nCHANGED  \".simpleide/legacy-owned-hashes.json\" +1 -0\nCHANGED  \".simpleide/sx.py\" +63 -5\nCHANGED  \"__pycache__/normalize.cpython-312.pyc\" +? -?\nCHANGED  \"__pycache__/normalize.cpython-39.pyc\" +? -?\nCHANGED  \"__pycache__/test_normalize.cpython-312.pyc\" +? -?\nCHANGED  \"__pycache__/test_normalize.cpython-39.pyc\" +? -?\nCHANGED  \"normalize.py\" +9 -1\nCHANGED  \"test_normalize.py\" +? -?\nCHECKS   test: PASS current\nSCOPE    not supplied\nREAD     /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-medium-live-k2uwd_8r/.simpleide/artifacts/live-medium/request-9402c9f0627f492b7f7aa049cb0628c6b5c70376790d075be4af64e8ee0803c6.md; git diff HEAD -- <paths>\n",
+      "stderr": ""
+    }
+  ]
+}

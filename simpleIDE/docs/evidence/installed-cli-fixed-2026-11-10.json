@@ -1,0 +1,243 @@
+{
+  "kind": "installed CLI smoke with hook payload fixtures; not live IDE hooks",
+  "worker_statuses": [
+    "done",
+    "done",
+    "done"
+  ],
+  "check_history": [
+    "test: FAIL",
+    "test: PASS",
+    "test: FAIL"
+  ],
+  "all_assertions_passed": true,
+  "calls": [
+    {
+      "args": [
+        "--target",
+        "/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-fixed-install-6lxk3b_y",
+        "--tools",
+        "claude,cursor,codex",
+        "--hooks"
+      ],
+      "exit": 0,
+      "stdout": "write   /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-fixed-install-6lxk3b_y/.simpleide/mem.py\nwrite   /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-fixed-install-6lxk3b_y/.simpleide/sx.py\nwrite   /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-fixed-install-6lxk3b_y/.simpleide/models.json\nwrite   /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-fixed-install-6lxk3b_y/.simpleide/.gitignore\ncopy    /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-fixed-install-6lxk3b_y/.claude/skills/simpleide/\ncopy    /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-fixed-install-6lxk3b_y/.claude/skills/sx-writeup/\ncopy    /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-fixed-install-6lxk3b_y/.agents/skills/simpleide/\ncopy    /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-fixed-install-6lxk3b_y/.agents/skills/sx-writeup/\nwrite   /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-fixed-install-6lxk3b_y/.claude/agents/sx-planner.md\nwrite   /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-fixed-install-6lxk3b_y/.claude/agents/sx-reviewer.md\nwrite   /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-fixed-install-6lxk3b_y/.claude/agents/sx-tester.md\nwrite   /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-fixed-install-6lxk3b_y/.claude/agents/sx-worker.md\nwrite   /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-fixed-install-6lxk3b_y/.cursor/agents/sx-planner.md\nwrite   /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-fixed-install-6lxk3b_y/.cursor/agents/sx-reviewer.md\nwrite   /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-fixed-install-6lxk3b_y/.cursor/agents/sx-tester.md\nwrite   /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-fixed-install-6lxk3b_y/.cursor/agents/sx-worker.md\nwrite   /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-fixed-install-6lxk3b_y/.codex/agents/sx-planner.toml\nwrite   /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-fixed-install-6lxk3b_y/.codex/agents/sx-reviewer.toml\nwrite   /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-fixed-install-6lxk3b_y/.codex/agents/sx-scout.toml\nwrite   /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-fixed-install-6lxk3b_y/.codex/agents/sx-tester.toml\nwrite   /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-fixed-install-6lxk3b_y/.codex/agents/sx-worker.toml\nwrite   /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-fixed-install-6lxk3b_y/.simpleide/hook-created-claude.json\nwrite   /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-fixed-install-6lxk3b_y/.claude/settings.json\nwrite   /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-fixed-install-6lxk3b_y/.simpleide/hook-created-cursor.json\nwrite   /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-fixed-install-6lxk3b_y/.cursor/hooks.json\nwrite   /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-fixed-install-6lxk3b_y/.simpleide/hook-created-codex.json\nwrite   /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-fixed-install-6lxk3b_y/.codex/hooks.json\nblock   /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-fixed-install-6lxk3b_y/AGENTS.md\nblock   /private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-fixed-install-6lxk3b_y/CLAUDE.md\nMemory command: python3 .simpleide/sx.py mem   (try: python3 .simpleide/sx.py mem stats)\nOptional Codex config.toml: [sandbox_workspace_write] writable_roots = [\"/Users/shurley/.simpleide\"]\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "hook",
+        "capture-request",
+        "--host",
+        "codex"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "mem",
+        "add",
+        "goal",
+        "Installed runtime check",
+        "--task",
+        "fixed-smoke",
+        "--size",
+        "MEDIUM"
+      ],
+      "exit": 0,
+      "stdout": "P2 goal saved\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "mem",
+        "add",
+        "criteria",
+        "Real tests and worker returns preserve their observed order",
+        "--task",
+        "fixed-smoke"
+      ],
+      "exit": 0,
+      "stdout": "P3 criteria saved\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "hook",
+        "dispatch-guard",
+        "--host",
+        "codex"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "hook",
+        "dispatch-guard",
+        "--host",
+        "codex"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "hook",
+        "dispatch-guard",
+        "--host",
+        "codex"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "hook",
+        "dispatch-guard",
+        "--host",
+        "codex"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "hook",
+        "dispatch-guard",
+        "--host",
+        "codex"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "hook",
+        "dispatch-guard",
+        "--host",
+        "codex"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "hook",
+        "return-log",
+        "--host",
+        "codex"
+      ],
+      "exit": 0,
+      "stdout": "{}\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "hook",
+        "return-log",
+        "--host",
+        "codex"
+      ],
+      "exit": 0,
+      "stdout": "{}\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "hook",
+        "return-log",
+        "--host",
+        "codex"
+      ],
+      "exit": 0,
+      "stdout": "{}\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "hook",
+        "return-log",
+        "--host",
+        "codex"
+      ],
+      "exit": 0,
+      "stdout": "{}\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "hook",
+        "shell-guard",
+        "--host",
+        "codex"
+      ],
+      "exit": 0,
+      "stdout": "{\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"deny\", \"permissionDecisionReason\": \"simpleIDE blocked shell command: destructive or read-only role\"}}\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "check",
+        "test",
+        "--task",
+        "fixed-smoke"
+      ],
+      "exit": 1,
+      "stdout": "test: FAIL (0.05s; exit 1) \n  test_observed_value (smoke_test.Smoke.test_observed_value) ... FAIL\n  FAIL: test_observed_value (smoke_test.Smoke.test_observed_value)\n  AssertionError: '41' != '42'\n  full output: .simpleide/artifacts/fixed-smoke/test-1.txt\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "check",
+        "test",
+        "--task",
+        "fixed-smoke"
+      ],
+      "exit": 0,
+      "stdout": "test: PASS (0.04s; exit 0) \n  full output: .simpleide/artifacts/fixed-smoke/test-2.txt\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "check",
+        "test",
+        "--task",
+        "fixed-smoke"
+      ],
+      "exit": 1,
+      "stdout": "test: FAIL (0.04s; exit 1) \n  test_observed_value (smoke_test.Smoke.test_observed_value) ... FAIL\n  FAIL: test_observed_value (smoke_test.Smoke.test_observed_value)\n  AssertionError: '41' != '42'\n  full output: .simpleide/artifacts/fixed-smoke/test-3.txt\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "hook",
+        "stop-check",
+        "--host",
+        "codex"
+      ],
+      "exit": 0,
+      "stdout": "{\"decision\": \"block\", \"reason\": \"simpleIDE: open task fixed-smoke has no result; last check failed.\"}\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "mem",
+        "export",
+        "--task",
+        "fixed-smoke"
+      ],
+      "exit": 0,
+      "stdout": "# fixed-smoke \u2014 work record\n\n## Original request\n\n- **Verify the installed fixed runtime** \u2014 Verify the installed fixed runtime Refs: smoke. _(2026-11-10 20:46, P1)_\n\n## Goal\n\n- **Installed runtime check** _(2026-11-10 20:46, P2)_\n\n## Acceptance criteria\n\n- **Real tests and worker returns preserve their observed order** _(2026-11-10 20:46, P3)_\n\n## Tests\n\n- **test: FAIL** \u2014 \"/Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12\" -m unittest smoke_test -v Refs: .simpleide/artifacts/fixed-smoke/test-1.txt. _(2026-11-10 20:46, P4)_\n- **test: PASS** \u2014 \"/Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12\" -m unittest smoke_test -v Refs: .simpleide/artifacts/fixed-smoke/test-2.txt. _(2026-11-10 20:46, P5)_\n- **test: FAIL** \u2014 \"/Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12\" -m unittest smoke_test -v Refs: .simpleide/artifacts/fixed-smoke/test-3.txt. _(2026-11-10 20:46, P6)_\n\n",
+      "stderr": ""
+    }
+  ]
+}

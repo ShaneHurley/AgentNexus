@@ -1,0 +1,306 @@
+test_changed_during_check_and_conflicting_return_ids (test_repairs.Repairs.test_changed_during_check_and_conflicting_return_ids) ... FAIL
+test_checks_keep_failures_currentness_and_close_gate (test_repairs.Repairs.test_checks_keep_failures_currentness_and_close_gate) ... FAIL
+test_cleanup_preflights_all_and_rejects_bad_store (test_repairs.Repairs.test_cleanup_preflights_all_and_rejects_bad_store) ... FAIL
+test_concurrent_first_open_and_duplicate (test_repairs.Repairs.test_concurrent_first_open_and_duplicate) ... ok
+test_concurrent_worktree_add_and_missing_runtime (test_repairs.Repairs.test_concurrent_worktree_add_and_missing_runtime) ... FAIL
+test_correlated_intent_and_unknown_lifecycle (test_repairs.Repairs.test_correlated_intent_and_unknown_lifecycle) ... ERROR
+test_empty_section_contents_rejected (test_repairs.Repairs.test_empty_section_contents_rejected) ... FAIL
+test_explicit_binding_isolates_sessions_and_all_criteria (test_repairs.Repairs.test_explicit_binding_isolates_sessions_and_all_criteria) ... FAIL
+test_full_installed_workflow (test_repairs.Repairs.test_full_installed_workflow) ... FAIL
+test_global_and_local_rendered_commands_from_subdirectory (test_repairs.Repairs.test_global_and_local_rendered_commands_from_subdirectory) ... FAIL
+test_ids_never_reused_and_strict_ids (test_repairs.Repairs.test_ids_never_reused_and_strict_ids) ... FAIL
+test_installer_preflight_and_exact_hook_ownership (test_repairs.Repairs.test_installer_preflight_and_exact_hook_ownership) ... FAIL
+test_installer_validation_dry_run_rollback_and_doctor (test_repairs.Repairs.test_installer_validation_dry_run_rollback_and_doctor) ... FAIL
+test_interrupted_check_retains_output_and_unknown_freshness_requires_exception (test_repairs.Repairs.test_interrupted_check_retains_output_and_unknown_freshness_requires_exception) ... ERROR
+test_legacy_install_bootstrap_and_edited_collision (test_repairs.Repairs.test_legacy_install_bootstrap_and_edited_collision) ... ERROR
+test_legacy_outcome_and_shared_store_migration (test_repairs.Repairs.test_legacy_outcome_and_shared_store_migration) ... FAIL
+test_migration_backup_fts_and_identity (test_repairs.Repairs.test_migration_backup_fts_and_identity) ... FAIL
+test_migration_failure_rolls_back (test_repairs.Repairs.test_migration_failure_rolls_back) ... FAIL
+test_outcomes_are_explicit_immutable_and_filtered (test_repairs.Repairs.test_outcomes_are_explicit_immutable_and_filtered) ... FAIL
+test_pending_admission_limit_is_atomic (test_repairs.Repairs.test_pending_admission_limit_is_atomic) ... FAIL
+test_post_close_capture_does_not_reopen_old_task (test_repairs.Repairs.test_post_close_capture_does_not_reopen_old_task) ... FAIL
+test_question_resolution_and_export_provenance (test_repairs.Repairs.test_question_resolution_and_export_provenance) ... FAIL
+test_raw_git_paths_and_concurrent_check_logs (test_repairs.Repairs.test_raw_git_paths_and_concurrent_check_logs) ... FAIL
+test_search_attribution_requires_actual_hit_and_matching_session (test_repairs.Repairs.test_search_attribution_requires_actual_hit_and_matching_session) ... FAIL
+test_sharing_promotion_same_basename_and_total_limit (test_repairs.Repairs.test_sharing_promotion_same_basename_and_total_limit) ... FAIL
+test_worktree_context_executes_worker_and_preserves_evidence (test_repairs.Repairs.test_worktree_context_executes_worker_and_preserves_evidence) ... FAIL
+test_worktree_legacy_archive_and_interrupted_clean_recovery (test_repairs.Repairs.test_worktree_legacy_archive_and_interrupted_clean_recovery) ... ERROR
+
+======================================================================
+ERROR: test_correlated_intent_and_unknown_lifecycle (test_repairs.Repairs.test_correlated_intent_and_unknown_lifecycle)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 155, in test_correlated_intent_and_unknown_lifecycle
+    self.assertEqual(c.execute("SELECT task,requested_model,model,state FROM dispatch WHERE child_id='child2'").fetchone(),
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such column: requested_model
+
+======================================================================
+ERROR: test_interrupted_check_retains_output_and_unknown_freshness_requires_exception (test_repairs.Repairs.test_interrupted_check_retains_output_and_unknown_freshness_requires_exception)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 446, in test_interrupted_check_retains_output_and_unknown_freshness_requires_exception
+    self.assertEqual(sx.check_cmd(self.root, 'test', 't'), 1)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/simpleide-pre-repair-20261111/core/sx.py", line 465, in check_cmd
+    p = subprocess.run(command, shell=True, cwd=root, text=True, stdout=subprocess.PIPE,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/mock.py", line 1134, in __call__
+    return self._mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/mock.py", line 1138, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/mock.py", line 1199, in _execute_mock_call
+    result = effect(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 442, in interrupted
+    kw['stdout'].write('partial output\n')
+    ^^^^^^^^^^^^^^^^^^
+AttributeError: 'int' object has no attribute 'write'
+
+======================================================================
+ERROR: test_legacy_install_bootstrap_and_edited_collision (test_repairs.Repairs.test_legacy_install_bootstrap_and_edited_collision)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 532, in test_legacy_install_bootstrap_and_edited_collision
+    self.assertEqual(user_file.read_text(),'preserve user addition')
+                     ^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/pathlib.py", line 1028, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/pathlib.py", line 1014, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/sx-repair-ywv3px2y/project with spaces/.agents/skills/simpleide/user-notes.txt'
+
+======================================================================
+ERROR: test_worktree_legacy_archive_and_interrupted_clean_recovery (test_repairs.Repairs.test_worktree_legacy_archive_and_interrupted_clean_recovery)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 464, in test_worktree_legacy_archive_and_interrupted_clean_recovery
+    context.unlink()
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/pathlib.py", line 1343, in unlink
+    os.unlink(self)
+FileNotFoundError: [Errno 2] No such file or directory: '/private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/sx-repair-0f43k5z1/project with spaces-sx-t-one/.simpleide/context.json'
+
+======================================================================
+FAIL: test_changed_during_check_and_conflicting_return_ids (test_repairs.Repairs.test_changed_during_check_and_conflicting_return_ids)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 544, in test_changed_during_check_and_conflicting_return_ids
+    self.assertIn('stale',self.ok('pack','--task','t','--base','HEAD'))
+AssertionError: 'stale' not found in 'REQUEST  missing\nCRITERIA missing\nBASE     HEAD\nCHANGED  source.txt +1 -1\nCHECKS   test: PASS\nSCOPE    not supplied\nREAD     git diff HEAD -- <paths>\n'
+
+======================================================================
+FAIL: test_checks_keep_failures_currentness_and_close_gate (test_repairs.Repairs.test_checks_keep_failures_currentness_and_close_gate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 206, in test_checks_keep_failures_currentness_and_close_gate
+    self.assertIn('failed', stop)
+AssertionError: 'failed' not found in '{}\n'
+
+======================================================================
+FAIL: test_cleanup_preflights_all_and_rejects_bad_store (test_repairs.Repairs.test_cleanup_preflights_all_and_rejects_bad_store)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 273, in test_cleanup_preflights_all_and_rejects_bad_store
+    self.assertTrue(one.exists())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_concurrent_worktree_add_and_missing_runtime (test_repairs.Repairs.test_concurrent_worktree_add_and_missing_runtime)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 288, in test_concurrent_worktree_add_and_missing_runtime
+    self.assertNotEqual(self.cli('worktree', 'add', 't', 'missing').returncode, 0)
+AssertionError: 0 == 0
+
+======================================================================
+FAIL: test_empty_section_contents_rejected (test_repairs.Repairs.test_empty_section_contents_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 162, in test_empty_section_contents_rejected
+    self.assertEqual(json.loads(out)['permission'], 'deny')
+AssertionError: 'allow' != 'deny'
+- allow
++ deny
+
+
+======================================================================
+FAIL: test_explicit_binding_isolates_sessions_and_all_criteria (test_repairs.Repairs.test_explicit_binding_isolates_sessions_and_all_criteria)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 126, in test_explicit_binding_isolates_sessions_and_all_criteria
+    self.ok('mem', 'add', 'goal', 'A goal', '--task', 'a', '--request', a)
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 47, in ok
+    self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+AssertionError: 2 != 0 : usage: mem.py [-h]
+              {add,lesson,search,show,recent,export,forget,sync,stats,prune}
+              ...
+mem.py: error: unrecognized arguments: --request P1
+
+
+======================================================================
+FAIL: test_full_installed_workflow (test_repairs.Repairs.test_full_installed_workflow)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 491, in test_full_installed_workflow
+    self.ok('mem','add','goal','Goal '+task,'--task',task,'--request',request,'--size','MEDIUM',installed=True)
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 47, in ok
+    self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+AssertionError: 2 != 0 : usage: mem.py [-h]
+              {add,lesson,search,show,recent,export,forget,sync,stats,prune}
+              ...
+mem.py: error: unrecognized arguments: --request P1
+
+
+======================================================================
+FAIL: test_global_and_local_rendered_commands_from_subdirectory (test_repairs.Repairs.test_global_and_local_rendered_commands_from_subdirectory)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 361, in test_global_and_local_rendered_commands_from_subdirectory
+    self.assertEqual(r.returncode, 0, r.stderr)
+AssertionError: 2 != 0 : /Library/Frameworks/Python.framework/Versions/3.9/bin/python3: can't open file '/private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/sx-repair-t9ixgyon/project with spaces/.simpleide/sx.py': [Errno 2] No such file or directory
+
+
+======================================================================
+FAIL: test_ids_never_reused_and_strict_ids (test_repairs.Repairs.test_ids_never_reused_and_strict_ids)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 72, in test_ids_never_reused_and_strict_ids
+    self.assertIn('P3', self.ok('mem', 'add', 'note', 'replacement'))
+AssertionError: 'P3' not found in 'P2 note saved\n'
+
+======================================================================
+FAIL: test_installer_preflight_and_exact_hook_ownership (test_repairs.Repairs.test_installer_preflight_and_exact_hook_ownership)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 313, in test_installer_preflight_and_exact_hook_ownership
+    self.assertEqual(before, self.snapshot())
+AssertionError: {'.cu[30 chars]json'} != {'.cu[30 chars]json', '.simpleide/models.json': b'{\n  "_read[62650 chars].\n'}
+Diff is 108873 characters long. Set self.maxDiff to None to see it.
+
+======================================================================
+FAIL: test_installer_validation_dry_run_rollback_and_doctor (test_repairs.Repairs.test_installer_validation_dry_run_rollback_and_doctor)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 332, in test_installer_validation_dry_run_rollback_and_doctor
+    self.assertNotEqual(self.cli('--target', str(self.root), '--tools', tools, install=True).returncode, 0)
+AssertionError: 0 == 0
+
+======================================================================
+FAIL: test_legacy_outcome_and_shared_store_migration (test_repairs.Repairs.test_legacy_outcome_and_shared_store_migration)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 422, in test_legacy_outcome_and_shared_store_migration
+    self.assertIn('accepted=0', out)
+AssertionError: 'accepted=0' not found in ' tasks=1 accepted=1 avg_dispatches=0.0 avg_repairs=0.0 check_failures=0 avg_seconds=0.0 tokens=None cost=None\n'
+
+======================================================================
+FAIL: test_migration_backup_fts_and_identity (test_repairs.Repairs.test_migration_backup_fts_and_identity)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 87, in test_migration_backup_fts_and_identity
+    self.assertIn('Legacy needle', self.ok('mem', 'search', 'needle', '--scope', 'project'))
+AssertionError: 'Legacy needle' not found in 'no matches\n'
+
+======================================================================
+FAIL: test_migration_failure_rolls_back (test_repairs.Repairs.test_migration_failure_rolls_back)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 104, in test_migration_failure_rolls_back
+    with self.assertRaises(sqlite3.Error):
+AssertionError: Error not raised
+
+======================================================================
+FAIL: test_outcomes_are_explicit_immutable_and_filtered (test_repairs.Repairs.test_outcomes_are_explicit_immutable_and_filtered)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 184, in test_outcomes_are_explicit_immutable_and_filtered
+    self.assertIn('accepted=0', self.ok('stats', '--task', 'bad'))
+AssertionError: 'accepted=0' not found in ' tasks=1 accepted=1 avg_dispatches=0.0 avg_repairs=0.0 check_failures=0 avg_seconds=0.0 tokens=None cost=None\n'
+
+======================================================================
+FAIL: test_pending_admission_limit_is_atomic (test_repairs.Repairs.test_pending_admission_limit_is_atomic)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 172, in test_pending_admission_limit_is_atomic
+    self.assertEqual(sum('permissionDecision' in r for r in replies), 3)
+AssertionError: 0 != 3
+
+======================================================================
+FAIL: test_post_close_capture_does_not_reopen_old_task (test_repairs.Repairs.test_post_close_capture_does_not_reopen_old_task)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 516, in test_post_close_capture_does_not_reopen_old_task
+    self.ok('mem','add','goal','First','--task','first','--request',request)
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 47, in ok
+    self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+AssertionError: 2 != 0 : usage: mem.py [-h]
+              {add,lesson,search,show,recent,export,forget,sync,stats,prune}
+              ...
+mem.py: error: unrecognized arguments: --request P1
+
+
+======================================================================
+FAIL: test_question_resolution_and_export_provenance (test_repairs.Repairs.test_question_resolution_and_export_provenance)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 403, in test_question_resolution_and_export_provenance
+    self.ok('mem', 'add', 'goal', 'Task', '--task', 't', '--request', request)
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 47, in ok
+    self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+AssertionError: 2 != 0 : usage: mem.py [-h]
+              {add,lesson,search,show,recent,export,forget,sync,stats,prune}
+              ...
+mem.py: error: unrecognized arguments: --request P1
+
+
+======================================================================
+FAIL: test_raw_git_paths_and_concurrent_check_logs (test_repairs.Repairs.test_raw_git_paths_and_concurrent_check_logs)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 224, in test_raw_git_paths_and_concurrent_check_logs
+    self.ok('scope', '--base', 'HEAD', '--allow', 'allowed/**')
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 47, in ok
+    self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+AssertionError: 1 != 0 : "allowed/caf\303\251.py"
+"allowed/new\nline"
+"allowed/tab\tname"
+
+
+======================================================================
+FAIL: test_search_attribution_requires_actual_hit_and_matching_session (test_repairs.Repairs.test_search_attribution_requires_actual_hit_and_matching_session)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 384, in test_search_attribution_requires_actual_hit_and_matching_session
+    self.ok('mem', 'search', 'target', '--host', 'codex', '--session', 'a')
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 47, in ok
+    self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+AssertionError: 2 != 0 : usage: mem.py [-h]
+              {add,lesson,search,show,recent,export,forget,sync,stats,prune}
+              ...
+mem.py: error: unrecognized arguments: --host codex --session a
+
+
+======================================================================
+FAIL: test_sharing_promotion_same_basename_and_total_limit (test_repairs.Repairs.test_sharing_promotion_same_basename_and_total_limit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 375, in test_sharing_promotion_same_basename_and_total_limit
+    self.assertIn('Reusable needle', self.ok('mem', 'search', 'needle', root=b))
+AssertionError: 'Reusable needle' not found in 'no matches\n'
+
+======================================================================
+FAIL: test_worktree_context_executes_worker_and_preserves_evidence (test_repairs.Repairs.test_worktree_context_executes_worker_and_preserves_evidence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 247, in test_worktree_context_executes_worker_and_preserves_evidence
+    self.assertIn('Original criterion', self.ok('mem', 'recent', '--task', 't', root=worker, installed=True))
+AssertionError: 'Original criterion' not found in 'nothing recorded yet\n'
+
+----------------------------------------------------------------------
+Ran 27 tests in 7.001s
+
+FAILED (failures=22, errors=4)

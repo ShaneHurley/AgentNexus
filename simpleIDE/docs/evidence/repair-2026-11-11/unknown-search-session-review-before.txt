@@ -1,0 +1,14 @@
+test_search_attribution_requires_actual_hit_and_matching_session (test_repairs.Repairs.test_search_attribution_requires_actual_hit_and_matching_session) ... FAIL
+
+======================================================================
+FAIL: test_search_attribution_requires_actual_hit_and_matching_session (test_repairs.Repairs.test_search_attribution_requires_actual_hit_and_matching_session)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 410, in test_search_attribution_requires_actual_hit_and_matching_session
+    self.assertEqual(c.execute('SELECT uses FROM rec WHERE id=1').fetchone()[0], 2)
+AssertionError: 3 != 2
+
+----------------------------------------------------------------------
+Ran 1 test in 0.751s
+
+FAILED (failures=1)

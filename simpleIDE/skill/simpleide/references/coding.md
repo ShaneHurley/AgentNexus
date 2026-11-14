@@ -1,0 +1,5 @@
+# Coding
+
+Fix interfaces before independent tests. Tester reads acceptance criteria and existing test conventions, not new implementation. If writers could overlap, use `sx worktree add <slug> <piece>` and commit each piece there. `sx worktree merge <slug>` integrates in declaration order; it stops on conflicts. Run `sx check [name] --task <slug>` only after integration; inspect its short summary and open full artifact for diagnosis if needed. Use `sx scope --base <ref> --allow <glob>` before review. Repair, rerun affected checks, and clean only committed worktrees.
+
+Commit local runtime and host assets before adding worktrees, or verify a global installation. Keep execution root in the worker; its ignored context points to the durable parent ledger. Read planner criteria from the hashed Markdown artifact printed by pack. Manage merges/cleanup and accepted closure from the parent, run fresh integrated checks after merging, and retain branches. Clean preflights every piece and archives legacy independent evidence; --discard requires deliberate intent. Use worktree reconcile for interrupted operations.

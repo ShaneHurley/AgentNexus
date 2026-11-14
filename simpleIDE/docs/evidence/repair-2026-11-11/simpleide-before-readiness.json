@@ -1,0 +1,120 @@
+{
+  "python": "3.12.0",
+  "kind": "targeted local readiness probes; no live IDE/model calls",
+  "passed": 0,
+  "total": 13,
+  "observations": [
+    {
+      "name": "Uninstall Cursor preserves the remaining Codex installation",
+      "passed": false,
+      "expected": {
+        "codex_agent": true,
+        "shared_skill": true,
+        "rule": true
+      },
+      "actual": {
+        "codex_agent": true,
+        "shared_skill": false,
+        "rule": false
+      }
+    },
+    {
+      "name": "A failed result is not automatically counted as accepted",
+      "passed": false,
+      "expected": false,
+      "actual": true,
+      "stats": "MEDIUM tasks=1 accepted=1 avg_dispatches=0.0 avg_repairs=0.0 check_failures=0 avg_seconds=0.0 tokens=None cost=None\n"
+    },
+    {
+      "name": "Reusing a completed task slug does not silently retain accepted state",
+      "passed": false,
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "Adding task A does not attach session B original request",
+      "passed": false,
+      "expected": false,
+      "actual": true,
+      "request_rows": [
+        [
+          "Request for session-a",
+          "",
+          "session-a"
+        ],
+        [
+          "Request for session-b",
+          "task-a",
+          "session-b"
+        ]
+      ]
+    },
+    {
+      "name": "Lifecycle event retains the task validated by its parent session",
+      "passed": false,
+      "expected": "task-a",
+      "actual": "task-b"
+    },
+    {
+      "name": "Session A resume does not restore task B",
+      "passed": false,
+      "expected": false,
+      "actual": true,
+      "resume_output": "simpleIDE task: task-b\nrequest: Request for session-a\ngoal: task-b\nquestions recorded: 0\n"
+    },
+    {
+      "name": "Resume supplies all criterion text or retrieval IDs within its bound",
+      "passed": false,
+      "expected": true,
+      "actual": false,
+      "resume_output": "simpleIDE task: recovery\ngoal: recovery\ncriteria: Criterion 1\ncriteria: Criterion 2\nquestions recorded: 1\n"
+    },
+    {
+      "name": "Resume distinguishes an answered question from open questions",
+      "passed": false,
+      "expected": true,
+      "actual": false,
+      "resume_output": "simpleIDE task: recovery\ngoal: recovery\ncriteria: Criterion 1\ncriteria: Criterion 2\nquestions recorded: 1\n"
+    },
+    {
+      "name": "stats --task filters the task summary",
+      "passed": false,
+      "expected": false,
+      "actual": true,
+      "stats": "MEDIUM tasks=2 accepted=0 avg_dispatches=0.0 avg_repairs=0.0 check_failures=0 avg_seconds=None tokens=None cost=None\n"
+    },
+    {
+      "name": "Separate projects with the same folder name can find shared lessons",
+      "passed": false,
+      "expected": true,
+      "actual": false,
+      "search_output": "no matches\n",
+      "explicit_shared_search": "S1 lesson 2026-11-11 from=same-name | Distinct repository lesson :: A verified behavior in the first repository\n"
+    },
+    {
+      "name": "Explicitly sharing an existing local lesson actually shares it",
+      "passed": false,
+      "expected": true,
+      "actual": false,
+      "save_output": "P1 lesson already recorded + shared\n",
+      "search_output": "no matches\n"
+    },
+    {
+      "name": "Worker worktree can retrieve the parent task records by default",
+      "passed": false,
+      "expected": true,
+      "actual": false,
+      "worktree_recent": "nothing recorded yet\n",
+      "parent_recent": "P1 goal 2026-11-11 task=split | split\n"
+    },
+    {
+      "name": "Global write-up skill points to an available sx.py command",
+      "passed": false,
+      "expected": true,
+      "actual": false,
+      "installed_skill": "---\nname: sx-writeup\ndescription: Turn an sx mem export into a concise factual task write-up, or build a style-only voice profile from user-provided writing samples.\n---\n# Write-up\n\nRun `python3 .simpleide/sx.py mem export --task <slug> --out docs/simpleide/<slug>.md`. Read that export and write a concise document: what was done, why, checks and evidence, and what remains open. Separate implemented, proposed, and unresolved claims. Every factual claim must trace to a record in the export. Read `~/.simpleide/voice.md` if it exists; it changes style only.\n\n# Voice profile\n\nOnly when the user provides writing samples, describe the sample's sentence length, vocabulary, level of technical detail, formality, and typical openings/closings in `~/.simpleide/voice.md`. Keep it under 40 lines. Do not infer facts, preferences or opinions beyond writing style. Ask for samples if none exist.\n",
+      "prescribed_command_exit": 2,
+      "prescribed_command_stderr": "/Library/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python: can't open file '/private/var/folders/2j/c618_bgn0f7fnjffr8pms6t80000gn/T/simpleide-readiness-pihz7vrq/global-project/.simpleide/sx.py': [Errno 2] No such file or directory\n"
+    }
+  ]
+}

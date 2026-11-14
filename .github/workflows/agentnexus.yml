@@ -46,5 +46,7 @@ jobs:
         run: |
           uv run --locked python -m unittest discover -s tests -v
           uv run --locked python -m daily_coder validate
+      - name: simpleIDE regression suite
+        run: python -m unittest discover -s simpleIDE/tests -v
       - name: Publication safety
         run: uv run --locked python -m agent_core.release_preflight --base origin/main --fixture-manifest config/publication-fixtures.json

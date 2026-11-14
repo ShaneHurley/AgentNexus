@@ -478,6 +478,7 @@ class Repairs(unittest.TestCase):
         two = Path(self.ok('worktree','add','t','two').strip())
         context = one / '.simpleide/context.json'
         context.unlink()
+        self.ok('context', 'standalone', root=one, installed=True)
         self.ok('mem','add','finding','Independent legacy evidence','--task','t',root=one,installed=True)
         artifacts = one / '.simpleide/artifacts'; artifacts.mkdir(exist_ok=True)
         (artifacts/'ignored.txt').write_text('durable ignored evidence')
@@ -712,5 +713,32 @@ class Repairs(unittest.TestCase):
         self.ok('worktree', 'merge', 't')
         self.assertTrue((self.root / 'second.txt').exists())
         self.ok('worktree', 'clean', 't')
+
+    def test_r2_missing_context_fails_without_new_store(self):
+        self.installed_repository()
+        worker = Path(self.ok('worktree', 'add', 't', 'one').splitlines()[0])
+        (worker / '.simpleide/context.json').unlink()
+        for args in (('mem', 'show', 'P1'), ('mem', 'add', 'note', 'lost'), ('task', 'dispatches', 't')):
+            result = self.cli(*args, root=worker, installed=True)
+            self.assertNotEqual(result.returncode, 0, args)
+            self.assertIn('reconcile', result.stderr + result.stdout)
+        self.assertFalse((worker / '.simpleide/project.db').exists())
+        self.ok('worktree', 'reconcile', 't', '--apply')
+        self.assertIn('Split work', self.ok('mem', 'show', 'P1', root=worker, installed=True))
+
+    def test_r2_declared_standalone_worktree_keeps_own_store(self):
+        self.installed_repository()
+        other = self.base / 'standalone-worktree'
+        self.git('worktree', 'add', '-q', '-b', 'standalone', str(other))
+        self.assertNotEqual(self.cli('mem', 'add', 'note', 'mine', root=other, installed=True).returncode, 0)
+        self.ok('context', 'standalone', root=other, installed=True)
+        self.ok('mem', 'add', 'note', 'mine', root=other, installed=True)
+        self.assertTrue((other / '.simpleide/project.db').exists())
+
+    def test_r2_plain_project_still_creates_store(self):
+        self.repository()
+        self.ok('mem', 'add', 'note', 'plain')
+        self.assertTrue((self.root / '.simpleide/project.db').exists())
+
 
 

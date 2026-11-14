@@ -1,0 +1,8 @@
+test_r2_declared_standalone_worktree_keeps_own_store (test_repairs.Repairs.test_r2_declared_standalone_worktree_keeps_own_store) ... ok
+test_r2_missing_context_fails_without_new_store (test_repairs.Repairs.test_r2_missing_context_fails_without_new_store) ... ok
+test_r2_plain_project_still_creates_store (test_repairs.Repairs.test_r2_plain_project_still_creates_store) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 2.256s
+
+OK

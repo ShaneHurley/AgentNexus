@@ -1,0 +1,24 @@
+test_r2_declared_standalone_worktree_keeps_own_store (test_repairs.Repairs.test_r2_declared_standalone_worktree_keeps_own_store) ... FAIL
+test_r2_missing_context_fails_without_new_store (test_repairs.Repairs.test_r2_missing_context_fails_without_new_store) ... FAIL
+test_r2_plain_project_still_creates_store (test_repairs.Repairs.test_r2_plain_project_still_creates_store) ... ok
+
+======================================================================
+FAIL: test_r2_declared_standalone_worktree_keeps_own_store (test_repairs.Repairs.test_r2_declared_standalone_worktree_keeps_own_store)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 732, in test_r2_declared_standalone_worktree_keeps_own_store
+    self.assertNotEqual(self.cli('mem', 'add', 'note', 'mine', root=other, installed=True).returncode, 0)
+AssertionError: 0 == 0
+
+======================================================================
+FAIL: test_r2_missing_context_fails_without_new_store (test_repairs.Repairs.test_r2_missing_context_fails_without_new_store)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/shurley/Documents/AgentNexus/simpleIDE/tests/test_repairs.py", line 722, in test_r2_missing_context_fails_without_new_store
+    self.assertNotEqual(result.returncode, 0, args)
+AssertionError: 0 == 0 : ('mem', 'show', 'P1')
+
+----------------------------------------------------------------------
+Ran 3 tests in 1.435s
+
+FAILED (failures=2)

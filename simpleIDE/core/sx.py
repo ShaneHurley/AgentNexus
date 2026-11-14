@@ -104,10 +104,36 @@ def project_root():
     return here
 
 
+def linked_worktree(root):
+    r = subprocess.run(["git", "rev-parse", "--git-dir", "--git-common-dir"], cwd=root,
+                       capture_output=True, text=True)
+    if r.returncode != 0:
+        return False
+    lines = [line.strip() for line in r.stdout.splitlines() if line.strip()]
+    if len(lines) < 2:
+        return False
+    git_dir = (Path(root) / lines[0]).resolve()
+    common_dir = (Path(root) / lines[1]).resolve()
+    return git_dir != common_dir
+
+
+def standalone_marker(root):
+    r = subprocess.run(["git", "rev-parse", "--git-path", "simpleide-standalone"], cwd=root,
+                       capture_output=True, text=True)
+    if r.returncode != 0:
+        return (Path(root) / ".git/simpleide-standalone").resolve()
+    p = Path(r.stdout.strip())
+    return p if p.is_absolute() else (Path(root) / p).resolve()
+
+
 def store_root(root):
     explicit = os.environ.get("SIMPLEIDE_STORE")
     pointer = root / ".simpleide/context.json"
     if not explicit and not pointer.exists():
+        if linked_worktree(root) and not standalone_marker(root).exists():
+            raise ValueError("this is a Git linked worktree with no simpleIDE context; from the parent "
+                             "checkout run: sx worktree reconcile <task> --apply, or declare it independent "
+                             "with: sx context standalone")
         return root
     data = json.loads(pointer.read_text()) if pointer.exists() and not explicit else {}
     value = explicit or data.get("store_root")
@@ -976,6 +1002,19 @@ def archive_worker(con, root, entry):
     return str(directory / "manifest.json")
 
 
+def write_context(path, root, con, slug):
+    path = Path(path)
+    pointer = path / ".simpleide/context.json"
+    pointer.parent.mkdir(exist_ok=True)
+    pointer.write_text(json.dumps({"store_root": str(store_root(root)), "store_id": identity(con), "task": slug}, indent=2) + "\n")
+    exclude = Path(git(path, "rev-parse", "--git-path", "info/exclude").stdout.strip())
+    if not exclude.is_absolute(): exclude = path / exclude
+    exclude.parent.mkdir(parents=True, exist_ok=True)
+    existing = exclude.read_text() if exclude.exists() else ""
+    if ".simpleide/context.json" not in existing:
+        with exclude.open("a") as f: f.write("\n.simpleide/context.json\n")
+
+
 def worktree_cmd(root, action, slug, piece=None, discard=False, apply=False):
     validate_slug(slug)
     if (root / ".simpleide/context.json").exists():
@@ -1063,16 +1102,7 @@ def _worktree_cmd(root, action, slug, piece=None, discard=False, apply=False):
                 command = ["worktree", "add", str(path), branch] if exists else ["worktree", "add", "-b", branch, str(path)]
                 git(root, *command)
             worker_runtime(path)
-            pointer = path / ".simpleide/context.json"
-            pointer.parent.mkdir(exist_ok=True)
-            pointer.write_text(json.dumps({"store_root": str(store_root(root)), "store_id": identity(con), "task": slug}, indent=2) + "\n")
-            # Local Git exclusion works even when the committed ignore file predates contexts.
-            exclude = Path(git(path,"rev-parse","--git-path","info/exclude").stdout.strip())
-            if not exclude.is_absolute(): exclude = path / exclude
-            exclude.parent.mkdir(parents=True, exist_ok=True)
-            existing = exclude.read_text() if exclude.exists() else ""
-            if ".simpleide/context.json" not in existing:
-                with exclude.open("a") as f: f.write("\n.simpleide/context.json\n")
+            write_context(path, root, con, slug)
             task_artifact(con, root, slug)
             with con:
                 con.execute("UPDATE worktree SET state='added',diagnostic='' WHERE task=? AND piece=?", (slug,piece))
@@ -1094,6 +1124,9 @@ def _worktree_cmd(root, action, slug, piece=None, discard=False, apply=False):
             print(f"{e['piece']}: recorded={e['state']} present={present} actual={actual_branch} integrated={integrated} diagnostic={e['diagnostic']}")
             if apply:
                 branch_matches = (actual == "refs/heads/" + e["branch"])
+                if present and branch_matches and not (Path(e["path"]) / ".simpleide/context.json").exists():
+                    write_context(e["path"], root, con, slug)
+                    print("restored context for " + e["piece"])
                 state = "removed" if not present and e["state"] == "removing" and Path(e["diagnostic"]).is_file() else "merged" if present and branch_matches and integrated else None
                 if state:
                     with con: con.execute("UPDATE worktree SET state=? WHERE id=?",(state,e["id"]))
@@ -1608,6 +1641,7 @@ def main(argv=None):
     tc = ts.add_parser("cancel"); tc.add_argument("slug"); tc.add_argument("--dispatch", type=int, required=True); tc.add_argument("--refs", required=True)
     sub.add_parser("doctor")
     st = sub.add_parser("stats"); st.add_argument("--task"); st.add_argument("--cost", type=float); st.add_argument("--tokens", type=int); st.add_argument("--usage-source")
+    cx = sub.add_parser("context"); cx.add_argument("mode", choices=("standalone",))
     h = sub.add_parser("hook"); h.add_argument("event", choices=("capture-request", "dispatch-guard", "shell-guard", "return-log", "stop-check", "resume")); h.add_argument("--host", choices=("claude", "cursor", "codex"))
     args, rest = ap.parse_known_args(argv)
     root = project_root()
@@ -1635,6 +1669,14 @@ def main(argv=None):
                         print(json.dumps(dict(r)))
             return 0
         if args.cmd == "doctor": return doctor_cmd(root)
+        if args.cmd == "context":
+            if (root / ".simpleide/context.json").exists():
+                raise ValueError("managed worktree; use worktree reconcile")
+            marker = standalone_marker(root)
+            marker.parent.mkdir(parents=True, exist_ok=True)
+            marker.write_text(json.dumps({"declared": time.time()}) + "\n")
+            print(marker)
+            return 0
         if args.cmd == "stats": return stats_cmd(root, args.task, args.cost, args.tokens, args.usage_source)
         if args.cmd == "hook": return hook_cmd(root, args.event, args.host)
     except (ValueError, OSError, sqlite3.Error) as err:
